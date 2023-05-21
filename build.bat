@@ -1,0 +1,1 @@
+gcc -O2 -s -o ry.exe src/ry.c
