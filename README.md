@@ -49,6 +49,7 @@ extend Array {
         self.data = ?;
         self.something = ?;
         self.other = ?;
+        // all of the above or: self = {?};
     }
     
     @internal
