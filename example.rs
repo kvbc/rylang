@@ -1,4 +1,3 @@
-```rs
 struct Animal {
     @private String sound;
 }
@@ -27,6 +26,7 @@ extend Dog {
         return dog;
     }
     
+    @internal
     *!Animal get_animal( !*!Dog self ) {
         return self.animal;
     }
@@ -36,4 +36,3 @@ void main() {
     Dog dog = Dog.new();
     dog.get_animal().make_sound();
 }
-```
