@@ -35,4 +35,9 @@ extend Dog {
 void main() {
     Dog dog = Dog.new();
     dog.get_animal().make_sound();
+
+    @ref !*u32 ptr; // err
+    @ref !*Dog ptr = dog;
+    ptr = dog; // err
+    ptr.get_animal().make_sound();
 }
