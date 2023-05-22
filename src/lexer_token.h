@@ -3,7 +3,10 @@
 
 #include "cstr.h"
 #include "core.h"
+#include "str.h"
+
 #include <stdint.h>
+#include <stdio.h>
 
 enum ry_LexerTokenCode {
     TK_NONE,
@@ -17,6 +20,9 @@ enum ry_LexerTokenCode {
     TK_CL_RND_BRACK, // )
     TK_OP_CRL_BRACK, // {
     TK_CL_CRL_BRACK, // }
+    TK_OP_SQ_BRACK, // [
+    TK_CL_SQ_BRACK, // ]
+    TK_EXMARK, // !
 
     // 
     // Keywords
@@ -26,7 +32,6 @@ enum ry_LexerTokenCode {
 
     TK_KW_STRUCT,
     TK_KW_EXTEND,
-    TK_KW_CONST,
     TK_KW_RETURN,
     TK_KW_CASE,
     TK_KW_SWITCH,
@@ -99,7 +104,6 @@ enum ry_LexerTokenCode {
     TK_OR,    // ||
     TK_GR,    // >
     TK_LE,    // <
-    TK_NOT,   // !
 
     TK_QM,    // ?
     TK_COLON, // :
@@ -110,13 +114,10 @@ enum ry_LexerTokenCode {
 
 struct ry_LexerToken {
     enum ry_LexerTokenCode code;
-    union value {
-        union str {
-            const char * name;
-            RY_SIZE_T namelen;
-        };
+    union {
+        struct ry_String str;
         int64_t num;
-    };
+    } value;
 };
 
 // 
@@ -128,7 +129,6 @@ static const char * kwcode_to_str (enum ry_LexerTokenCode code) {
     switch( code ) {
         case TK_KW_STRUCT:   return "struct";
         case TK_KW_EXTEND:   return "extend";
-        case TK_KW_CONST:    return "const";
         case TK_KW_RETURN:   return "return";
         case TK_KW_CASE:     return "case";
         case TK_KW_SWITCH:   return "switch";
@@ -177,9 +177,15 @@ static unsigned long kwcode_to_strhash (enum ry_LexerTokenCode code) {
 struct ry_LexerToken ry_LexerToken_new (enum ry_LexerTokenCode code) {
     struct ry_LexerToken token;
     token.code = code;
-    token.name = NULL;
-    token.namelen = 0;
     return token;
+}
+
+void ry_LexerToken_free( struct ry_LexerToken * tk ) {
+    if((tk->code == TK_NAME) ||
+       (tk->code == TK_META) ||
+       (tk->code == TK_STRING)
+    )
+        ry_String_free(&(tk->value.str));
 }
 
 enum ry_LexerTokenCode ry_LexerToken_string_to_keyword (const char * str, RY_SIZE_T len) {
@@ -200,13 +206,17 @@ void ry_LexerToken_print (struct ry_LexerToken * token) {
     switch( token->code ) {
         case TK_NONE: printf("none"); break;  
         
-        case TK_NAME: printf("name: %.*s", token->namelen, token->name); break;
+        case TK_NAME: printf("name \"%.*s\" (len: %u)", token->value.str.len, token->value.str.buf, token->value.str.len); break;
         case TK_META: printf("@"); break;
         case TK_SEMI: printf(";"); break;
+        case TK_STRING: printf("\"%.*s\" (len: %u)", token->value.str.len, token->value.str.buf, token->value.str.len); break;
         case TK_OP_RND_BRACK: printf("("); break;
         case TK_CL_RND_BRACK: printf(")"); break;
         case TK_OP_CRL_BRACK: printf("{"); break;
         case TK_CL_CRL_BRACK: printf("}"); break;
+        case TK_OP_SQ_BRACK: printf("["); break;
+        case TK_CL_SQ_BRACK: printf("]"); break;
+        case TK_EXMARK: printf("!"); break;
 
         // 
         // Arithmetic Operators
@@ -251,7 +261,6 @@ void ry_LexerToken_print (struct ry_LexerToken * token) {
         case TK_OR:    printf("||"); break;
         case TK_GR:    printf(">"); break;
         case TK_LE:    printf("<"); break;
-        case TK_NOT:   printf("!"); break;
 
         case TK_QM:    printf("?"); break;
         case TK_COLON: printf(":"); break;
@@ -260,7 +269,7 @@ void ry_LexerToken_print (struct ry_LexerToken * token) {
             if( IS_KWCODE(token->code) ) {
                 const char * kwstr = kwcode_to_str(token->code);
                 unsigned long kwhash = kwcode_to_strhash(token->code);
-                printf("%s (hash: %ul)", kwstr, kwhash);
+                printf("keyword \"%s\" (hash: %ul, len: %u)", kwstr, kwhash, strlen(kwstr));
             }
             else printf("[???]");
     }

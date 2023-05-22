@@ -38,7 +38,7 @@ void ry_Array_push (struct ry_Array * arr, const void * data) {
     arr->len++;
 }
 
-const void * ry_Array_get (struct ry_Array * arr, RY_SIZE_T idx) {
+void * ry_Array_get (struct ry_Array * arr, RY_SIZE_T idx) {
     RY_ASSERT(idx < arr->len);
     return (uint8_t*)arr->data + (idx * arr->itemsz);
 }
