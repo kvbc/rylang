@@ -16,10 +16,10 @@ extend Array {
     
     @internal
     @private void init( Array& self ) {
-        a.len = 0;
-        a.cap = 0;
-        a.data = null;
-        a.something = false;
+        self.len = 0;
+        self.cap = 0;
+        self.data = null;
+        self.something = false;
         // warning! unitialized struct member .other
         // a.other = false;
     }
@@ -34,6 +34,21 @@ extend Array {
         a.init(); // from prev extend
         a.non_internal();
         return a;
+    }
+    
+    @internal
+    void free( Array& self ) {
+        // free stuff
+        free(self.data);
+        
+        // if any struct member is not ?
+        // and its going out of scope, an error will be printed out
+        // telling you to free your memory
+        self.len = ?;
+        self.cap = ?;
+        self.data = ?;
+        self.something = ?;
+        self.other = ?;
     }
     
     @internal
@@ -82,5 +97,6 @@ void main () {
     arr.push(0);
     arr.something = false;
     arr.set_other(true);
-}
+} // arr goes out of scope: error - arr has not been freed
+// you have to call arr.free() manually
 ```
