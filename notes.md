@@ -92,3 +92,25 @@ do {
 
 `break`
 `continue`
+
+# Vars
+
+```rs
+u32 * ptr; // == ?
+const (const u32 *) ptr;
+!u32* !;
+u32 !padding = 69;
+
+(u32*)* ptr2;
+u32 ** ptr2;
+
+(u32*)* !ptr;
+
+
+
+*u32 !ptr;
+uint32_t * const ptr;
+
+!*!(!*!u32) ptr;
+const (const uint32_t * const) * const ptr;
+```
