@@ -111,6 +111,6 @@ u32 ** ptr2;
 *u32 !ptr;
 uint32_t * const ptr;
 
-! *!(!*u32) ptr;
-const (const uint32_t *) * const ptr;
+!*!(!*!u32) ptr!
+const (const uint32_t * const) * const ptr;
 ```
