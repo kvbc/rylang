@@ -44,9 +44,7 @@ void * ry_Array_get (struct ry_Array * arr, RY_SIZE_T idx) {
 }
 
 void ry_Array_clear (struct ry_Array * arr) {
-    RY_SIZE_T itemsz = arr->itemsz; // to be sure
-    ry_Array_free(arr);
-    ry_Array_init(arr, itemsz);
+    arr->len = 0;
 }
 
 #endif // RY_ARRAY_H

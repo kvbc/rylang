@@ -155,8 +155,9 @@ static const char * kwcode_to_str (enum ry_LexerTokenCode code) {
         case TK_KW_CHAR: return "char";
         case TK_KW_F32:  return "f32";
         case TK_KW_F64:  return "f64";
+
+        default: return NULL;
     }
-    return NULL;
 }
 
 static unsigned long kwcode_to_strhash (enum ry_LexerTokenCode code) {
@@ -173,12 +174,6 @@ static unsigned long kwcode_to_strhash (enum ry_LexerTokenCode code) {
 // 
 // 
 // 
-
-struct ry_LexerToken ry_LexerToken_new (enum ry_LexerTokenCode code) {
-    struct ry_LexerToken token;
-    token.code = code;
-    return token;
-}
 
 void ry_LexerToken_free( struct ry_LexerToken * tk ) {
     if((tk->code == TK_NAME) ||

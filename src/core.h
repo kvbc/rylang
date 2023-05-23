@@ -18,4 +18,6 @@
 
 #define RY_ASSERT(cond) (assert(cond))
 
+#define RY_NUMLIT_T int64_t // number literal type
+
 #endif // RY_CORE_H
