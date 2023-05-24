@@ -21,7 +21,10 @@ namespace Rect {
 @main
 void main() {
     struct Rect r; // == ?
-    Rect::init(&r);
+    !* struct Rect rptr = &r;
+    // error: no pointer math
+    // rptr += 2;
+    Rect::init(rptr);
 }
 ```
 
