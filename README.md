@@ -28,6 +28,8 @@ u8 x = {}; // x = ?
 
 # Conditionals
 
+If / Else
+
 ```rs
 if( true )
     print("true");
@@ -46,8 +48,33 @@ else
 u8 x = if( true ) {} // x = ?
 ```
 
+Ternary
+
 ```rs
 u8 x = true ? 1 : 0;
+```
+
+Match
+
+```rs
+u8 x = 2;
+u8 y = match( x ) {
+    case 1: break 10;
+    case 2: break 20;
+    case 3: break 30;
+}
+print(y); // 20
+```
+
+```rs
+u8 x = 2;
+match( x ) {
+    case 1: print(10);
+    case 2: print(20);
+    case 3: print(30);
+}
+// out: 20
+// (no "passing through" cases)
 ```
 
 # Loops
