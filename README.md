@@ -26,10 +26,6 @@ u8 x = {
 u8 x = {}; // x = ?
 ```
 
-```rs
-
-```
-
 # Conditionals
 
 ```rs
@@ -48,6 +44,24 @@ else
 
 ```rs
 u8 x = if( true ) {} // x = ?
+```
+
+```rs
+u8 x = true ? 1 : 0;
+```
+
+Loops
+
+```rs
+u32 x = loop {
+    @static u32 i = 0;
+    if( i % 10 == 0 )
+        break i;
+    i++;
+    if( i >= 100 )
+        break;   
+}
+print(x) // 10
 ```
 
 # Examples
