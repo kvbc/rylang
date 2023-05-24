@@ -26,6 +26,26 @@ u8 x = {
 u8 x = {}; // x = ?
 ```
 
+# Conditionals
+
+```rs
+if( true )
+    print("true");
+else
+    print("false")
+```
+
+```rs
+u8 x = if( true )
+    break 1;
+else
+    break 0;
+```
+
+```rs
+u8 x = if( true ) {} // x = ?
+```
+
 # Examples
 
 ```rs
