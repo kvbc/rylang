@@ -50,7 +50,7 @@ u8 x = if( true ) {} // x = ?
 u8 x = true ? 1 : 0;
 ```
 
-Loops
+# Loops
 
 ```rs
 u32 x = loop {
@@ -66,6 +66,18 @@ print(x) // 10
 
 ```rs
 u32 x = loop {} // x == ?
+```
+
+# Types
+
+```
+u8 x; // u8 x;
+!u8 x; // const u8 x;
+*u8 x; // u8 * x;
+*!u8 x; // const u8 * x;
+!*u8 x; // u8 * const x;
+!*!u8 x; // const u8 * const x;
+!*!(!*!u8) x; const (const * u8 const) * const x;
 ```
 
 # Examples
