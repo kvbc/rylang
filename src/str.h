@@ -16,6 +16,7 @@ struct ry_String {
 
 void ry_String_fromview( struct ry_String * str, const struct ry_StringView * view ) {
     str->buf = RY_MALLOC(view->len + 1);
+    assert(str->buf != NULL);
     RY_MEMCPY(str->buf, view->buf, view->len);
     str->buf[view->len] = '\0';
     str->len = view->len;

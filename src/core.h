@@ -18,6 +18,10 @@
 
 #define RY_ASSERT(cond) (assert(cond))
 
-#define RY_NUMLIT_T int64_t // number literal type
+typedef uint8_t ry_char_t;
+typedef int64_t ry_numlit_t; // number literal type
+
+#define RY_CHAR_MIN (0)
+#define RY_CHAR_MAX (255)
 
 #endif // RY_CORE_H

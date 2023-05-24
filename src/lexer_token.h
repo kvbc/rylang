@@ -205,6 +205,7 @@ void ry_LexerToken_print (struct ry_LexerToken * token) {
         case TK_META: printf("@"); break;
         case TK_SEMI: printf(";"); break;
         case TK_STRING: printf("\"%.*s\" (len: %u)", token->value.str.len, token->value.str.buf, token->value.str.len); break;
+        case TK_NUMBER: printf("number: %d", token->value.num); break;
         case TK_OP_RND_BRACK: printf("("); break;
         case TK_CL_RND_BRACK: printf(")"); break;
         case TK_OP_CRL_BRACK: printf("{"); break;

@@ -9,12 +9,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdarg.h>
 
 // 
 // 
 // 
 
 #define CHAR_EOF (-1)
+#define CHAR_NUMLIT_SEP ('_')
 
 // 
 // 
@@ -26,12 +28,12 @@ struct ry_LexerPos {
     RY_SIZE_T ln;
     RY_SIZE_T col;
 };
-static void ry__LexerPos_init (struct ry_LexerPos * pos) {
+static void ry_LexerPos_init (struct ry_LexerPos * pos) {
     pos->col = 1;
     pos->ln = 1;
 }
-static void ry__LexerPos_clear (struct ry_LexerPos * pos) {
-    ry__LexerPos_init(pos);
+static void ry_LexerPos_clear (struct ry_LexerPos * pos) {
+    ry_LexerPos_init(pos);
 }
 
 // 
@@ -43,27 +45,52 @@ static void ry__LexerPos_clear (struct ry_LexerPos * pos) {
 enum ry_LexerInfoCode {
     LEX_INFO_UNTERMINATED_STRING,
     LEX_INFO_UNFINISHED_STRING,
-
     LEX_INFO_UNDEFINED_ESC_SEQ,
-    LEX_INFO_UNTERMINATED_ESC_SEQ
+    LEX_INFO_ESC_SEQ_OVERFLOW,
+    
+    LEX_INFO_TRAILING_NUMBER_SEPARATOR,
+    LEX_INFO_MALFORMED_NUMBER_LITERAL
 };
 struct ry_LexerInfo {
     enum ry_LexerInfoCode code;
     struct ry_LexerPos pos;
+    const char * msg;
+    RY_BOOL msg_allocd;
 };
-static void ry__LexerInfo_init( struct ry_LexerInfo * info, enum ry_LexerInfoCode code, struct ry_LexerPos pos ) {
+static void ry_LexerInfo_free( struct ry_LexerInfo * info ) {
+    if( info->msg_allocd )
+        free(info->msg);
+}
+static void ry_LexerInfo_init( struct ry_LexerInfo * info, enum ry_LexerInfoCode code, struct ry_LexerPos pos, ... ) {
     info->code = code;
     info->pos = pos;
-}
-static const char * ry__LexerInfo_to_string( const struct ry_LexerInfo * info ) {
-    switch( info->code ) {
-        case LEX_INFO_UNTERMINATED_STRING: return "unterminated string literal";
-        case LEX_INFO_UNFINISHED_STRING:   return "unfinished string literal";
+    info->msg = "[???]";
+    info->msg_allocd = RY_FALSE;
+    
+    switch( code ) {
+        case LEX_INFO_UNTERMINATED_STRING: info->msg = "unterminated string literal"; break;
+        case LEX_INFO_UNFINISHED_STRING:   info->msg = "unfinished string literal";   break;
+        case LEX_INFO_UNDEFINED_ESC_SEQ:   info->msg = "undefined escape sequence";   break;
+        case LEX_INFO_ESC_SEQ_OVERFLOW:
+            va_list args;
+            va_start(args, pos);
+            ry_numlit_t num = va_arg(args, ry_numlit_t);
+            va_end(args);
 
-        case LEX_INFO_UNDEFINED_ESC_SEQ: return "undefined escape sequence";
-        case LEX_INFO_UNTERMINATED_ESC_SEQ: return "unterminated escape sequence";
+            const char * fmt = "escape sequence is out of bounds: \\%ll is not in range (%d, %d)";
+            int msglen = snprintf(NULL, 0, fmt, num, RY_CHAR_MIN, RY_CHAR_MAX);
+            assert(msglen > 0);
+            char * msg = RY_MALLOC(msglen + 1);
+            msg[msglen] = '\0';
+            snprintf(msg, msglen, fmt, num, RY_CHAR_MIN, RY_CHAR_MAX);
+            info->msg = msg;
+            info->msg_allocd = RY_TRUE;
+
+            break;
+
+        case LEX_INFO_TRAILING_NUMBER_SEPARATOR: info->msg = "trailing number separator"; break;
+        case LEX_INFO_MALFORMED_NUMBER_LITERAL:  info->msg = "malformed number literal";  break;
     }
-    return "[???]";
 }
 
 // 
@@ -95,15 +122,49 @@ static void lex_clear_tokens( struct ry_Lexer * lex ) {
 // Char
 // 
 
-static RY_BOOL is_digit_char( char c ) {
+static RY_BOOL is_char_decimal_digit( char c ) {
     return (c >= '0') && (c <= '9');
 }
+static uint8_t char_to_decimal_digit( char c ) {
+    return c - '0';
+}
+
+static RY_BOOL is_char_binary_digit( char c ) {
+    return (c == '0') || (c == '1');
+}
+static uint8_t char_to_binary_digit( char c ) {
+    assert(is_char_binary_digit(c));
+    return c - '0';
+}
+
+static RY_BOOL is_char_hex_digit( char c ) {
+    if( is_char_decimal_digit(c) )
+        return RY_TRUE;
+    c = tolower(c);
+    return (c >= 'a') && (c <= 'f');
+}
+static uint8_t char_to_hex_digit( char c ) {
+    assert(is_char_hex_digit(c));
+    if( is_char_decimal_digit(c) )
+        return char_to_decimal_digit(c);
+    return 10 + tolower(c) - 'a';
+}
+
+static RY_BOOL is_char_oct_digit( char c ) {
+    return (c >= '0') && (c <= '7');
+}
+static uint8_t char_to_oct_digit( char c ) {
+    assert(is_char_oct_digit(c));
+    return c - '0';
+}
+
+// 
 
 static RY_BOOL is_name_start_char (char c) {
     return (c == '_') || ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z'));
 }
 static RY_BOOL is_name_char (char c) {
-    return is_name_start_char(c) || is_digit_char(c);
+    return is_name_start_char(c) || is_char_decimal_digit(c);
 }
 
 static RY_BOOL is_nl_char( char c ) {
@@ -123,6 +184,9 @@ static RY_BOOL lex_is_eofofs( struct ry_Lexer * lex, int offset ) {
 }
 static RY_BOOL lex_is_eof( struct ry_Lexer * lex ) {
     return lex_is_eofofs(lex, 0);
+}
+static RY_BOOL lex_is_eofnext( struct ry_Lexer * lex ) {
+    return lex_is_eofofs(lex, 1);
 }
 
 // 
@@ -159,11 +223,11 @@ static char lex_read_prev( struct ry_Lexer * lex ) {
 // 
 
 static void lex_next( struct ry_Lexer * lex ) {
+    lex->src_idx++;
+
     char c = lex_read(lex);
     char nc = lex_read_next(lex);
     char pc = lex_read_prev(lex);
-
-    lex->src_idx++;
 
     if( !is_nl_char(pc) ) {
         if( is_nl_char(c) ) {
@@ -212,32 +276,110 @@ static struct ry_LexerToken lex_name( struct ry_Lexer * lex ) {
     return tk;
 }
 
+static ry_numlit_t lex_number__base(
+    struct ry_Lexer * lex,
+    size_t base,
+    RY_BOOL (* is_valid_char) (char c),
+    uint8_t (* char_to_value) (char c)
+) {
+    char c = lex_read(lex);
+    assert(is_char_decimal_digit(c));
+    ry_numlit_t num = 0;
+
+    for( RY_BOOL first = RY_TRUE ;; first = RY_FALSE ) {
+        if( c == CHAR_NUMLIT_SEP ) {
+            lex_next(lex);
+            if( lex_is_eof(lex) ) {
+                struct ry_LexerInfo info;
+                ry_LexerInfo_init(&info, LEX_INFO_TRAILING_NUMBER_SEPARATOR, lex->pos);
+                ry_Array_push(&lex->infos, &info);
+                break;
+            }
+            continue;
+        }
+        else if( is_valid_char(c) ) {
+            num *= base;
+            num += char_to_value(c);
+        }
+        else break;
+
+        if( !first ) {
+            if( lex_is_eofnext(lex) )
+                break;
+            lex_next(lex);
+        }
+
+        c = lex_read_next(lex);
+    }
+
+    return num;
+}
+static ry_numlit_t lex_number( struct ry_Lexer * lex ) {
+    char c1 = lex_read(lex);
+
+    if( c1 == CHAR_NUMLIT_SEP ) {
+        struct ry_LexerInfo info;
+        ry_LexerInfo_init(&info, LEX_INFO_TRAILING_NUMBER_SEPARATOR, lex->pos);
+        ry_Array_push(&lex->infos, &info);
+    }
+    else assert(is_char_decimal_digit(c1));
+
+    ry_numlit_t num;
+
+    if( c1 == '0' ) {
+        lex_next(lex);
+        if( lex_is_eof(lex) )
+            return 0;
+
+        char c2 = lex_read(lex);
+        if( (c2 == 'x') || (c2 == 'b') ) {
+            lex_next(lex);
+            if( lex_is_eof(lex) ) {
+                struct ry_LexerInfo info;
+                ry_LexerInfo_init(&info, LEX_INFO_MALFORMED_NUMBER_LITERAL, lex->pos);
+                ry_Array_push(&lex->infos, &info);
+                return -1;
+            }
+        }
+
+        if( c2 == 'x' ) // hex
+            return lex_number__base(lex, 16, &is_char_hex_digit, &char_to_hex_digit); 
+        else if( c2 == 'b' ) // bin
+            return lex_number__base(lex, 2, &is_char_binary_digit, &char_to_binary_digit);            
+        else // oct
+            return lex_number__base(lex, 8, &is_char_oct_digit, &char_to_oct_digit);
+    }
+    
+    // dec
+    return lex_number__base(lex, 10, &is_char_decimal_digit, &char_to_decimal_digit);
+}
+
 static struct ry_LexerToken lex_string( struct ry_Lexer * lex ) {
-    assert(lex_read(lex) == '"');
+    {
+        char c = lex_read(lex);
+        assert(c == '"');
+    }
 
     lex_next(lex);
-    const char * str = lex_srcptr(lex);
+    struct ry_Array chars;
+    ry_Array_init(&chars, sizeof(char));
 
     for( ;; ) {
         char c = lex_read(lex);
-        lex_next(lex);
-
-        if( lex_is_eof(lex) ) {
-            struct ry_LexerInfo info;
-            ry__LexerInfo_init(&info, LEX_INFO_UNTERMINATED_STRING, lex->pos);
-            ry_Array_push(&lex->infos, &info);
-            break;
-        }
-
+    
         if( is_nl_char(c) ) {
             struct ry_LexerInfo info;
-            ry__LexerInfo_init(&info, LEX_INFO_UNFINISHED_STRING, lex->pos);
+            ry_LexerInfo_init(&info, LEX_INFO_UNFINISHED_STRING, lex->pos);
             ry_Array_push(&lex->infos, &info);
         }
+        else if( c == '\\' ) {
+            if( lex_is_eofnext(lex) )
+                goto next;
+            lex_next(lex);
+            char nc = lex_read(lex);
 
-        if( c == '\\' ) {
-            char esc = -1;
-            switch( c ) {
+            char esc = CHAR_EOF;
+            switch( nc ) {
                 case 'a': esc = '\a'; break;
                 case 'b': esc = '\b'; break;
                 case 'f': esc = '\f'; break;
@@ -248,26 +390,49 @@ static struct ry_LexerToken lex_string( struct ry_Lexer * lex ) {
                 case '"': esc = '\"'; break;
                 case '\\': esc = '\\'; break;
                 default:
-                    if( is_digit_char(c) ) {
-                        // read
+                    if( is_char_decimal_digit(nc) ) {
+                        ry_numlit_t num = lex_number(lex);
+                        if( (num < CHAR_MIN) || (num > CHAR_MAX) ) {
+                            struct ry_LexerInfo info;
+                            ry_LexerInfo_init(&info, LEX_INFO_ESC_SEQ_OVERFLOW, lex->pos, num);
+                            ry_Array_push(&lex->infos, &info);
+                            break;
+                        }
+                        esc = num;
                     } else {
                         struct ry_LexerInfo info;
-                        ry__LexerInfo_init(&info, LEX_INFO_UNDEFINED_ESC_SEQ, lex->pos);
+                        ry_LexerInfo_init(&info, LEX_INFO_UNDEFINED_ESC_SEQ, lex->pos);
                         ry_Array_push(&lex->infos, &info);
                     }
                     break;
             }
+
+            if( esc != CHAR_EOF )
+                ry_Array_push(&chars, &esc);
         }
         else if( c == '"' ) {
             break;
         }
-    } // ends on closing "
+        else {
+            ry_Array_push(&chars, &c);
+        }
 
-    RY_SIZE_T str_len = lex_srcptr(lex) - str + 1;
+    next:
+
+        if( lex_is_eofnext(lex) ) {
+            struct ry_LexerInfo info;
+            ry_LexerInfo_init(&info, LEX_INFO_UNTERMINATED_STRING, lex->pos);
+            ry_Array_push(&lex->infos, &info);
+            break;
+        }
+        lex_next(lex);
+    }
+    // ends on closing "
+    assert(!lex_is_eof(lex));
 
     struct ry_LexerToken tk;
     tk.code = TK_STRING;
-    struct ry_StringView view = ry_StringView_new(str, str_len);
+    struct ry_StringView view = ry_StringView_new(chars.data, chars.len);
     ry_String_fromview(&tk.value.str, &view);
 
     return tk;
@@ -290,10 +455,14 @@ void ry_Lexer_init (
     lex->src_idx = 0;
     ry_Array_init(&lex->infos, sizeof(struct ry_LexerInfo));
     ry_Array_init(&lex->tokens, sizeof(struct ry_LexerToken));
-    ry__LexerPos_init(&lex->pos);
+    ry_LexerPos_init(&lex->pos);
 }
 
 void ry_Lexer_free (struct ry_Lexer * lex) {
+    for( RY_SIZE_T i = 0; i < lex->infos.len; i++ ) {
+        struct ry_LexerInfo * info = ry_Array_get(&lex->infos, i);
+        ry_LexerInfo_free(info);
+    }
     lex_clear_tokens(lex);
     ry_Array_free(&lex->infos);
     ry_Array_free(&lex->tokens);
@@ -307,7 +476,7 @@ void ry_Lexer_print_infos( struct ry_Lexer * lex ) {
             lex->id.len, lex->id.buf,
             info->pos.ln,
             info->pos.col,
-            ry__LexerInfo_to_string(info)
+            info->msg
         );
     }
 }
@@ -315,12 +484,10 @@ void ry_Lexer_print_infos( struct ry_Lexer * lex ) {
 void ry_Lexer_run (struct ry_Lexer * lex) {
     ry_Array_clear(&lex->infos);
     lex_clear_tokens(lex);
-    ry__LexerPos_clear(&lex->pos);
+    ry_LexerPos_clear(&lex->pos);
     lex->src_idx = 0;
 
     for( ;; ) {
-        printf(">>> %s\n", lex_srcptr(lex));
-
         char c = lex_read(lex);
         char nc = lex_read_next(lex);
 
@@ -422,6 +589,10 @@ void ry_Lexer_run (struct ry_Lexer * lex) {
                 else if( c == '"' ) {
                     tk = lex_string(lex);
                 }
+                else if( is_char_decimal_digit(c) ) {
+                    tk.code = TK_NUMBER;
+                    tk.value.num = lex_number(lex);
+                }
 
             #undef TK
             #undef TKSET
@@ -431,12 +602,9 @@ void ry_Lexer_run (struct ry_Lexer * lex) {
         if( tk.code != TK_NONE )
             ry_Array_push(&lex->tokens, &tk);
 
-        printf("1\n");
         lex_next(lex);
-        printf("2\n");
         if( lex_is_eof(lex) )
             break;
-        printf("3\n");
     }
 }
 
