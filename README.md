@@ -12,7 +12,7 @@
 {
     if( true )
         break;
-    print(":(");
+    print("oops");
 } // "breakable"
 ```
 
