@@ -109,6 +109,29 @@ p.name = "Mark";
 p.age = 21;
 ```
 
+```rs
+struct Player {
+    i32 x;
+    i32 y;
+    @private u32 gold;
+}
+
+namespace Player {
+    @internal void set_gold(
+        !* struct Player p,
+        u32 gold
+    ) {
+        p.gold = gold; // fine, @internal
+    }
+}
+
+struct Player p;
+p.x = 0; // ok
+p.y = 0; // ok
+p.gold = 100; // err: field is private
+Player::set_gold(&p, 100); // fine
+```
+
 # Examples
 
 ```rs
