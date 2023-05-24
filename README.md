@@ -21,7 +21,7 @@ namespace Rect {
 @main
 void main() {
     struct Rect r; // == ?
-    Rect.init(&r);
+    Rect::init(&r);
 }
 ```
 
