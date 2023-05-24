@@ -25,6 +25,10 @@ void main() {
     // error: no pointer math
     // rptr += 2;
     Rect::init(rptr);
+
+    // no error
+    @unsafe *! ptr = &r;
+    ptr++;
 }
 ```
 
