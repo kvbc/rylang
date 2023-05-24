@@ -19,11 +19,11 @@
 ```rs
 u8 x = {
     break 3;
-} // return
+}; // return
 ```
 
 ```rs
-u8 x = {} // x = ?
+u8 x = {}; // x = ?
 ```
 
 # Examples
