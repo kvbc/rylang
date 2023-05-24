@@ -64,6 +64,10 @@ u32 x = loop {
 print(x) // 10
 ```
 
+```rs
+u32 x = loop {} // x == ?
+```
+
 # Examples
 
 ```rs
