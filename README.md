@@ -26,6 +26,10 @@ u8 x = {
 u8 x = {}; // x = ?
 ```
 
+```rs
+
+```
+
 # Conditionals
 
 ```rs
