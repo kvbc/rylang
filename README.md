@@ -1,5 +1,33 @@
 # rylang
 
+# Blocks
+
+```rs
+{
+    ...
+} // standalone
+```
+
+```rs
+{
+    if( true )
+        break;
+    print(":(");
+} // "breakable"
+```
+
+```rs
+u8 x = {
+    break 3;
+} // return
+```
+
+```rs
+u8 x = {} // x = ?
+```
+
+# Examples
+
 ```rs
 struct Rect {
     @private i32 x;
