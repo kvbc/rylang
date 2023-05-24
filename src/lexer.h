@@ -77,12 +77,11 @@ static void ry_LexerInfo_init( struct ry_LexerInfo * info, enum ry_LexerInfoCode
             ry_numlit_t num = va_arg(args, ry_numlit_t);
             va_end(args);
 
-            const char * fmt = "escape sequence is out of bounds: \\%ll is not in range (%d, %d)";
-            int msglen = snprintf(NULL, 0, fmt, num, RY_CHAR_MIN, RY_CHAR_MAX);
+            const char * fmt = "escape sequence is out of bounds: \\\\(%u / 0x%X / 0%o) is not in range (%d, %d / 0x%X / 0%o)";
+            int msglen = snprintf(NULL, 0, fmt, num, num, num, RY_CHAR_MIN, RY_CHAR_MAX, RY_CHAR_MAX, RY_CHAR_MAX);
             assert(msglen > 0);
             char * msg = RY_MALLOC(msglen + 1);
-            msg[msglen] = '\0';
-            snprintf(msg, msglen, fmt, num, RY_CHAR_MIN, RY_CHAR_MAX);
+            snprintf(msg, msglen + 1, fmt, num, num, num, RY_CHAR_MIN, RY_CHAR_MAX, RY_CHAR_MAX, RY_CHAR_MAX);
             info->msg = msg;
             info->msg_allocd = RY_TRUE;
 
@@ -283,7 +282,6 @@ static ry_numlit_t lex_number__base(
     uint8_t (* char_to_value) (char c)
 ) {
     char c = lex_read(lex);
-    assert(is_char_decimal_digit(c));
     ry_numlit_t num = 0;
 
     for( RY_BOOL first = RY_TRUE ;; first = RY_FALSE ) {
@@ -392,7 +390,7 @@ static struct ry_LexerToken lex_string( struct ry_Lexer * lex ) {
                 default:
                     if( is_char_decimal_digit(nc) ) {
                         ry_numlit_t num = lex_number(lex);
-                        if( (num < CHAR_MIN) || (num > CHAR_MAX) ) {
+                        if( (num < RY_CHAR_MIN) || (num > RY_CHAR_MAX) ) {
                             struct ry_LexerInfo info;
                             ry_LexerInfo_init(&info, LEX_INFO_ESC_SEQ_OVERFLOW, lex->pos, num);
                             ry_Array_push(&lex->infos, &info);

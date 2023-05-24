@@ -10,7 +10,7 @@ int main (void) {
         "   break;"
         "}"
         "\"this is a string\""
-        "\"this is a\\nnl \\tstring \\10 nl 2!!! \\n \\75\\0x55\\0124\\65\\0x53 \""
+        "\"this is a\\nnl \\tstring \\10 nl 2!!! \\n \\75\\0x55\\0124\\65\\0x53 \\0xFE \""
     );
     struct ry_StringView id = ry_StringView_frombuf("main.test");
 
