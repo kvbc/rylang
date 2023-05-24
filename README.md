@@ -132,6 +132,17 @@ p.gold = 100; // err: field is private
 Player::set_gold(&p, 100); // fine
 ```
 
+Enum
+
+```rs
+enum Color {
+    RED,   // 0
+    GREEN, // 1
+    BLUE.  // 2
+}
+enum Color c = RED;
+```
+
 # Examples
 
 ```rs
