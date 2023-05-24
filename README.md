@@ -117,11 +117,11 @@ struct Player {
 }
 
 namespace Player {
-    @internal void set_gold(
-        !* struct Player p,
+    void set_gold(
+        @private !* struct Player p,
         u32 gold
     ) {
-        p.gold = gold; // fine, @internal
+        p.gold = gold; // fine, @private
     }
 }
 
