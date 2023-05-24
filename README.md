@@ -70,6 +70,8 @@ u32 x = loop {} // x == ?
 
 # Types
 
+Pointers & Immutability (const)
+
 ```rs
 u8 x;         // u8 x;
 !u8 x;        // const u8 x;
@@ -78,6 +80,33 @@ u8 x;         // u8 x;
 !*u8 x;       // u8 * const x;
 !*!u8 x;      // const u8 * const x;
 !*!(!*!u8) x; // const (const * u8 const) * const x;
+```
+
+Pointers
+
+```rs
+u8 x;
+{
+    !*!u8 ptr = &x;
+    u8 a = *ptr; // fine
+    u8 b = *(ptr + 1); // error: no ptr math
+} {
+    @unsafe !*!u8 ptr = &x;
+    u8 a = *(ptr + 1); // fine
+}
+
+```
+
+Struct
+
+```rs
+struct Person {
+    *!u8 name;
+    u8 age;
+}
+struct Person p;
+p.name = "Mark";
+p.age = 21;
 ```
 
 # Examples
