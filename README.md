@@ -70,14 +70,14 @@ u32 x = loop {} // x == ?
 
 # Types
 
-```
-u8 x; // u8 x;
-!u8 x; // const u8 x;
-*u8 x; // u8 * x;
-*!u8 x; // const u8 * x;
-!*u8 x; // u8 * const x;
-!*!u8 x; // const u8 * const x;
-!*!(!*!u8) x; const (const * u8 const) * const x;
+```rs
+u8 x;         // u8 x;
+!u8 x;        // const u8 x;
+*u8 x;        // u8 * x;
+*!u8 x;       // const u8 * x;
+!*u8 x;       // u8 * const x;
+!*!u8 x;      // const u8 * const x;
+!*!(!*!u8) x; // const (const * u8 const) * const x;
 ```
 
 # Examples
