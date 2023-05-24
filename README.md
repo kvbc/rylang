@@ -1,6 +1,31 @@
 # rylang
 
 ```rs
+struct Rect {
+    @private i32 x;
+    @private i32 y;
+    @private u32 w;
+    @private u32 h;
+}
+namespace Rect {
+    @internal
+    void init( !* struct Rect self, i32 x, i32 y, u32 w, u32 h ) {
+        assert(*self == ?);
+        self.x = x;
+        self.y = y;
+        self.w = w;
+        self.h = h;
+    }
+}
+
+@main
+void main() {
+    struct Rect r; // == ?
+    Rect.init(&r);
+}
+```
+
+```rs
 struct Array {
     @private u32 len;    // == ?
     @private u32 cap;    // == ?
