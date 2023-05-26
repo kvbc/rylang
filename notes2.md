@@ -46,7 +46,9 @@ void func( i32 a, i32 b, i32 c ) {
     return a + b + c;
 }
 
-i32(!*!i32 arr, u32 len, i32 num) idxof = {
+/*
+^idxof_func = i32(!*!i32 arr, u32 len, i32 num)
+^idxof_func idxof = {
     break loop {
         @static u32 i = 0;
         if( arr[i] == num )
@@ -54,6 +56,48 @@ i32(!*!i32 arr, u32 len, i32 num) idxof = {
         if( ++i >= len )
             break -1;
     };
+}
+*^idxof_func ptr = &idxof;
+*/
+
+(i32, i32)i32 add( a, b ) {
+    break a + b;
+}
+*(i32 a, i32 b)i32 ptr = &add;
+
+(!*!i32, u32, i32)i32
+idxof (arr, len, num) {
+    break loop {
+        @static u32 i = 0;
+        if( arr[i] == num )
+            break i;
+        if( ++i >= len )
+            break -1;
+    };
+}
+
+```
+
+```rs
+$Vector2 = {
+    i32 x;
+    i32 y;
+};
+::Vector2 = {
+    (!*$Vector2 self, i32 x, i32 y)void init = {
+        self.x = x;
+        self.y = y;
+    }
+
+    (!*$Vector2 self, i32 n)void add = {
+        self.x += n;
+        self.y += n;
+    }
+}
+@main ()void main () {
+    $Vector2 v;
+    ::Vector2::init(&v, 0, 0);
+    ::Vector2::add(&v, 5);
 }
 ```
 
