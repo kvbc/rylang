@@ -84,12 +84,14 @@ $Vector2 = {
     i32 y;
 };
 ::Vector2 = {
-    (!*$Vector2 self, i32 x, i32 y)void init = {
+    (!*$Vector2 self, i32 x, i32 y)void
+    init = {
         self.x = x;
         self.y = y;
     }
 
-    (!*$Vector2 self, i32 n)void add = {
+    (!*$Vector2 self, i32 n)void
+    add = {
         self.x += n;
         self.y += n;
     }
