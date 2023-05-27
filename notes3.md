@@ -416,29 +416,45 @@ comment
 
 **Arithmetic**
 
-Type | Operator | Name
----- | -------- | ----
-Unary  | `-`   | negation
-Unary  | `--x` | pre-decrementation
-Unary  | `++x` | pre-incrementation
-Unary  | `x--` | post-decrementation
-Unary  | `x++` | post-incrementation
-Binary | `+`   | addition
-Binary | `-`   | subtraction
-Binary | `*`   | multiplication  
-Binary | `/`   | division
-Binary | `%`   | modulo (remainder)
+Type | Operator | Name | Syntax
+---- | -------- | ---- | ------
+Unary  | `-`   | negation           | `- <expr>`
+Binary | `+`   | addition           | `<expr> + <expr>`
+Binary | `-`   | subtraction        | `<expr> - <expr>`
+Binary | `*`   | multiplication     | `<expr> * <expr>`
+Binary | `/`   | division           | `<expr> / <expr>`
+Binary | `%`   | modulo (remainder) | `<expr> % <expr>`
+
+Assign
+
+Type | Operator | Name | Syntax
+---- | -------- | ---- | ------
+Binary | `+=`   | addition           | `<name> += <expr> ;`
+Binary | `-=`   | subtraction        | `<name> -= <expr> ;`
+Binary | `*=`   | multiplication     | `<name> *= <expr> ;`
+Binary | `/=`   | division           | `<name> /= <expr> ;`
+Binary | `%=`   | modulo (remainder) | `<name> %= <expr> ;`
 
 **Bitwise**
 
-Type | Operator | Name
----- | -------- | -----------
-Unary  | `~`  | bitwise negation
-Binary | `|`  | bitwise OR
-Binary | `^`  | bitwise XOR
-Binary | `&`  | bitwise AND
-Binary | `<<` | bitwise left shift
-Binary | `>>` | bitwise right shift
+Type | Operator | Name | Syntax
+---- | -------- | ---- | ------
+Unary  | `~`  | bitwise negation    | `~ <expr>`
+Binary | `|`  | bitwise OR          | `<expr> | <expr>`
+Binary | `^`  | bitwise XOR         | `<expr> ^ <expr>`
+Binary | `&`  | bitwise AND         | `<expr> & <expr>`
+Binary | `<<` | bitwise left shift  | `<expr> << <expr>`
+Binary | `>>` | bitwise right shift | `<expr> >> <expr>`
+
+Assign
+
+Type | Operator | Name | Syntax
+---- | -------- | ---- | ------
+Binary | `|=`  | bitwise OR          | `<name> |= <expr>`
+Binary | `^=`  | bitwise XOR         | `<name> ^= <expr>`
+Binary | `&=`  | bitwise AND         | `<name> &= <expr>`
+Binary | `<<=` | bitwise left shift  | `<name> <<= <expr>`
+Binary | `>>=` | bitwise right shift | `<name> >>= <expr>`
 
 **Comparison**
 
@@ -473,7 +489,9 @@ Type | Operator | Tag | Syntax
 ---- | :------: | --- | ------
 Unary | `&` | \<address> | `& <name>`
 
-as
+###### as
+
+See [Conversion](#types-conversion) in [Types](#types)
 
 Type | Operator | Tag | Syntax
 ---- | :------: | --- | ------
@@ -502,8 +520,10 @@ Tag | Syntax
 
 **Functions**
 
-**Immutability**
+**Immutability** (*const*-ness)
 
-**Conversion**
+##### Conversion
+
+See [as](#as) in [Operators](#operators)
 
 `3 as f32`
