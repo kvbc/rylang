@@ -1,3 +1,58 @@
+Note
+- [zig](https://ziglang.org/documentation/master/)
+- [rust](https://www.rust-lang.org/learn)
+- [go](https://go.dev/learn/)
+- [nim](https://nim-lang.org/docs/manual.html)
+- [odin](https://odin-lang.org/docs/overview/)
+
+Notes
+- raw string \`single back ticks\`
+- variadic arguments
+- default argument values
+- named arguments
+  ```rust
+  $Vector2 = {
+    x i32;
+    y i32;
+  };
+  :Vector2 = {
+    new (x i32 = 0, y i32)$Vector2 = {
+      v $Vector2;
+      v.x = x;
+      v.y = y;
+      break v;
+    }
+  };
+  v $Vector2 = :Vector2:new(y=0);
+  ```
+- problem - scoped func struct?
+  ```rust
+  $Result = {
+    val i32;
+    ok bool;
+  };
+  xadd (a i32, b i32)$Result = {
+    res $Result;
+    res.val = a + b;
+    res.ok = (a != b);
+    break res;
+  }
+  res $Result = xadd(1, 2);
+  ```
+  ```rust
+  xadd (a i32, b i32)xadd:$Result = {
+    @public $Result = {
+      val i32;
+      ok bool;
+    };
+    res $Result;
+    res.val = a + b;
+    res.ok = (a != b);
+    break res;
+  }
+  res xadd:$Result = xadd(1, 2);
+  ```
+
 # Variables
 
 Tag | Syntax
@@ -71,7 +126,7 @@ Tag | Syntax
       }
   }
   @main main ()void = {
-    pos $Vector2 = :Vector2:new(&pos, 0, 0);
+    pos $Vector2 = :Vector2:new(0, 0);
   }
   ```
 
@@ -79,7 +134,7 @@ Tag | Syntax
 
 Tag | Syntax
 --- | ------
-\<enum>        | `# <name> [<generics>] = <enum_block> ;`
+\<enum>        | `# <name> = <enum_block> ;`
 \<enum_block>  | `{ <enum_field> {<enum_field>} }`
 \<enum_field>  | `<name> [= <number>] ,`
 \<enum_access> | `# <name> : <name>` 
@@ -161,10 +216,10 @@ Tag | Syntax | Comment
 
 Tag | Syntax | Comment
 --- | ------ | -------
-\<alias> | `^ <name> = <type> ;` | Type alias
-\<alias> | `: ^ <name> = : <name> {: <name>} ;` | [Namespace](#namespace) alias
-\<alias> | `$ ^ <name> = <struct_type> ;` | [Struct](#struct) alias
-\<alias> | `# ^ <name> = <enum_type> ;` | [Enum](#enum) alias
+\<alias> | `^ <name> [<generics>] = <type> ;` | Type alias
+\<alias> | `:^ <name> = :<name> {:<name>} ;` | [Namespace](#namespace) alias
+\<alias> | `$^ <name> [<generics>] = <struct_type> ;` | [Struct](#struct) alias
+\<alias> | `#^ <name> = <enum_type> ;` | [Enum](#enum) alias
 
 - An *alias* is an different name (alias) for a specified type.
 - Examples:
@@ -230,6 +285,12 @@ Tag | Syntax | Comment
   }
   ```
 
+**Loop -- continue**
+
+Tag | Syntax
+--- | ------
+\<continue> | `continue ;`
+
 # Modules
 
 ```rust
@@ -264,23 +325,40 @@ Tag | Syntax | Examples
 --- | ------ | --------
 \<generics> | `< <name> {,<name>} >` | `<T>`, `<T1, T2>`, `<A, B, C>`
 
-Generics can only be applied within struct and enum definitions.
-
-```rust
-$Pair<T> = {
-  a T;
-  b T;
-};
-{
-  pair $Pair<i32>;
-  pair.a = -10;
-  pair.b = 5;
-} {
-  pair $Pair<bool>;
-  pair.a = false;
-  pair.b = true;
-}
-```
+- Generics can only be applied within struct and alias definitions.
+  - See [Struct](#struct)
+  - See [Alias](#alias)
+- Examples
+  - Struct
+    ```rust
+    $Pair<T> = {
+      a T;
+      b T;
+    };
+    {
+      pair $Pair<i32>;
+      pair.a = -10;
+      pair.b = 5;
+    } {
+      pair $Pair<bool>;
+      pair.a = false;
+      pair.b = true;
+    }
+    ```
+  - Alias
+    ```rust
+    ^func<Ta, Tb, Tret> = (a Ta, b Tb)Tret;
+    ```
+    ```rust
+    $Pair<T> = {
+      a T;
+      b T;
+    };
+    $^IntPair = $Pair<i32>;
+    p $^IntPair;
+    p.a = 1;
+    p.b = 2;
+    ```
 
 # Block
 
@@ -333,3 +411,99 @@ comment
 [if / elif / else](#control-flow)
 [loop](#control-flow)
 [block](#block)
+
+# Operators
+
+**Arithmetic**
+
+Type | Operator | Name
+---- | -------- | ----
+Unary  | `-`   | negation
+Unary  | `--x` | pre-decrementation
+Unary  | `++x` | pre-incrementation
+Unary  | `x--` | post-decrementation
+Unary  | `x++` | post-incrementation
+Binary | `+`   | addition
+Binary | `-`   | subtraction
+Binary | `*`   | multiplication  
+Binary | `/`   | division
+Binary | `%`   | modulo (remainder)
+
+**Bitwise**
+
+Type | Operator | Name
+---- | -------- | -----------
+Unary  | `~`  | bitwise negation
+Binary | `|`  | bitwise OR
+Binary | `^`  | bitwise XOR
+Binary | `&`  | bitwise AND
+Binary | `<<` | bitwise left shift
+Binary | `>>` | bitwise right shift
+
+**Comparison**
+
+Type | Operator | Name
+---- | -------- | ----
+Binary | `==` | equals
+Binary | `!=` | not equals
+Binary | `< ` | less
+Binary | `<=` | less or equal
+Binary | `> ` | greater
+Binary | `>=` | greater or equal
+
+**Logical**
+
+Type | Operator | Name
+---- | -------- | ----
+Unary  | `!`  | logical NOT
+Binary | `||` | logical OR
+Binary | `&&` | logical AND
+
+**Other**
+
+Ternary
+
+Type | Operator | Tag | Syntax
+---- | :------: | --- | ------
+Ternary | `?:` | \<ternary> | `( <expr> ) ? ( <expr> ) : ( <expr> )`
+
+Address
+
+Type | Operator | Tag | Syntax
+---- | :------: | --- | ------
+Unary | `&` | \<address> | `& <name>`
+
+as
+
+Type | Operator | Tag | Syntax
+---- | :------: | --- | ------
+Binary | `as` | \<as> | `<expr> as <type>`
+
+**Associativity**
+**Precedence**
+
+# Types
+
+**Primitives**
+
+Tag | Syntax
+--- | ------
+\<primitive> | below
+
+- Integers
+  - `i8`, `i16`, `i32`, `i64`, `i128`
+  - `u8`, `u16`, `u32`, `u64`, `u128`
+- Floating-point: `f32`, `f64`
+- Boolean: `bool`
+- Character: `char`
+- Size: `isize`, `usize`
+
+**Pointers**
+
+**Functions**
+
+**Immutability**
+
+**Conversion**
+
+`3 as f32`
