@@ -100,6 +100,9 @@ $Vector2 = {
     $Vector2 v;
     ::Vector2::init(&v, 0, 0);
     ::Vector2::add(&v, 5);
+
+    ^v2 = :Vector2;
+    :^v2:add(&v, 5);
 }
 ```
 
