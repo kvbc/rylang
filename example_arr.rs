@@ -33,19 +33,24 @@ $Array<T> = {
     @private buf *T;
 }
 :Array = {
-    @init init (self !* @private $Array)void = {
+    @init init <T>(self !* @private $Array<T>)void = {
         self.sz = 0;
-        self.cap = 0;
-        self.buf = nullptr;
+        self.buf = :std:mem:malloc(sizeof(T) * 1000);
     }
 
-    @free free (self !* @private $Array)void = {
+    push <T>(self !* @private $Array<T>, val T)void = {
+        self.buf[self.sz] = val;
+        self.sz++;
+    }
+
+    @free free <T>(self !* @private $Array<T>)void = {
         :std:mem:free(self.buf);
     }
 }
 
 @main main ()void = {
-    arr $Array;
-    :Array:init(&arr);
-    :Array:free(&arr);
+    arr $Array<i32>;
+    :Array:init<i32>(&arr);
+    :Array:push<i32>(&arr, 10);
+    :Array:free<i32>(&arr);
 }
