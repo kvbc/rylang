@@ -9,6 +9,7 @@ Notes
 - raw string \`single back ticks\`
 - variadic arguments
 - default argument values
+- pointer arrays
 - named arguments
   ```rust
   $Vector2 = {
