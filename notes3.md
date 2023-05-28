@@ -69,6 +69,12 @@ Those can be unitialized, but **all** of their fields **must** be initalized in 
   ptr *u8 = &len;
   s $struct;
   ```
+  ```rust
+  $A = { x j32; };
+  $B = { a $A; };
+  b $B;
+  b.a.x = 3;
+  ```
 
 # Functions
 
