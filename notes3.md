@@ -62,6 +62,7 @@ Tag | Syntax
 
 - All variables must be initialized, except variables of the struct type. \ 
 Those can be unitialized, but **all** of their fields **must** be initalized in the same block that the struct has been declared in. See [Struct](#struct)
+- Variables can exist inside of functions and, in a sense, structs.
 - Examples:
   ```rust
   len u8 = 10;
