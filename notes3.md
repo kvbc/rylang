@@ -10,6 +10,7 @@ Notes
 - variadic arguments
 - default argument values
 - pointer arrays
+- using / use
 - named arguments
   ```rust
   $Vector2 = {
