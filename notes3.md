@@ -39,7 +39,7 @@ Tag | Syntax
 &emsp; \<var_type>, <br> &emsp; \<struct_type> | See [Types](#types)
 
 - All variables must be initialized, except variables of the struct type, which don't *have to* be initialized (see [Struct](#struct)).
-- Variables can **only** exist inside of functions and their sub-blocks - there are no global variables.
+- Variables can **only** exist inside of functions and their sub-blocks - there can be no global variables.
 - Examples:
   ```rust
   val u8 = 10;
