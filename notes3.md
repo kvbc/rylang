@@ -58,11 +58,15 @@ Notes
 
 Tag | Syntax
 --- | ------
-\<var> | `<name> <var_type> = <expr> ;`
-\<var> | `<name> <struct_type> ;`
+\<var>         | `<name> <var_type> = <expr> ;`
+\<var>         | `<name> <struct_type> ;`
+&emsp; \<name>        | See [Names](#names)
+&emsp; \<expr>        | See [Expressions](#expressions)
+&emsp; \<var_type>    | See [Types](#types)
+&emsp; \<struct_type> | See [Types](#types)
 
-- All variables must be initialized, except variables of the struct type. \ 
-  See [Struct](#struct).
+- All variables must be initialized, except variables of the struct type (see [Struct](#struct)).
+- Examples:
   ```rust
   len u8 = 10;
   ptr *u8 = &len;
@@ -84,15 +88,64 @@ Tag | Syntax
 
 Tag | Syntax
 --- | ------
-\<func>      | `<name> <func_type> = <block> ;`
-\<func_type> |
+\<func>      | `<name> <func_type> <block> ;`
+&emsp; \<func_type> | See [Types](#types)
+&emsp; \<name>      | See [Names](#names)
+&emsp; \<block>     | See [Block](#block)
 
+- Functions can have inside:
+  - sub-functions,
+  - [namespaces](#namespace),
+  - [struct](#struct) definitions,
+  - [enum](#enum) definitions,
+  - [aliases](#alias)
+- Sub-functions are, by default, not closures - you can't access outer variables \
+  You can mark a sub-function as a closure with the `@closure` metadata,
+  allowing it to access variables of the same scope that the function has been defined in.
+  ```rust
+  main ()void {
+    a i32 = 1;
+    b i32 = 2;
+    // @closure // fine
+    add ()i32 {
+        break a + b; // ERROR
+    }
+    c i32 = add();
+  }
+  ```
+  ```rust
+  main ()void {
+    a i32 = 1;
+    b i32 = 2;
+    @closure add_1 ()i32 {
+        // @closure // fine
+        add_2 ()i32 {
+            break a + b; // ERROR: even if add_1() is a closure, add_2() is not
+        }
+        break add_2();
+    }
+    c i32 = add_1();
+  }
+  ```
+  ```rust
+  main ()void {
+    a i32 = 1;
+    b i32 = 2;
+    add_1 ()i32 {
+        @closure add_2 ()i32 {
+            break a + b; // ERROR: add_1 must be a closure itself to allow for sub-closures
+        }
+        break add_2();
+    }
+    c i32 = add_1();
+  }
+  ```
 - Examples:
   ```rust
-  add (a i32, b i32)i32 = {
+  add (a i32, b i32)i32 {
     break a + b;
   }
-  @main main ()void = {
+  main ()void {
     a i32 = 1;
     b i32 = 2;
     c i32 = add(a, b);
