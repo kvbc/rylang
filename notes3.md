@@ -57,23 +57,31 @@ Notes
 
 Tag | Syntax
 --- | ------
-\<var> | `<name> <type> = <expr> ;`
+\<var> | `<name> <var_type> = <expr> ;`
 \<var> | `<name> <struct_type> ;`
 
 - All variables must be initialized, except variables of the struct type. \ 
-Those can be unitialized, but **all** of their fields **must** be initalized in the same block that the struct has been declared in. See [Structures](#structures)
+  See [Struct](#struct)
+Those cannot be initialized, but **all** of their fields **must** be initalized in the same block that the struct has been declared in.
+  - See [Struct](#structures)
 - Examples:
   ```rust
   len u8 = 10;
   ptr *u8 = &len;
-  s $struct;
+  ```
+  ```rust
+  $Vector2 = { x i32; y i32; };
+  pos $Vector2;
+  pos.x = 0;
+  pos.y = 0;
   ```
 
 # Functions
 
 Tag | Syntax
 --- | ------
-\<func> | `<name> <func_type> = <block> ;`
+\<func>      | `<name> <func_type> = <block> ;`
+\<func_type> |
 
 - Examples:
   ```rust
@@ -272,17 +280,16 @@ Tag | Syntax | Comment
 
 **Loop**
 
-Tag | Syntax | Comment
---- | ------ | -------
-\<loop> | `loop <block>`
+Type | Tag | Syntax
+---- | --- | ------
+\<expr> | \<loop> | `loop ( <var> ; <bool_expr> ; <bool_expr> ; <stmt> )`
 
 - Examples:
   ```rust
-  loop {
-    @static i u32 = 0;
-    :std:print(i);
-    breakif( i++ >= 10 );
-  }
+  loop( u32 i = 0;; i++ ) {}
+  loop( u32 i = 0; i < 10;; i++ ) {}
+  loop( u32 i = 0;; i < 10; i++ ) {}
+  loop( u32 i = 0; i < 10; i < 10; i++ ) {}
   ```
 
 **Loop -- continue**
