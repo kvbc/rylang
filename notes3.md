@@ -9,6 +9,7 @@ Notes
 - raw string \`single back ticks\`
 - variadic arguments
 - default argument values
+- pointer arrays
 - named arguments
   ```rust
   $Vector2 = {
@@ -61,10 +62,7 @@ Tag | Syntax
 \<var> | `<name> <struct_type> ;`
 
 - All variables must be initialized, except variables of the struct type. \ 
-  See [Struct](#struct)
-Those cannot be initialized, but **all** of their fields **must** be initalized in the same block that the struct has been declared in.
-  - See [Struct](#structures)
-- Examples:
+  See [Struct](#struct).
   ```rust
   len u8 = 10;
   ptr *u8 = &len;
@@ -74,6 +72,12 @@ Those cannot be initialized, but **all** of their fields **must** be initalized 
   pos $Vector2;
   pos.x = 0;
   pos.y = 0;
+  ```
+  ```rust
+  $A = { x j32; };
+  $B = { a $A; };
+  b $B;
+  b.a.x = 3;
   ```
 
 # Functions
