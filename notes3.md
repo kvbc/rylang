@@ -39,7 +39,7 @@ Tag | Syntax
 &emsp; \<expr> | See [Expressions](#expressions)
 &emsp; \<var_type>, <br> &emsp; \<struct_type> | See [Types](#types)
 
-- All variables must be initialized, except variables of the struct type, which don't *have to* be initialized (see [Struct](#struct)).
+- All variables must be initialized.
 - Variables can **only** exist inside of functions and their sub-blocks - there can be no global variables.
 - Examples:
   ```rust
@@ -171,7 +171,7 @@ Tag | Syntax
   ```rust
   $Vector2 = {} // ERROR
   ```
-- The fields **cannot** be initialized on struct creation.
+- The fields **cannot** be initialized on struct definition.
   ```rust
   $Vector2 = {
     x i32 = 0; // ERROR
@@ -184,28 +184,6 @@ Tag | Syntax
   pos.x = 0;
   pos.y = 0;
   x i32 = pos.x;
-  ```
-- As an exception, a struct variable doesn't have to be initialized (see [Variables](#variables)). \
-  But if that's the case, all of it's fields must be initialized in the same scope that the variable has been declared in.
-  ```rust
-  $Vector2 = { x i32; y i32 };
-  
-  pos $Vector2 = { 0, 0 }; // ERROR
-  
-  {
-    pos $Vector2; // ERROR: fields uninitalized
-  }
-
-  pos $Vector2;
-  pos.x = 0;
-  pos.y = 0;
-  // fine, all fields initialized
-
-  pos $Vector2;
-  {
-    pos.x = 0; // ERROR: fields must be initalized in the same scope
-    pos.y = 0; //        that the variable has been declared in.
-  }
   ```
 - Examples:
   ```rust
