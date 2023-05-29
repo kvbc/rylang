@@ -11,6 +11,7 @@ Notes
 - default argument values
 - pointer arrays
 - using / use
+- struct literal
 - named arguments
   ```rust
   $Vector2 = {
