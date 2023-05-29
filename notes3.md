@@ -35,6 +35,7 @@ Tag | Syntax
 \<var>         | `<name> <var_type> = <expr> ;`
 \<var>         | `<name> <struct_type> = <struct_literal> ;`
 &emsp; \<name> | See [Names](#names)
+&emsp; \<expr> | See [Expressions](#expressions)
 &emsp; \<struct_literal> | See [Literals](#literals)
 &emsp; \<var_type>, <br> &emsp; \<struct_type> | See [Types](#types)
 
