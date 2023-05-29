@@ -66,6 +66,7 @@ Tag | Syntax
 &emsp; \<struct_type> | See [Types](#types)
 
 - All variables must be initialized, except variables of the struct type (see [Struct](#struct)).
+- Variables can only exist inside of functions and their sub-blocks - there are no global variables.
 - Examples:
   ```rust
   len u8 = 10;
@@ -88,10 +89,12 @@ Tag | Syntax
 
 Tag | Syntax
 --- | ------
-\<func>      | `<name> <func_type> <block> ;`
+\<func>       | `<name> <func_type> <func_block> ;`
+\<func_block> | `{ <func_stmt> {<func_stmt>} }`
+\<func_stmt>  | `<stmt> | <func> | <namespace> | <struct> | <enum> | <alias>`
 &emsp; \<func_type> | See [Types](#types)
 &emsp; \<name>      | See [Names](#names)
-&emsp; \<block>     | See [Block](#block)
+&emsp; \<stmt>      | See [Statements](#statements)
 
 - Functions can have inside:
   - sub-functions,
@@ -100,8 +103,8 @@ Tag | Syntax
   - [enum](#enum) definitions,
   - [aliases](#alias)
 - Sub-functions are, by default, not closures - you can't access outer variables \
-  You can mark a sub-function as a closure with the `@closure` metadata,
-  allowing it to access variables of the same scope that the function has been defined in.
+  You can mark a sub-function as a closure using the `@closure` metadata, \
+  allowing it to access variables of the same scope that the sub-function has been defined in.
   ```rust
   main ()void {
     a i32 = 1;
@@ -120,7 +123,7 @@ Tag | Syntax
     @closure add_1 ()i32 {
         // @closure // fine
         add_2 ()i32 {
-            break a + b; // ERROR: even if add_1() is a closure, add_2() is not
+            break a + b; // ERROR: both add_1() and add_2() must be closures
         }
         break add_2();
     }
@@ -133,12 +136,33 @@ Tag | Syntax
     b i32 = 2;
     add_1 ()i32 {
         @closure add_2 ()i32 {
-            break a + b; // ERROR: add_1 must be a closure itself to allow for sub-closures
+            break a + b; // ERROR: add_1() must be a closure itself to allow for sub-closures
         }
         break add_2();
     }
     c i32 = add_1();
   }
+  ```
+- Functions are also, in a sense, namespaces. \
+  You can access a function's:
+  - sub-[struct](#struct),
+  - sub-[enum](#enum),
+  - sub-[namespace](#namespace), or
+  - sub-[alias](#alias)
+  
+  See [Namespace](#namespace).
+  ```rust
+  xadd (a i32, b i32)xadd:$Result = {
+    @public $Result = {
+      val i32;
+      ok bool;
+    };
+    res $Result;
+    res.val = a + b;
+    res.ok = (a != b);
+    break res;
+  }
+  res xadd:$Result = xadd(1, 2);
   ```
 - Examples:
   ```rust
