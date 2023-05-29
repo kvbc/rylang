@@ -3,7 +3,6 @@ Note
 - [rust](https://www.rust-lang.org/learn)
 - [go](https://go.dev/learn/)
 - [nim](https://nim-lang.org/docs/manual.html)
-- [odin](https://odin-lang.org/docs/overview/)
 
 Notes
 - raw string \`single back ticks\`
