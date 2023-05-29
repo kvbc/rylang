@@ -26,51 +26,24 @@ Notes
   };
   v $Vector2 = :Vector2:new(y=0);
   ```
-- problem - scoped func struct?
-  ```rust
-  $Result = {
-    val i32;
-    ok bool;
-  };
-  xadd (a i32, b i32)$Result = {
-    res $Result;
-    res.val = a + b;
-    res.ok = (a != b);
-    break res;
-  }
-  res $Result = xadd(1, 2);
-  ```
-  ```rust
-  xadd (a i32, b i32)xadd:$Result = {
-    @public $Result = {
-      val i32;
-      ok bool;
-    };
-    res $Result;
-    res.val = a + b;
-    res.ok = (a != b);
-    break res;
-  }
-  res xadd:$Result = xadd(1, 2);
-  ```
 
 # Variables
 
 Tag | Syntax
 --- | ------
 \<var>         | `<name> <var_type> = <expr> ;`
+\<var>         | `<name> <struct_type> = <expr> ;`
 \<var>         | `<name> <struct_type> ;`
-&emsp; \<name>        | See [Names](#names)
-&emsp; \<expr>        | See [Expressions](#expressions)
-&emsp; \<var_type>    | See [Types](#types)
-&emsp; \<struct_type> | See [Types](#types)
+&emsp; \<name> | See [Names](#names)
+&emsp; \<expr> | See [Expressions](#expressions)
+&emsp; \<var_type>, <br> &emsp; \<struct_type> | See [Types](#types)
 
-- All variables must be initialized, except variables of the struct type (see [Struct](#struct)).
-- Variables can only exist inside of functions and their sub-blocks - there are no global variables.
+- All variables must be initialized, except variables of the struct type, which don't *have to* be initialized (see [Struct](#struct)).
+- Variables can **only** exist inside of functions and their sub-blocks - there are no global variables.
 - Examples:
   ```rust
-  len u8 = 10;
-  ptr *u8 = &len;
+  val u8 = 10;
+  ptr *u8 = &val;
   ```
   ```rust
   $Vector2 = { x i32; y i32; };
@@ -89,20 +62,24 @@ Tag | Syntax
 
 Tag | Syntax
 --- | ------
-\<func>       | `<name> <func_type> <func_block> ;`
+\<func>       | `<name> <func_type> <func_block>`
 \<func_block> | `{ <func_stmt> {<func_stmt>} }`
 \<func_stmt>  | `<stmt> | <func> | <namespace> | <struct> | <enum> | <alias>`
 &emsp; \<func_type> | See [Types](#types)
 &emsp; \<name>      | See [Names](#names)
 &emsp; \<stmt>      | See [Statements](#statements)
+&emsp; \<namespace> | See [Namespace](#namespace)
+&emsp; \<struct>    | See [Struct](#struct)
+&emsp; \<enum>      | See [Enum](#enum)
+&emsp; \<alias>     | See [Alias](#alias)
 
-- Functions can have inside:
+- Functions can have inner:
   - sub-functions,
   - [namespaces](#namespace),
   - [struct](#struct) definitions,
-  - [enum](#enum) definitions,
+  - [enum](#enum) definitions, and
   - [aliases](#alias)
-- Sub-functions are, by default, not closures - you can't access outer variables \
+- Sub-functions are (by default) not closures - they can't access outer variables. \
   You can mark a sub-function as a closure using the `@closure` metadata, \
   allowing it to access variables of the same scope that the sub-function has been defined in.
   ```rust
@@ -134,6 +111,7 @@ Tag | Syntax
   main ()void {
     a i32 = 1;
     b i32 = 2;
+    // @closure // fine
     add_1 ()i32 {
         @closure add_2 ()i32 {
             break a + b; // ERROR: add_1() must be a closure itself to allow for sub-closures
@@ -143,8 +121,8 @@ Tag | Syntax
     c i32 = add_1();
   }
   ```
-- Functions are also, in a sense, namespaces. \
-  You can access a function's:
+- Functions follow the same rules as [namespaces](#namespace). You can access a function's:
+  - sub-function,
   - sub-[struct](#struct),
   - sub-[enum](#enum),
   - sub-[namespace](#namespace), or
@@ -152,8 +130,8 @@ Tag | Syntax
   
   See [Namespace](#namespace).
   ```rust
-  xadd (a i32, b i32)xadd:$Result = {
-    @public $Result = {
+  xadd (a i32, b i32) :xadd():$Result {
+    $Result = {
       val i32;
       ok bool;
     };
@@ -162,7 +140,7 @@ Tag | Syntax
     res.ok = (a != b);
     break res;
   }
-  res xadd:$Result = xadd(1, 2);
+  res :xadd():$Result = xadd(1, 2);
   ```
 - Examples:
   ```rust
@@ -182,15 +160,21 @@ Tag | Syntax
 --- | ------
 \<struct>       | `$ <name> [<generics>] = <struct_block> ;`
 \<struct_block> | `{ <struct_field> {<struct_field>} }`
-\<struct_field> | `<name> <type> ;`
+\<struct_field> | `<name> <var_type> ;` where `<var_type>` isn't the struct itself
+&emsp; \<name>     | See [Names](#names)
+&emsp; \<var_type> | See [Types](#types)
+&emsp; \<generics> | See [Generics](#generics)
 
 - A *struct* (Structure) is just a collection of variables (fields).
 - A *struct* cannot be empty.
+  ```rust
+  $Vector2 = {} // ERROR
+  ```
 - The fields **cannot** be initialized on struct creation.
   ```rust
   $Vector2 = {
-    x i32 = 0; // error
-    y i32 = 0; // error
+    x i32 = 0; // ERROR
+    y i32 = 0; // ERROR
   }
   ```
 - The fields can be accessed using the dot `.` operator.
@@ -199,6 +183,28 @@ Tag | Syntax
   pos.x = 0;
   pos.y = 0;
   x i32 = pos.x;
+  ```
+- As an exception, a struct variable doesn't have to be initialized (see [Variables](#variables)). \
+  But if that's the case, all of it's fields must be initialized in the same scope that the variable has been declared in.
+  ```rust
+  $Vector2 = { x i32; y i32 };
+  
+  pos $Vector2 = { 0, 0 }; // ERROR
+  
+  {
+    pos $Vector2; // ERROR: fields uninitalized
+  }
+
+  pos $Vector2;
+  pos.x = 0;
+  pos.y = 0;
+  // fine, all fields initialized
+
+  pos $Vector2;
+  {
+    pos.x = 0; // ERROR: fields must be initalized in the same scope
+    pos.y = 0; //        that the variable has been declared in.
+  }
   ```
 - Examples:
   ```rust
@@ -214,7 +220,7 @@ Tag | Syntax
           break v; 
       }
   }
-  @main main ()void = {
+  main ()void {
     pos $Vector2 = :Vector2:new(0, 0);
   }
   ```
