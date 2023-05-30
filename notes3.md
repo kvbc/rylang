@@ -12,6 +12,7 @@ Notes
 - using / use
 - struct literal
 - unions
+- switch
 - default struct fields
 - named arguments
   ```rust
