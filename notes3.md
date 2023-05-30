@@ -1,22 +1,21 @@
 Note
-- [zig](https://ziglang.org/documentation/master/)
-- [rust](https://www.rust-lang.org/learn)
-- [go](https://go.dev/learn/)
-- [nim](https://nim-lang.org/docs/manual.html)
+[x] [zig](https://ziglang.org/documentation/master/)
+[x] [odin](https://odin-lang.org/docs/overview/)
+[ ] [rust](https://www.rust-lang.org/learn)
+[ ] [go](https://go.dev/learn/)
+[ ] [nim](https://nim-lang.org/docs/manual.html)
 
 Notes
-- raw string \`single back ticks\`
-- variadic arguments
-- default argument values
-- pointer arrays
+- raw string \`single back ticks\` - `Literals`
+- variadic arguments - `<func_type>`
+- default argument values - `<func_type>`
+- pointer arrays - `Types`
 - using / use
-- struct literal
+- struct literal - `Literals`
 - union
-- block labels
-- switch
-- named blocks (for `break`)
-- default struct fields
-- named arguments
+- block labels - `Block`
+- switch / match
+- named arguments - `() operator`
   ```rust
   $Vector2 = {
     x i32;
@@ -39,23 +38,50 @@ Tag | Syntax
 --- | ------
 \<var>         | `<name> <var_type> = <expr> ;`
 \<var>         | `<name> <struct_type> = <struct_literal> ;`
+\<var>         | `<name> <struct_type> = <expr> ;` where `<expr>` is of type `<struct_type>`
 &emsp; \<name> | See [Names](#names)
 &emsp; \<expr> | See [Expressions](#expressions)
 &emsp; \<struct_literal> | See [Literals](#literals)
 &emsp; \<var_type>, <br> &emsp; \<struct_type> | See [Types](#types)
 
 - All variables must be initialized.
-- Variables can **only** exist inside of functions and their sub-blocks - there can be no global variables.
+- Variables can only exist inside of functions and their sub-blocks - there can be no global variables.
+- Variable shadowing is disallowed.
+  ```rust
+  :main ()void {
+    x u8 = 1;
+    {
+        x u8 = 2; // ERROR: variable redefinition
+    }
+  }
+  ```
+- Variables of the *struct* type must be initialized either by copy or by using the [struct literal](#literals). \
+  See [Struct](#struct).
+  ```rust
+  :main ()void = {
+    :$Vector2 = { x i32; y i32 };
+    a :$Vector2 = { // literal
+        .x = 0,
+        .y = 0
+    };
+    // or
+    b :$Vector2 = a; // copy
+    c :$Vector2 = { // copy
+        break a;
+    }
+  }
+  ```
 - Examples:
   ```rust
   val u8 = 10;
   ptr *u8 = &val;
   ```
   ```rust
-  $Vector2 = { x i32; y i32; };
-  pos $Vector2;
-  pos.x = 0;
-  pos.y = 0;
+  :$Vector2 = { x i32; y i32; };
+  pos :$Vector2 = {
+    .x = 0,
+    .y = 0
+  };
   ```
   ```rust
   $A = { x j32; };
@@ -68,25 +94,35 @@ Tag | Syntax
 
 Tag | Syntax
 --- | ------
-\<func>       | `<name> <func_type> <func_block>`
+\<func>       | `: <name> <func_type> = <func_block> ;`
 \<func_block> | `{ <func_stmt> {<func_stmt>} }`
-\<func_stmt>  | `<stmt> | <func> | <namespace> | <struct> | <enum> | <alias>`
-&emsp; \<func_type> | See [Types](#types)
-&emsp; \<name>      | See [Names](#names)
-&emsp; \<stmt>      | See [Statements](#statements)
-&emsp; \<namespace> | See [Namespace](#namespace)
-&emsp; \<struct>    | See [Struct](#struct)
-&emsp; \<enum>      | See [Enum](#enum)
-&emsp; \<alias>     | See [Alias](#alias)
+\<func_stmt>  | `<stmt> | <namespace_stmt>`
+&emsp; \<func_type>      | See [Types](#types)
+&emsp; \<name>           | See [Names](#names)
+&emsp; \<stmt>           | See [Statements](#statements)
+&emsp; \<namespace_stmt> | See [Namespace](#namespace)
 
-- Functions can have inner:
-  - sub-functions,
-  - [namespaces](#namespace),
-  - [struct](#struct) definitions,
-  - [enum](#enum) definitions, and
-  - [aliases](#alias)
-- Sub-functions are (by default) not closures - they can't access outer variables. \
-  You can mark a sub-function as a closure using the `@closure` metadata, \
+- A function is a collection of statements that get sequentially executed whenever you call it.
+  - See [Statements](#statements) for the definition of a statement `<stmt>`.
+  - See [Operators](#operators) for the function call operator `()`.
+- See `<func_type>` in [Types](#types).
+- Functions are also namespaces.
+  - See [Namespaces](#namespace).
+  ```rust
+  :xadd (a i32, b i32) :xadd():$Result {
+    :$Result = {
+      val i32;
+      ok bool;
+    };
+    res :$Result;
+    res.val = a + b;
+    res.ok = (a != b);
+    break res;
+  };
+  res :xadd():$Result = :xadd(1, 2);
+  ```
+- Sub-functions are (by default) not closures - they can't access variables of outer scope. \
+  You can mark a sub-function as a closure by using the `@closure` metadata, \
   allowing it to access variables of the same scope that the sub-function has been defined in.
   ```rust
   main ()void {
@@ -100,60 +136,39 @@ Tag | Syntax
   }
   ```
   ```rust
-  main ()void {
+  :main ()void = {
     a i32 = 1;
     b i32 = 2;
-    @closure add_1 ()i32 {
+    @closure :add_1 ()i32 = {
         // @closure // fine
-        add_2 ()i32 {
+        :add_2 ()i32 = {
             break a + b; // ERROR: both add_1() and add_2() must be closures
         }
-        break add_2();
+        break :add_2();
     }
-    c i32 = add_1();
+    c i32 = :add_1();
   }
   ```
   ```rust
-  main ()void {
+  :main ()void = {
     a i32 = 1;
     b i32 = 2;
     // @closure // fine
-    add_1 ()i32 {
-        @closure add_2 ()i32 {
+    :add_1 ()i32 = {
+        @closure :add_2 ()i32 = {
             break a + b; // ERROR: add_1() must be a closure itself to allow for sub-closures
         }
-        break add_2();
+        break :add_2();
     }
-    c i32 = add_1();
+    c i32 = :add_1();
   }
-  ```
-- Functions follow the same rules as [namespaces](#namespace). You can access a function's:
-  - sub-function,
-  - sub-[struct](#struct),
-  - sub-[enum](#enum),
-  - sub-[namespace](#namespace), or
-  - sub-[alias](#alias)
-  
-  See [Namespace](#namespace).
-  ```rust
-  xadd (a i32, b i32) :xadd():$Result {
-    $Result = {
-      val i32;
-      ok bool;
-    };
-    res $Result;
-    res.val = a + b;
-    res.ok = (a != b);
-    break res;
-  }
-  res :xadd():$Result = xadd(1, 2);
   ```
 - Examples:
   ```rust
-  add (a i32, b i32)i32 {
+  :add (a i32, b i32)i32 = {
     break a + b;
   }
-  main ()void {
+  :main ()void = {
     a i32 = 1;
     b i32 = 2;
     c i32 = add(a, b);
@@ -164,48 +179,60 @@ Tag | Syntax
 
 Tag | Syntax
 --- | ------
-\<struct>       | `$ <name> [<generics>] = <struct_block> ;`
-\<struct_block> | `{ <struct_field> {<struct_field>} }`
-\<struct_field> | `<name> <var_type> ;` where `<var_type>` isn't the struct itself
-&emsp; \<name>     | See [Names](#names)
-&emsp; \<var_type> | See [Types](#types)
-&emsp; \<generics> | See [Generics](#generics)
+\<struct>       | `: $ <name> [<generics>] = <struct_block> ;`
+\<struct_block> | `{ <struct_stmt> {<struct_stmt>} }`
+\<struct_stmt>  | `<struct_field> | <namespace_stmt>`
+\<struct_field> | `<name> <var_type> ;` where `<var_type>` isn't the defined struct itself
+&emsp; \<name>           | See [Names](#names)
+&emsp; \<var_type>       | See [Types](#types)
+&emsp; \<generics>       | See [Generics](#generics)
+&emsp; \<namespace_stmt> | See [Namespace](#namespace)
 
-- A *struct* (Structure) is just a collection of variables (fields).
+- A *struct* (Structure) is a collection of variables (fields).
+- A *struct* is also a namespace.
+  - See [Namespace](#namespace).
 - A *struct* cannot be empty.
   ```rust
-  $Vector2 = {} // ERROR
+  :$Vector2 = {} // ERROR
   ```
-- The fields **cannot** be initialized on struct definition.
+- See [Generics](#generics) for struct generics.
+- A *struct* field cannot be of the same type as the defined struct.
   ```rust
-  $Vector2 = {
-    x i32 = 0; // ERROR
-    y i32 = 0; // ERROR
-  }
+  :$A = {
+    a :$A; // ERROR
+  };
   ```
-- The fields can be accessed using the dot `.` operator.
+- *Struct* fields follow the same rules as regular variables.
+  - See [Variables](#variables).
+- *Struct* fields can be assigned default values.
   ```rust
-  pos $Vector2;
+  :$Vector2 = {
+    x i32 = 0;
+    y i32 = 0;
+  };
+  ```
+- *Struct* fields can be accessed using the dot `.` operator.
+  ```rust
+  pos :$Vector2;
   pos.x = 0;
   pos.y = 0;
   x i32 = pos.x;
   ```
 - Examples:
   ```rust
-  $Vector2 = {
+  :$Vector2 = {
       x i32;
       y i32;
-  };
-  :Vector2 = {
-      new (x i32, y i32)$Vector2 {
-          v $Vector2;
-          v.x = x;
-          v.y = y;
+      :new (x i32, y i32) :$Vector2 = {
+          v :$Vector2 = {
+            .x = x,
+            .y = y
+          };
           break v; 
       }
-  }
-  main ()void {
-    pos $Vector2 = :Vector2:new(0, 0);
+  };
+  :main ()void = {
+    pos :$Vector2 = :$Vector2:new(0, 0);
   }
   ```
 
@@ -213,18 +240,24 @@ Tag | Syntax
 
 Tag | Syntax
 --- | ------
-\<enum>        | `# <name> = <enum_block> ;`
-\<enum_block>  | `{ <enum_field> {<enum_field>} }`
+\<enum>        | `: # <name> = <enum_block> ;`
+\<enum_block>  | `{ <enum_stmt> {<enum_stmt>} }`
+\<enum_stmt>   | `<enum_field> | <namespace_stmt>`
 \<enum_field>  | `<name> [= <number>] ,`
-\<enum_access> | `# <name> : <name>` 
+\<enum_access> | `: # <name> : <name>`
+&emsp; \<name>           | See [Names](#names)
+&emsp; \<namespace_stmt> | See [Namespace](#namespace)
+&emsp; \<number>         | See [Literals](#literals)
 
 - *Enum* (Enumeration) is a collection of scoped, named, unique integer values (fields)
-- *Enum* values are of type `i32`
-- *Enum* values can be accessed using the colon `:` operator
+- *Enum* fields are of type `i32`
+- *Enums* are also namespaces.
+  - See [Namespace](#namespace).
+- *Enum* fields can be accessed using the colon `:` operator
   - ```rust
-    var #Enum = #Enum:FIELD;
+    var #Enum = :#Enum:FIELD;
     ```
-- *Enum* values can be explicitely set.
+- *Enum* fields can be explicitely set.
   - The set value must be an integer literal.
     ```rust
     x i32 = 10;
@@ -241,7 +274,7 @@ Tag | Syntax
         BLUE = 1 // ERROR
     }
     ```
-  - Even multiple times
+  - The fields can be set even multiple times
     ```rust
     #Animal = {
         DOG, // 0
@@ -252,44 +285,53 @@ Tag | Syntax
         HORSE // 101
     }
     ```
-- The first *enum* value, if not explicitely set, is equal to 0.
-- Each next *enum* value, if not explicitely set, is 1 higher than the previous value. 
+- The first *enum* field, if not explicitely set, is equal to 0.
+- Each next *enum* field, if not explicitely set, is 1 higher than the previous value. 
 - Examples:
   ```rust
-  #Color = {
+  :#Color = {
     RED;   // 0
     GREEN; // 1
     BLUE;  // 2
   };
-  c #Color = #Color:RED;
+  c :#Color = :#Color:RED;
   ```
 
 # Namespace
 
-Tag | Syntax | Comment
---- | ------ | -------
+Tag | Syntax | Comment | Example
+--- | ------ | ------- | -------
 \<namespace>        | `: <name> = <namespace_block> ;`
 \<namespace>        | `: <name> = <string> ;` | Module import
-\<namespace_block>  | `{ <namespace_field> {<namespace_field>} }`
-\<namespace_field>  | `<func> | <struct> | <enum> | <namespace> | <alias>`
-\<namespace_access> | `: <name> : <name>`
-\<namespace_access> | `: ^ <name> : <name>` | Namespace [alias](#alias)
+\<namespace_block>  | `{ <namespace_stmt> {<namespace_stmt>} }`
+\<namespace_stmt>   | `<func> | <struct> | <enum> | <namespace> | <alias>`
+\<namespace_entity> | `: [^ | $ | #] <name>`  | Sub-namespace / Alias / Struct / Enum
+\<namespace_entity> | `: <name> ()` | Function
+\<namespace_access> | `<namespace_entity> <namespace_entity> {<namespace_entity>}`
+&emsp; \<name>   | See [Names](#names)
+&emsp; \<string> | See [Literals](#literals)
+&emsp; \<func>   | See [Functions](#functions)
+&emsp; \<struct> | See [Struct](#struct)
+&emsp; \<enum>   | See [Enum](#enum)
+&emsp; \<alias>  | See [Alias](#alias)
 
 - A *namespace* is a scoped collection of:
-  - Functions
-  - Structs
-  - Enums
-  - Aliases
-  - Other namespaces
+  - [Functions](#functions),
+  - [Structs](#struct),
+  - [Enums](#enum),
+  - [Aliases](#alias), and
+  - Other *namespaces*
 
+- *Namespaces* can be imported from other files. This concept forms the basis of [Modules](#modules).
+- [Functions](#functions), [Structs](#struct) and [Enums](#enum) are all *namespaces*.
+- See [Alias](#alias) for namespace aliasing.
 - To access a *namespace* member, you can use the colon `:` operator
   - ```rust
     :math = {
-        $Vector2 = { x i32; y i32; };
+        :$Vector2 = { x i32; y i32; };
     };
     pos :math:$Vector2;
     ```
-- See [Alias](#alias) for namespace aliasing.
 
 # Alias
 
