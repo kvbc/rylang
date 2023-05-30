@@ -11,6 +11,7 @@ Notes
 - pointer arrays
 - using / use
 - struct literal
+- unions
 - default struct fields
 - named arguments
   ```rust
