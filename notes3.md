@@ -14,6 +14,7 @@ Notes
 - union
 - block labels
 - switch
+- named blocks (for `break`)
 - default struct fields
 - named arguments
   ```rust
