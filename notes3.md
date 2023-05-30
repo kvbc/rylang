@@ -11,7 +11,8 @@ Notes
 - pointer arrays
 - using / use
 - struct literal
-- unions
+- union
+- block labels
 - switch
 - default struct fields
 - named arguments
