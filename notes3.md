@@ -53,7 +53,7 @@ Tag | Parent | Comment
 --- | ------ | -------
 \<var> | `<func_block>`, all sub-blocks of `<func_block>` | Where you can define variables.
 
-**Additional**
+**Context**
 
 - Variable shadowing is disallowed.
   ```rust
