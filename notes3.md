@@ -231,7 +231,7 @@ Tag | Syntax
   x i32 = pos.x;
   ```
 - Functions declared inside of a *struct*, with their first parameter being of the defined *struct* type, are called *methods*. \
-  You can call them on a struct instance using the dot `.` operator.
+  You can call them on a struct instance using the colon `:` operator.
   - See [Operators](#operators) for the *struct* *method* access operator.
 
   The first "self" argument is excluded from a *method* call. \
@@ -252,7 +252,7 @@ Tag | Syntax
       a $Vector2 = { .x = 1; .y = 1; };
       b $Vector2 = { .x = 2; .y = 2; };
   
-      a.add(b);
+      a:add(b);
   
       // is the same as
   
