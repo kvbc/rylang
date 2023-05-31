@@ -15,7 +15,7 @@ Notes
 - union
 - block labels - `Block`
 - switch / match
-- function parameters immutable by default - `<func_type>`
+- function parameters immutable - `<func_type>`
 - named arguments - `() operator`
   ```rust
   $Vector2 = {
@@ -35,18 +35,26 @@ Notes
 
 # Variables :white_check_mark:
 
-Tag | Syntax
---- | ------
+**Syntax**
+
+Tag | Syntax | Comment
+--- | ------ | -------
 \<var>         | `<name> <var_type> = <expr> ;`
 \<var>         | `<name> <struct_type> = <struct_literal> ;`
-\<var>         | `<name> <struct_type> = <expr> ;` where `<expr>` is of type `<struct_type>`
+\<var>         | `<name> <struct_type> = <expr> ;` where `<expr>` results in type `<struct_type>` | Struct copy
 &emsp; \<name> | See [Names](#names)
 &emsp; \<expr> | See [Expressions](#expressions)
 &emsp; \<struct_literal> | See [Literals](#literals)
 &emsp; \<var_type>, <br> &emsp; \<struct_type> | See [Types](#types)
 
-- All variables must be initialized.
-- Variables can only exist inside of functions and their sub-blocks - there can be no global variables.
+**Parentship**
+
+Tag | Parent | Comment
+--- | ------ | -------
+\<var> | `<func_block>`, all sub-blocks of `<func_block>` | Where you can define variables.
+
+**Additional**
+
 - Variable shadowing is disallowed.
   ```rust
   main ()void {
@@ -56,8 +64,16 @@ Tag | Syntax
     }
   }
   ```
-- Variables of the *struct* type must be initialized either by copy or by using the [struct literal](#literals). \
-  See [Struct](#struct).
+
+**Interpretation**
+
+- See `<name>` in [Names](#names) for the rules behind a valid variable name (identifier).
+- See `<expr>` in [Expressions](#expressions) for what a non-struct variable can be assigned.
+- All variables must be initialized.
+- Variables can only exist inside of functions and their sub-blocks - there can be no global variables.
+- Variables of the *struct* type must be initialized either by copy or by using the struct literal.
+  - See [Struct](#struct).
+  - See [Literals](#struct) for the definition of a *struct literal*.
   ```rust
   main ()void = {
     $Vector2 = { x i32; y i32 };
@@ -68,28 +84,53 @@ Tag | Syntax
     // or
     b $Vector2 = a; // copy
     c $Vector2 = { // copy
-        break a;
+        break b;
     }
   }
   ```
-- Examples:
+  This supposed copy might not always result in an actual copy of the data. \
+  The compiler is expected to, where applicable, prefer "moving" the data instead of actually copying it. \
+  One such example can be observed below.
   ```rust
-  val u8 = 10;
-  ptr *u8 = &val;
-  ```
-  ```rust
-  $Vector2 = { x i32; y i32; };
-  pos $Vector2 = {
-    .x = 0,
-    .y = 0
+  $Vector2 = {
+    x i32;
+    y i32;
+    new( x i32, y i32 ) $Vector2 = {
+        v $Vector2 = {
+            .x = x,
+            .y = y
+        };
+        break v;
+    }
   };
+  main() void = {
+    pos $Vector2 = :$Vector2:new(0, 0);
+  }
   ```
-  ```rust
-  $A = { x j32; };
-  $B = { a $A; };
-  b $B;
-  b.a.x = 3;
-  ```
+  TODO: Talk about how it's done in C - returning a struct by value in C (implicit return pointer)
+
+**Examples**
+
+```rust
+val u8 = 10;
+ptr *u8 = &val;
+```
+```rust
+$Vector2 = { x i32; y i32; };
+pos $Vector2 = {
+.x = 0,
+.y = 0
+};
+```
+```rust
+$A = { x j32; };
+$B = { a $A; };
+b $B = {
+.a = {
+    .x = 3;
+};
+};
+```
 
 # Functions :white_check_mark:
 
@@ -103,15 +144,15 @@ Tag | Syntax
 &emsp; \<stmt>           | See [Statements](#statements)
 &emsp; \<namespace_stmt> | See [Namespace](#namespace)
 
-- A function is a collection of statements that get sequentially executed whenever you call it.
+- A function is an ordered sequence of statements that get executed whenever you call it.
   - See [Statements](#statements) for the definition of a statement `<stmt>`.
   - See [Namespace](#namespace) for the definition of a namespace statement `<namespace_stmt>`.
-- See [Operators](#operators) for the function call operator `()`.
-- See `<func_type>` in [Types](#types).
+- See [Operators](#operators) for the function call operator `()` --- how to call a function & call-specific language features.
+- See `<func_type>` in [Types](#types) --- all about function parameters and return semantics.
 - Functions are also namespaces.
   - See [Namespaces](#namespace).
   ```rust
-  xadd (a i32, b i32) xadd():$Result {
+  xadd (a i32, b i32) :xadd():$Result {
     $Result = {
       val i32;
       ok bool;
@@ -121,7 +162,7 @@ Tag | Syntax
     res.ok = (a != b);
     break res;
   };
-  res xadd():$Result = xadd(1, 2);
+  res :xadd():$Result = xadd(1, 2);
   ```
 - Sub-functions are (by default) not closures - they can't access variables of outer scope. \
   You can mark a sub-function as a closure by using the `@closure` metadata, \
@@ -177,7 +218,7 @@ Tag | Syntax
   }
   ```
 
-# Struct
+# Struct :white_check_mark:
 
 Tag | Syntax
 --- | ------
@@ -185,12 +226,14 @@ Tag | Syntax
 \<struct_block>  | `{ <struct_stmt> {<struct_stmt>} }`
 \<struct_stmt>   | `<struct_field> | <namespace_stmt>`
 \<struct_field>  | `<name> <var_type> [= <compexpr>] ;` where `<var_type>` isn't the defined struct itself
+\<struct_field>  | `<name> <struct_type> [= <struct_literal>] ;` where `<struct_type>` isn't the defined struct itself
 &emsp; \<name>           | See [Names](#names)
 &emsp; \<var>            | See [Variables](#variables)
 &emsp; \<var_type>       | See [Types](#types)
 &emsp; \<generics>       | See [Generics](#generics)
 &emsp; \<namespace_stmt> | See [Namespace](#namespace)
-&emsp; \<compexpr>       | ???
+&emsp; \<compexpr>       | See [Expressions](#expressions)
+&emsp; \<struct_literal> | See [Literals](#literals)
 
 - A *struct* (Structure) is a collection of variables (fields).
 - A *struct* is also a namespace.
@@ -280,26 +323,27 @@ Tag | Syntax
 
 Tag | Syntax
 --- | ------
-\<enum>        | `<enum_type> = <enum_block> ;`
+\<enum>        | `# <name> = <enum_block> ;`
 \<enum_block>  | `{ <enum_stmt> {<enum_stmt>} }`
 \<enum_stmt>   | `<enum_field> | <namespace_stmt>`
-\<enum_field>  | `<name> [= <number>] ,`
+\<enum_field>  | `<name> [= <compexpr>] ;` where `<compexpr>` results in `i32`
 \<enum_access> | `<enum_type> : <name>`
 &emsp; \<name>           | See [Names](#names)
 &emsp; \<namespace_stmt> | See [Namespace](#namespace)
 &emsp; \<number>         | See [Literals](#literals)
-&emsp; \<enum_type>      | See [Types](#types)
+&emsp; \<compexpr>       | See [Expressions](#expressions)
 
 - *Enum* (Enumeration) is a collection of scoped, named, unique integer values (fields)
 - *Enum* fields are of type `i32`
 - *Enums* are also namespaces.
   - See [Namespace](#namespace).
 - *Enum* fields can be accessed using the colon `:` operator
-  - ```rust
-    var #Enum = #Enum:FIELD;
-    ```
+  ```rust
+  var #Enum = #Enum:FIELD;
+  ```
 - *Enum* fields can be explicitely set.
-  - The set value must be an integer literal.
+  - The set value must be a compile-time expression resulting in a value of type `i32`.
+    - See [Expressions](#expressions) for the definition of compile-time expressions.
     ```rust
     x i32 = 10;
     #Color = {
@@ -337,50 +381,13 @@ Tag | Syntax
   };
   c #Color = #Color:RED;
   ```
-
-# Namespace
-
-Tag | Syntax | Comment
---- | ------ | -------
-\<namespace>        | `: <name> = <namespace_block> ;`
-\<namespace>        | `: <name> = <string> ;` | Module import
-\<namespace_block>  | `{ <namespace_stmt> {<namespace_stmt>} }`
-\<namespace_stmt>   | `<func> | <struct> | <enum> | <namespace> | <alias>`
-\<namespace_entity> | `^ <name>`  | Alias access / Namespace alias
-\<namespace_entity> | `<struct_type> | <enum_type> | <name>`  | Struct / Enum / Namespace
-\<namespace_entity> | `<name> ()` | Function
-\<namespace_access> | `<namespace_entity> : <namespace_entity> {: <namespace_entity>}`
-&emsp; \<name>   | See [Names](#names)
-&emsp; \<string> | See [Literals](#literals)
-&emsp; \<func>   | See [Functions](#functions)
-&emsp; \<struct> | See [Struct](#struct)
-&emsp; \<enum>   | See [Enum](#enum)
-&emsp; \<alias>  | See [Alias](#alias)
-
-- A *namespace* is a scoped collection of:
-  - [Functions](#functions),
-  - [Structs](#struct),
-  - [Enums](#enum),
-  - [Aliases](#alias), and
-  - Other *namespaces*
-
-- *Namespaces* can be imported from other files. This concept forms the basis of [Modules](#modules).
-- [Functions](#functions), [Structs](#struct) and [Enums](#enum) are all *namespaces*.
-- See [Alias](#alias) for namespace aliasing.
-- To access a *namespace* member, you can use the colon `:` operator
-  - ```rust
-    :math = {
-        $Vector2 = { x i32; y i32; };
-    };
-    pos :math:$Vector2;
-    ```
-
 # Alias
 
 Tag | Syntax | Comment
 --- | ------ | -------
 \<alias> | `^ <name> [<generics>] = <var_type> ;` | Type alias
-\<alias> | `:^ <name> = (<name> | <namespace_access>) ;` where `<namespace_access>` is a sub-namespace access | [Namespace](#namespace) / sub-namespace alias
+\<alias> | `:^ <name> = : <name> ;` | [Namespace](#namespace) alias
+\<alias> | `:^ <name> = <namespace_access> ;` where `<namespace_access>` is a sub-namespace access | Sub-[namespace](#namespace) alias
 \<alias> | `$^ <name> [<generics>] = <struct_type> ;` | [Struct](#struct) alias
 \<alias> | `#^ <name> = <enum_type> ;` | [Enum](#enum) alias
 &emsp; \<name>             | See [Names](#names)
@@ -388,7 +395,7 @@ Tag | Syntax | Comment
 &emsp; \<namespace_access> | See [Namespace](#namespace)
 &emsp; \<struct_type> <br> &emsp; \<enum_type> | See [Types](#types)
 
-- An *alias* is an different name (alias) for a specified type.
+- An *alias* is a different name for a specified type.
 - Examples:
   ```rust
   ^char = u8;
@@ -412,6 +419,43 @@ Tag | Syntax | Comment
   ^abc = :a:b:c;
   pos2 :^abc:$Vector2;
   ```
+
+# Namespace
+
+Tag | Syntax | Comment
+--- | ------ | -------
+\<namespace>        | `: <name> = <namespace_block> ;`
+\<namespace>        | `: <name> = <string> ;` | Module import
+\<namespace_block>  | `{ <namespace_stmt> {<namespace_stmt>} }`
+\<namespace_stmt>   | `<func> | <struct> | <enum> | <namespace> | <alias>`
+\<namespace_entity> | `^ <name>`  | Alias access / Namespace alias
+\<namespace_entity> | `<struct_type> | <enum_type> | <name>`  | Struct / Enum / Namespace
+\<namespace_entity> | `<name> ()` | Function
+\<namespace_access> | `: <namespace_entity> : <namespace_entity> {: <namespace_entity>}`
+&emsp; \<name>   | See [Names](#names)
+&emsp; \<string> | See [Literals](#literals)
+&emsp; \<func>   | See [Functions](#functions)
+&emsp; \<struct> | See [Struct](#struct)
+&emsp; \<enum>   | See [Enum](#enum)
+&emsp; \<alias>  | See [Alias](#alias)
+
+- A namespace is a scoped collection of:
+  - [Functions](#functions),
+  - [Structs](#struct),
+  - [Enums](#enum),
+  - [Aliases](#alias), and
+  - Other namespaces
+
+- Namespaces can be imported from other files. This concept forms the basis of [Modules](#modules).
+- [Functions](#functions), [Structs](#struct) and [Enums](#enum) are all namespaces.
+- See [Alias](#alias) for namespace aliasing.
+- To access a namespace member, you can use the colon `:` operator
+  - ```rust
+    :math = {
+        $Vector2 = { x i32; y i32; };
+    };
+    pos :math:$Vector2;
+    ```
 
 # Control Flow
 
