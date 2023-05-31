@@ -181,12 +181,14 @@ Tag | Syntax
 
 Tag | Syntax
 --- | ------
-\<struct>       | `<struct_type> [<generics>] = <struct_block> ;`
-\<struct_block> | `{ <struct_stmt> {<struct_stmt>} }`
-\<struct_stmt>  | `<struct_field> | <namespace_stmt>`
-\<struct_field> | `<name> <var_type> ;` where `<var_type>` isn't the defined struct itself
+\<struct>        | `$ <name> [<generics>] = <struct_block> ;`
+\<struct_block>  | `{ <struct_stmt> {<struct_stmt>} }`
+\<struct_stmt>   | `<struct_field> | <namespace_stmt>`
+\<struct_field>  | `<name> <var_type> ;` where `<var_type>` isn't the defined struct itself
+\<struct_field>  | `<var>` where the variable type isn't the defined struct itself
 &emsp; \<name>           | See [Names](#names)
-&emsp; \<var_type> <br> \<struct_type> | See [Types](#types)
+&emsp; \<var>            | See [Variables](#variables)
+&emsp; \<var_type>       | See [Types](#types)
 &emsp; \<generics>       | See [Generics](#generics)
 &emsp; \<namespace_stmt> | See [Namespace](#namespace)
 
@@ -221,11 +223,41 @@ Tag | Syntax
   };
   ```
 - *Struct* fields can be accessed using the dot `.` operator.
+  - See [Operators](#operators) for the *struct* field access operator
   ```rust
   pos $Vector2;
   pos.x = 0;
   pos.y = 0;
   x i32 = pos.x;
+  ```
+- Functions declared inside of a *struct*, with their first parameter being of the defined *struct* type, are called *methods*. \
+  You can call them on a struct instance using the dot `.` operator.
+  - See [Operators](#operators) for the *struct* *method* access operator.
+
+  The first "self" argument is excluded from a *method* call. \
+  This *struct* *method* syntax is nothing but syntactic sugar for plain-old *namespace* access.
+  ```rust
+  $Vector2 = {
+      x i32;
+      y i32;
+  
+      add( self !*$Vector2, other !*!$Vector2 ) !*$Vector2 = {
+          self.x += other.x;
+          self.y += other.y;
+          break self;
+      }
+  };
+  
+  main() void {
+      a $Vector2 = { .x = 1; .y = 1; };
+      b $Vector2 = { .x = 2; .y = 2; };
+  
+      a.add(b);
+  
+      // is the same as
+  
+      $Vector2:add(&a, b);
+  }
   ```
 - Examples:
   ```rust
@@ -244,7 +276,6 @@ Tag | Syntax
     pos $Vector2 = $Vector2:new(0, 0);
   }
   ```
-
 # Enum
 
 Tag | Syntax
