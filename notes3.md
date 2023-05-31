@@ -2,7 +2,7 @@ Note
 [x] [zig](https://ziglang.org/documentation/master/)
 [x] [odin](https://odin-lang.org/docs/overview/)
 [ ] [rust](https://www.rust-lang.org/learn)
-[ ] [go](https://go.dev/learn/)
+[ ] [go](https://go.dev/ref/spec)
 [ ] [nim](https://nim-lang.org/docs/manual.html)
 
 Notes
@@ -15,6 +15,7 @@ Notes
 - union
 - block labels - `Block`
 - switch / match
+- function parameters immutable by default - `<func_type>`
 - named arguments - `() operator`
   ```rust
   $Vector2 = {
@@ -32,7 +33,7 @@ Notes
   v $Vector2 = :Vector2:new(y=0);
   ```
 
-# Variables
+# Variables :white_check_mark:
 
 Tag | Syntax
 --- | ------
@@ -48,7 +49,7 @@ Tag | Syntax
 - Variables can only exist inside of functions and their sub-blocks - there can be no global variables.
 - Variable shadowing is disallowed.
   ```rust
-  :main ()void {
+  main ()void {
     x u8 = 1;
     {
         x u8 = 2; // ERROR: variable redefinition
@@ -58,15 +59,15 @@ Tag | Syntax
 - Variables of the *struct* type must be initialized either by copy or by using the [struct literal](#literals). \
   See [Struct](#struct).
   ```rust
-  :main ()void = {
-    :$Vector2 = { x i32; y i32 };
-    a :$Vector2 = { // literal
+  main ()void = {
+    $Vector2 = { x i32; y i32 };
+    a $Vector2 = { // literal
         .x = 0,
         .y = 0
     };
     // or
-    b :$Vector2 = a; // copy
-    c :$Vector2 = { // copy
+    b $Vector2 = a; // copy
+    c $Vector2 = { // copy
         break a;
     }
   }
@@ -77,8 +78,8 @@ Tag | Syntax
   ptr *u8 = &val;
   ```
   ```rust
-  :$Vector2 = { x i32; y i32; };
-  pos :$Vector2 = {
+  $Vector2 = { x i32; y i32; };
+  pos $Vector2 = {
     .x = 0,
     .y = 0
   };
@@ -90,11 +91,11 @@ Tag | Syntax
   b.a.x = 3;
   ```
 
-# Functions
+# Functions :white_check_mark:
 
 Tag | Syntax
 --- | ------
-\<func>       | `: <name> <func_type> = <func_block> ;`
+\<func>       | `<name> <func_type> = <func_block> ;`
 \<func_block> | `{ <func_stmt> {<func_stmt>} }`
 \<func_stmt>  | `<stmt> | <namespace_stmt>`
 &emsp; \<func_type>      | See [Types](#types)
@@ -104,22 +105,23 @@ Tag | Syntax
 
 - A function is a collection of statements that get sequentially executed whenever you call it.
   - See [Statements](#statements) for the definition of a statement `<stmt>`.
-  - See [Operators](#operators) for the function call operator `()`.
+  - See [Namespace](#namespace) for the definition of a namespace statement `<namespace_stmt>`.
+- See [Operators](#operators) for the function call operator `()`.
 - See `<func_type>` in [Types](#types).
 - Functions are also namespaces.
   - See [Namespaces](#namespace).
   ```rust
-  :xadd (a i32, b i32) :xadd():$Result {
-    :$Result = {
+  xadd (a i32, b i32) xadd():$Result {
+    $Result = {
       val i32;
       ok bool;
     };
-    res :$Result;
+    res $Result;
     res.val = a + b;
     res.ok = (a != b);
     break res;
   };
-  res :xadd():$Result = :xadd(1, 2);
+  res xadd():$Result = xadd(1, 2);
   ```
 - Sub-functions are (by default) not closures - they can't access variables of outer scope. \
   You can mark a sub-function as a closure by using the `@closure` metadata, \
@@ -136,39 +138,39 @@ Tag | Syntax
   }
   ```
   ```rust
-  :main ()void = {
+  main ()void = {
     a i32 = 1;
     b i32 = 2;
-    @closure :add_1 ()i32 = {
+    @closure add_1 ()i32 = {
         // @closure // fine
-        :add_2 ()i32 = {
+        add_2 ()i32 = {
             break a + b; // ERROR: both add_1() and add_2() must be closures
         }
-        break :add_2();
+        break add_2();
     }
-    c i32 = :add_1();
+    c i32 = add_1();
   }
   ```
   ```rust
-  :main ()void = {
+  main ()void = {
     a i32 = 1;
     b i32 = 2;
     // @closure // fine
-    :add_1 ()i32 = {
-        @closure :add_2 ()i32 = {
+    add_1 ()i32 = {
+        @closure add_2 ()i32 = {
             break a + b; // ERROR: add_1() must be a closure itself to allow for sub-closures
         }
-        break :add_2();
+        break add_2();
     }
-    c i32 = :add_1();
+    c i32 = add_1();
   }
   ```
 - Examples:
   ```rust
-  :add (a i32, b i32)i32 = {
+  add (a i32, b i32)i32 = {
     break a + b;
   }
-  :main ()void = {
+  main ()void = {
     a i32 = 1;
     b i32 = 2;
     c i32 = add(a, b);
@@ -179,60 +181,67 @@ Tag | Syntax
 
 Tag | Syntax
 --- | ------
-\<struct>       | `: $ <name> [<generics>] = <struct_block> ;`
+\<struct>       | `<struct_type> [<generics>] = <struct_block> ;`
 \<struct_block> | `{ <struct_stmt> {<struct_stmt>} }`
 \<struct_stmt>  | `<struct_field> | <namespace_stmt>`
 \<struct_field> | `<name> <var_type> ;` where `<var_type>` isn't the defined struct itself
 &emsp; \<name>           | See [Names](#names)
-&emsp; \<var_type>       | See [Types](#types)
+&emsp; \<var_type> <br> \<struct_type> | See [Types](#types)
 &emsp; \<generics>       | See [Generics](#generics)
 &emsp; \<namespace_stmt> | See [Namespace](#namespace)
 
 - A *struct* (Structure) is a collection of variables (fields).
 - A *struct* is also a namespace.
   - See [Namespace](#namespace).
+  ```rust
+    $Vector2 = {
+      ^int = i32;
+      x ^int;
+      y ^int;
+    };
+  ```
 - A *struct* cannot be empty.
   ```rust
-  :$Vector2 = {} // ERROR
+  $Vector2 = {} // ERROR
   ```
 - See [Generics](#generics) for struct generics.
 - A *struct* field cannot be of the same type as the defined struct.
   ```rust
-  :$A = {
-    a :$A; // ERROR
+  $A = {
+    a $A; // ERROR
   };
   ```
 - *Struct* fields follow the same rules as regular variables.
   - See [Variables](#variables).
 - *Struct* fields can be assigned default values.
   ```rust
-  :$Vector2 = {
+  $Vector2 = {
     x i32 = 0;
     y i32 = 0;
   };
   ```
 - *Struct* fields can be accessed using the dot `.` operator.
   ```rust
-  pos :$Vector2;
+  pos $Vector2;
   pos.x = 0;
   pos.y = 0;
   x i32 = pos.x;
   ```
 - Examples:
   ```rust
-  :$Vector2 = {
+  $Vector2 = {
       x i32;
       y i32;
-      :new (x i32, y i32) :$Vector2 = {
-          v :$Vector2 = {
+      new (x i32, y i32) $Vector2 = {
+          v $Vector2 = {
             .x = x,
             .y = y
           };
           break v; 
       }
   };
-  :main ()void = {
-    pos :$Vector2 = :$Vector2:new(0, 0);
+  main ()void = {
+    pos $Vector2 = $Vector2:new(0, 0);
   }
   ```
 
@@ -240,14 +249,15 @@ Tag | Syntax
 
 Tag | Syntax
 --- | ------
-\<enum>        | `: # <name> = <enum_block> ;`
+\<enum>        | `<enum_type> = <enum_block> ;`
 \<enum_block>  | `{ <enum_stmt> {<enum_stmt>} }`
 \<enum_stmt>   | `<enum_field> | <namespace_stmt>`
 \<enum_field>  | `<name> [= <number>] ,`
-\<enum_access> | `: # <name> : <name>`
+\<enum_access> | `<enum_type> : <name>`
 &emsp; \<name>           | See [Names](#names)
 &emsp; \<namespace_stmt> | See [Namespace](#namespace)
 &emsp; \<number>         | See [Literals](#literals)
+&emsp; \<enum_type>      | See [Types](#types)
 
 - *Enum* (Enumeration) is a collection of scoped, named, unique integer values (fields)
 - *Enum* fields are of type `i32`
@@ -255,7 +265,7 @@ Tag | Syntax
   - See [Namespace](#namespace).
 - *Enum* fields can be accessed using the colon `:` operator
   - ```rust
-    var #Enum = :#Enum:FIELD;
+    var #Enum = #Enum:FIELD;
     ```
 - *Enum* fields can be explicitely set.
   - The set value must be an integer literal.
@@ -289,25 +299,26 @@ Tag | Syntax
 - Each next *enum* field, if not explicitely set, is 1 higher than the previous value. 
 - Examples:
   ```rust
-  :#Color = {
+  #Color = {
     RED;   // 0
     GREEN; // 1
     BLUE;  // 2
   };
-  c :#Color = :#Color:RED;
+  c #Color = #Color:RED;
   ```
 
 # Namespace
 
-Tag | Syntax | Comment | Example
---- | ------ | ------- | -------
+Tag | Syntax | Comment
+--- | ------ | -------
 \<namespace>        | `: <name> = <namespace_block> ;`
 \<namespace>        | `: <name> = <string> ;` | Module import
 \<namespace_block>  | `{ <namespace_stmt> {<namespace_stmt>} }`
 \<namespace_stmt>   | `<func> | <struct> | <enum> | <namespace> | <alias>`
-\<namespace_entity> | `: [^ | $ | #] <name>`  | Sub-namespace / Alias / Struct / Enum
-\<namespace_entity> | `: <name> ()` | Function
-\<namespace_access> | `<namespace_entity> <namespace_entity> {<namespace_entity>}`
+\<namespace_entity> | `^ <name>`  | Alias access / Namespace alias
+\<namespace_entity> | `<struct_type> | <enum_type> | <name>`  | Struct / Enum / Namespace
+\<namespace_entity> | `<name> ()` | Function
+\<namespace_access> | `<namespace_entity> : <namespace_entity> {: <namespace_entity>}`
 &emsp; \<name>   | See [Names](#names)
 &emsp; \<string> | See [Literals](#literals)
 &emsp; \<func>   | See [Functions](#functions)
@@ -328,7 +339,7 @@ Tag | Syntax | Comment | Example
 - To access a *namespace* member, you can use the colon `:` operator
   - ```rust
     :math = {
-        :$Vector2 = { x i32; y i32; };
+        $Vector2 = { x i32; y i32; };
     };
     pos :math:$Vector2;
     ```
@@ -337,10 +348,14 @@ Tag | Syntax | Comment | Example
 
 Tag | Syntax | Comment
 --- | ------ | -------
-\<alias> | `^ <name> [<generics>] = <type> ;` | Type alias
-\<alias> | `:^ <name> = :<name> {:<name>} ;` | [Namespace](#namespace) alias
+\<alias> | `^ <name> [<generics>] = <var_type> ;` | Type alias
+\<alias> | `:^ <name> = (<name> | <namespace_access>) ;` where `<namespace_access>` is a sub-namespace access | [Namespace](#namespace) / sub-namespace alias
 \<alias> | `$^ <name> [<generics>] = <struct_type> ;` | [Struct](#struct) alias
 \<alias> | `#^ <name> = <enum_type> ;` | [Enum](#enum) alias
+&emsp; \<name>             | See [Names](#names)
+&emsp; \<generics>         | See [Generics](#generics)
+&emsp; \<namespace_access> | See [Namespace](#namespace)
+&emsp; \<struct_type> <br> &emsp; \<enum_type> | See [Types](#types)
 
 - An *alias* is an different name (alias) for a specified type.
 - Examples:
@@ -371,8 +386,8 @@ Tag | Syntax | Comment
 
 **If / Else**
 
-Tag | Syntax | Comment
---- | ------ | -------
+Tag | Syntax
+--- | ------
 \<if>   | `if ( <expr> ) <block> {<elif>} [<else>]`
 \<elif> | `elif ( <expr> ) <block>`
 \<else> | `else <block>` 
@@ -639,6 +654,11 @@ Tag | Syntax
 **Pointers**
 
 **Functions**
+
+
+  - Functions can take parameters, that get passed by value.
+  - Functions can take variadic arguments.
+  - Function parameters can take default values
 
 **Immutability** (*const*-ness)
 
