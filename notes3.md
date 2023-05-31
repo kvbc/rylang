@@ -184,13 +184,13 @@ Tag | Syntax
 \<struct>        | `$ <name> [<generics>] = <struct_block> ;`
 \<struct_block>  | `{ <struct_stmt> {<struct_stmt>} }`
 \<struct_stmt>   | `<struct_field> | <namespace_stmt>`
-\<struct_field>  | `<name> <var_type> ;` where `<var_type>` isn't the defined struct itself
-\<struct_field>  | `<var>` where the variable type isn't the defined struct itself
+\<struct_field>  | `<name> <var_type> [= <compexpr>] ;` where `<var_type>` isn't the defined struct itself
 &emsp; \<name>           | See [Names](#names)
 &emsp; \<var>            | See [Variables](#variables)
 &emsp; \<var_type>       | See [Types](#types)
 &emsp; \<generics>       | See [Generics](#generics)
 &emsp; \<namespace_stmt> | See [Namespace](#namespace)
+&emsp; \<compexpr>       | ???
 
 - A *struct* (Structure) is a collection of variables (fields).
 - A *struct* is also a namespace.
