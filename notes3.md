@@ -16,7 +16,7 @@ Notes
 - block labels - `Block`
 - switch / match
 - function parameters immutable - `<func_type>`
-- compile time expressions
+- compile-time expressions
 - named arguments - `() operator`
   ```rust
   $Vector2 = {
