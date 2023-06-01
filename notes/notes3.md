@@ -16,7 +16,7 @@ Notes
 - block labels - `Block`
 - switch / match
 - function parameters immutable - `<func_type>`
-- compile-time expressions
+- compile-time expressions - `Expressions`
 - named arguments - `() operator`
   ```rust
   $Vector2 = {
@@ -36,23 +36,25 @@ Notes
 
 # Variables :white_check_mark:
 
+TODO: Explain what's a variable
+
 **Syntax**
 
 Tag | Syntax | Comment
 --- | ------ | -------
-\<var>         | `<name> <var_type> = <expr> ;`
+\<var>         | `<name> <type> = <expr> ;` where `<type>` excludes `<struct_type>`
 \<var>         | `<name> <struct_type> = <struct_literal> ;`
 \<var>         | `<name> <struct_type> = <expr> ;` where `<expr>` results in type `<struct_type>` | Struct copy
 &emsp; \<name> | See [Names](#names)
 &emsp; \<expr> | See [Expressions](#expressions)
 &emsp; \<struct_literal> | See [Literals](#literals)
-&emsp; \<var_type>, <br> &emsp; \<struct_type> | See [Types](#types)
+&emsp; \<type>, <br> &emsp; \<struct_type> | See [Types](#types)
 
 **Parentship**
 
 Tag | Parent | Comment
 --- | ------ | -------
-\<var> | `<func_block>`, all sub-blocks of `<func_block>` | Where you can define variables.
+\<var> | `<func_block>`, all sub-blocks of `<func_block>` | See **Interpretation**
 
 **Context**
 
@@ -63,6 +65,7 @@ Tag | Parent | Comment
     {
         x u8 = 2; // ERROR: variable redefinition
     }
+    x u8 = 3; // ERROR: variable redefinition
   }
   ```
 
@@ -119,21 +122,27 @@ ptr *u8 = &val;
 ```rust
 $Vector2 = { x i32; y i32; };
 pos $Vector2 = {
-.x = 0,
-.y = 0
+    .x = 0,
+    .y = 0
 };
 ```
 ```rust
 $A = { x j32; };
 $B = { a $A; };
 b $B = {
-.a = {
-    .x = 3;
-};
+    .a = {
+        .x = 3;
+    };
 };
 ```
 
-# Functions :white_check_mark:
+# Functions
+
+A function is an ordered sequence of statements that get executed whenever you call it.
+  - See [Statements](#statements) for the definition of a statement `<stmt>`.
+  - See [Namespace](#namespace) for the definition of a namespace statement `<namespace_stmt>`.
+
+**Syntax**
 
 Tag | Syntax
 --- | ------
@@ -145,11 +154,21 @@ Tag | Syntax
 &emsp; \<stmt>           | See [Statements](#statements)
 &emsp; \<namespace_stmt> | See [Namespace](#namespace)
 
-- A function is an ordered sequence of statements that get executed whenever you call it.
-  - See [Statements](#statements) for the definition of a statement `<stmt>`.
-  - See [Namespace](#namespace) for the definition of a namespace statement `<namespace_stmt>`.
-- See [Operators](#operators) for the function call operator `()` --- how to call a function & call-specific language features.
-- See `<func_type>` in [Types](#types) --- all about function parameters and return semantics.
+**Parentship**
+
+Tag | Parent | Comment 
+--- | ------ | -------
+\<func> | \<namespace> | See **Interpretation**
+
+**Interpretation**
+
+- See [Operators](#operators) for the function call operator `()` and it's specific language features.
+- See `<func_type>` in [Types](#types) for all about function parameters and return semantics.
+- Functions can only be defined inside of namespaces. \
+  Do note that the the global scope, Structs, Enums and Functions are all considered namespaces. 
+  - See [Namespaces](#namespace)
+  - See [Struct](#struct)
+  - See [Enum](#enum)
 - Functions are also namespaces.
   - See [Namespaces](#namespace).
   ```rust
@@ -207,19 +226,21 @@ Tag | Syntax
     c i32 = add_1();
   }
   ```
-- Examples:
-  ```rust
-  add (a i32, b i32)i32 = {
+  
+**Examples**
+
+```rust
+add (a i32, b i32)i32 = {
     break a + b;
-  }
-  main ()void = {
+}
+main ()void = {
     a i32 = 1;
     b i32 = 2;
     c i32 = add(a, b);
-  }
-  ```
+}
+```
 
-# Struct :white_check_mark:
+# Struct
 
 Tag | Syntax
 --- | ------
