@@ -5,6 +5,15 @@ Note
 [ ] [go](https://go.dev/ref/spec)
 [ ] [nim](https://nim-lang.org/docs/manual.html)
 
+Good syntax
+- `Variables`
+- `Functions`
+- `Struct`
+- `Enum`
+
+Good info
+- TBD
+
 Notes
 - raw string \`single back ticks\` - `Literals`
 - variadic arguments - `<func_type>`
@@ -37,13 +46,13 @@ Notes
 
 # Variables
 
-TODO: Explain what's a variable
+A variable is a named container of data.
 
 **Syntax**
 
 Tag | Syntax | Comment
 --- | ------ | -------
-\<var>         | `<name> <type> = <expr> ;` where `<type>` excludes `<struct_type>`               | Non-struct variable
+\<var>         | `<name> <type> = <expr> ;` where `<type>` is not `<struct_type>`                 | Non-struct variable
 \<var>         | `<name> <struct_type> = <struct_literal> ;`                                      | Struct literal
 \<var>         | `<name> <struct_type> = <expr> ;` where `<expr>` results in type `<struct_type>` | Struct copy
 &emsp; \<name>           | See [Names](#names)
@@ -63,8 +72,8 @@ TODO
 
 - Variable shadowing is disallowed.
   ```rust
-  main ()void {
-  	x u8 = 1;
+  main ()void = {
+	x u8 = 1;
     {
         x u8 = 2; // ERROR: variable redefinition
     }
@@ -78,9 +87,10 @@ TODO
 - See `<expr>` in [Expressions](#expressions) for what a non-struct variable can be assigned.
 - All variables must be initialized.
 - Variables can only exist inside of functions and their sub-blocks - there can be no global variables.
-- Variables of the *struct* type must be initialized either by copy or by using the struct literal.
+- Variables of type *struct* `<struct_type>` must be initialized either by copy or by using the struct literal.
   - See [Struct](#struct).
-  - See [Literals](#struct) for the definition of a *struct literal*.
+  - See `<struct_type>` in [Types](#types).
+  - See [Literals](#literals) for the definition of a *struct literal*.
   ```rust
   main ()void = {
     $Vector2 = { x i32; y i32 };
@@ -92,8 +102,8 @@ TODO
     b $Vector2 = a; // copy
     c $Vector2 = { // copy
         break b;
-    }
-  }
+    };
+  };
   ```
   This supposed copy might not always result in an actual copy of the data. \
   The compiler is expected to, where applicable, prefer "moving" the data instead of actually copying it. \
@@ -169,16 +179,11 @@ Tag | Parent | Comment
 
 TODO
 
-**Interpretation**
-
 - See [Operators](#operators) for the function call operator `()` and it's specific language features.
-- See `<func_type>` in [Types](#types) for all about function parameters and return semantics.
-- Functions can only be defined inside of namespaces. \
-  - See [Namespaces](#namespace)
- Functions are also namespaces.
+- Functions are also namespaces.
   - See [Namespaces](#namespace).
   ```rust
-  xadd (a i32, b i32) :xadd():$Result {
+  xadd (a i32, b i32) :xadd():$Result = {
     $Result = {
       val i32;
       ok bool;
@@ -232,6 +237,14 @@ TODO
     c i32 = add_1();
   }
   ```
+
+**Interpretation**
+
+- See `<name>` in [Names](#names) for the rules behind a valid function name (identifier).
+- See `<func_type>` in [Types](#types) for all about function parameters and return semantics.
+- See `<stmt>` in [Statements](#statements) and `<namespace_stmt>` in [Namespace](#namespace) for all the statements that can be used inside of a function body.
+- Functions can only be defined inside of namespaces.
+  - See [Namespaces](#namespace)
   
 **Examples**
 
@@ -289,12 +302,11 @@ TODO
   ```
 - Structs can only be defined inside of namespaces.
   - See [Namespace](#namespace).
-A *struct* cannot be empty.
+- A *struct* cannot be empty.
   ```rust
   $Vector2 = {} // ERROR
   ```
 - See `<struct_type>` in [Types](#types) for anonymous structs.
-- See [Generics](#generics) for struct generics.
 - A *struct* field cannot be of the same type as the defined struct.
   ```rust
   $A = {
@@ -449,53 +461,6 @@ TODO
 c #Color = #Color:RED;
 ```
   
-# Alias
-
-An *alias* is a different name for a specified type.
-
-**Syntax**
-
-Tag | Syntax | Comment
---- | ------ | -------
-\<alias> | `^ <name> = <type> ;` where `<type>` excludes both `<struct_type>` and `<enum_type>` | Type Alias
-\<alias> | `:^ <name> = : <name> ;`      | [Namespace](#namespace) alias
-\<alias> | `:^ <name> = <namespace_access> ;` where `<namespace_access>` is a sub-namespace access | Sub-[namespace](#namespace) alias
-\<alias> | `$^ <name> = <struct_type> ;` | [Struct](#struct) alias
-\<alias> | `#^ <name> = <enum_type> ;`   | [Enum](#enum) alias
-&emsp; \<name>             | See [Names](#names)
-&emsp; \<namespace_access> | See [Namespace](#namespace)
-&emsp; \<type>, <br> &emsp; \<struct_type> <br> &emsp; \<enum_type> | See [Types](#types)
-
-**Context**
-
-TODO
-
-**Interpretation**
-
-- Examples:
-  ```rust
-  ^char = u8;
-  ^int = i32;
-
-  x ^int = 10;
-  c ^char = 'c';
-  ```
-  Namespace alias
-  ```rust
-  :a = {
-    :b = {
-        :c = {
-            $Vector2 = { x i32; y i32; };
-        }
-    }
-  };
-
-  pos1 :a:b:c:$Vector2;
-
-  ^abc = :a:b:c;
-  pos2 :^abc:$Vector2;
-  ```
-
 # Namespace
 
 A namespace is a scoped collection of:
@@ -510,12 +475,12 @@ A namespace is a scoped collection of:
 Tag | Syntax | Comment
 --- | ------ | -------
 \<namespace>        | `: <name> = <namespace_block> ;`
-\<namespace>        | `: <name> = <string> ;`                              | Module import
+\<namespace>        | `: <name> = <string> ;`                | Module import
 \<namespace_block>  | `{ <namespace_stmt> {<namespace_stmt>} }`
-\<namespace_stmt>   | `<func> | <struct> | <enum> | <namespace> | <alias>`
-\<namespace_entity> | `^ <name>`                                           | Alias access / Namespace alias
-\<namespace_entity> | `<struct_type> | <enum_type> | <name>`               | Struct / Enum / Namespace
-\<namespace_entity> | `<name> ()`                                          | Function
+\<namespace_stmt>   | `<func> | <struct> | <enum> | <namespace> | <namespace_alias>`
+\<namespace_entity> | `^ <name>`                             | Alias access / Namespace alias
+\<namespace_entity> | `<struct_type> | <enum_type> | <name>` | Struct / Enum / Namespace
+\<namespace_entity> | `<name> ()`                            | Function
 \<namespace_access> | `: <namespace_entity> : <namespace_entity> {: <namespace_entity>}`
 &emsp; \<name>   | See [Names](#names)
 &emsp; \<string> | See [Literals](#literals)
@@ -524,11 +489,18 @@ Tag | Syntax | Comment
 &emsp; \<enum>   | See [Enum](#enum)
 &emsp; \<alias>  | See [Alias](#alias)
 
+Tag | Syntax | Comment
+--- | ------ | -------
+\<namespace_alias>  | `:^ <name> = : <name> ;` | [Namespace](#namespace) alias
+\<namespace_alias>  | `:^ <name> = <namespace_access> ;` where `<namespace_access>` is a sub-namespace access | Sub-[namespace](#namespace) alias
+&emsp; \<name> | See [Names](#names)
+
 **Parentship**
 
 Tag | Parent | Comment
 --- | ------ | -------
-\<namespace> | \<namespace> | See **Context**
+\<namespace>       | \<namespace> | See **Context**
+\<namespace_alias> | \<namespace> | See **Context**
 
 **Context**
 
@@ -546,6 +518,25 @@ Tag | Parent | Comment
     };
     pos :math:$Vector2;
     ```
+
+**Examples**
+
+Namespace alias
+
+```rust
+:a = {
+  :b = {
+      :c = {
+          $Vector2 = { x i32; y i32; };
+      }
+  }
+};
+
+pos1 :a:b:c:$Vector2;
+
+^abc = :a:b:c;
+pos2 :^abc:$Vector2;
+```
 
 # Control Flow
 
