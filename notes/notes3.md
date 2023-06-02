@@ -45,6 +45,15 @@ Notes
   v $Vector2 = :Vector2:new(y=0);
   ```
 
+Table of Contents
+- [Variables](#variables)
+- [Functions][#functions]
+- [Struct](#struct)
+- [Enum](#enum)
+- [Namespace](#namespace)
+- [Block](#block)
+- [Control Flow](#control-flow)
+
 # Variables
 
 A variable is a named container of data.
@@ -514,14 +523,62 @@ Tag | Parent | Comment
 
 TODO
 
+# Block
+
+A block is a collection of statements.
+- See `<stmt>` in [Statements](#statements) for the definition of a *statement*.
+
+A block can be "broke from" using the `break` statement.
+
+**Syntax**
+
+Tag | Syntax
+--- | ------
+\<block> | `[<string>] { <stmt> {<stmt>} }`
+\<break> | `break [<string>] [<expr>] ;`
+&emsp; \<string> | See [Literals](#literals)
+&emsp; \<stmt> | See [Statements](#statements)
+&emsp; \<expr> | See [Expressions](#expressions)
+
+**Context**
+
+TODO
+
+**Interpretation**
+
+- All blocks can be labeled with a preceding string literal.
+- Break statements can be optionally provided the block label to break from (as a string literal) and an expression to return from a block
+	```rust
+		max usize = 10;
+		x isize = for( a usize = 0; a < max; a += 1 ) "a" {
+			for( b usize = 0; b < max; b += 1 ) "b" {
+				if a + b == a * b {
+					break "a" (a + b);
+				}
+			}
+		}
+	```
+
+**Examples&**
+
+```rust
+for( x usize = 0;; x < 10; x += 1) "x" {
+	for( y usize = 0;; y < 10; y += 1) "y" {
+		for( z usize = 0;; z < 10; z += 1) "z" {
+			if z < 5 { break "x"; }
+		}
+	}
+}
+```
+
 # Control Flow
 
 **If / Else**
 
 Tag | Syntax
 --- | ------
-\<if>   | `if ( <expr> ) <block> {<elif>} [<else>]`
-\<elif> | `elif ( <expr> ) <block>`
+\<if>   | `if <expr> <block> {<elif>} [<else>]`
+\<elif> | `elif <expr> <block>`
 \<else> | `else <block>` 
 
 - Examples:
@@ -626,25 +683,7 @@ Tag | Syntax | Examples
     p.a = 1;
     p.b = 2;
     ```
-
-# Block
-
-Tag | Syntax
---- | ------
-\<block> | `{ <stmt> {<stmt>} }`
-
-**break**
-
-Tag | Syntax
---- | ------
-\<break> | `break [<expr>] ;`
-
-**breakif**
-
-Tag | Syntax
---- | ------
-\<breakif> | `breakif ( <expr> ) [<expr>] ;`
-
+    
 # Comments
 
 ```rust
