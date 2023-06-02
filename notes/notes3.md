@@ -10,6 +10,7 @@ Good syntax
 - `Functions`
 - `Struct`
 - `Enum`
+- `Namespace`
 
 Good info
 - TBD
@@ -475,12 +476,10 @@ A namespace is a scoped collection of:
 Tag | Syntax | Comment
 --- | ------ | -------
 \<namespace>        | `: <name> = <namespace_block> ;`
-\<namespace>        | `: <name> = <string> ;`                | Module import
+\<namespace>        | `: <name> = <string> ;` | Module import
 \<namespace_block>  | `{ <namespace_stmt> {<namespace_stmt>} }`
-\<namespace_stmt>   | `<func> | <struct> | <enum> | <namespace> | <namespace_alias>`
-\<namespace_entity> | `^ <name>`                             | Alias access / Namespace alias
-\<namespace_entity> | `<struct_type> | <enum_type> | <name>` | Struct / Enum / Namespace
-\<namespace_entity> | `<name> ()`                            | Function
+\<namespace_stmt>   | `<func> | <struct> | <enum> | <namespace>`
+\<namespace_entity> | `<struct_type> | <enum_type> | <name> | (<name>())` | Struct / Enum / Namespace / Function
 \<namespace_access> | `: <namespace_entity> : <namespace_entity> {: <namespace_entity>}`
 &emsp; \<name>   | See [Names](#names)
 &emsp; \<string> | See [Literals](#literals)
@@ -489,18 +488,11 @@ Tag | Syntax | Comment
 &emsp; \<enum>   | See [Enum](#enum)
 &emsp; \<alias>  | See [Alias](#alias)
 
-Tag | Syntax | Comment
---- | ------ | -------
-\<namespace_alias>  | `:^ <name> = : <name> ;` | [Namespace](#namespace) alias
-\<namespace_alias>  | `:^ <name> = <namespace_access> ;` where `<namespace_access>` is a sub-namespace access | Sub-[namespace](#namespace) alias
-&emsp; \<name> | See [Names](#names)
-
 **Parentship**
 
 Tag | Parent | Comment
 --- | ------ | -------
-\<namespace>       | \<namespace> | See **Context**
-\<namespace_alias> | \<namespace> | See **Context**
+\<namespace> | \<namespace> | See **Context**
 
 **Context**
 
@@ -510,7 +502,6 @@ Tag | Parent | Comment
 
 - Namespaces can be imported from other files. This concept forms the basis of [Modules](#modules).
 - [Functions](#functions), [Structs](#struct) and [Enums](#enum) are all namespaces.
-- See [Alias](#alias) for namespace aliasing.
 - To access a namespace member, you can use the colon `:` operator
   - ```rust
     :math = {
@@ -521,22 +512,7 @@ Tag | Parent | Comment
 
 **Examples**
 
-Namespace alias
-
-```rust
-:a = {
-  :b = {
-      :c = {
-          $Vector2 = { x i32; y i32; };
-      }
-  }
-};
-
-pos1 :a:b:c:$Vector2;
-
-^abc = :a:b:c;
-pos2 :^abc:$Vector2;
-```
+TODO
 
 # Control Flow
 
