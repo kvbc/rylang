@@ -5,6 +5,9 @@ List (comptime T type) type {
 	};
 }
 
+^IntList = List(i32);
+list ^IntList = ...
+
 options ${
 	ok bool;
 	...

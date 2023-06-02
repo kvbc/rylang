@@ -174,11 +174,8 @@ TODO
 - See [Operators](#operators) for the function call operator `()` and it's specific language features.
 - See `<func_type>` in [Types](#types) for all about function parameters and return semantics.
 - Functions can only be defined inside of namespaces. \
-  Do note that the the global scope, Structs, Enums and Functions are all considered namespaces. 
   - See [Namespaces](#namespace)
-  - See [Struct](#struct)
-  - See [Enum](#enum)
-- Functions are also namespaces.
+ Functions are also namespaces.
   - See [Namespaces](#namespace).
   ```rust
   xadd (a i32, b i32) :xadd():$Result {
@@ -251,6 +248,8 @@ main ()void = {
 
 # Struct
 
+A *struct* (Structure) is a collection of variables (fields).
+
 **Syntax**
 
 Tag | Syntax
@@ -267,13 +266,18 @@ Tag | Syntax
 &emsp; \<compexpr>       | See [Expressions](#expressions)
 &emsp; \<struct_literal> | See [Literals](#literals)
 
+**Parentship**
+
+Tag | Parent | Comment
+--- | ------ | ------
+\<struct> | \<namespace> | See [Namespace](#namespace)
+
 **Context**
 
 TODO
 
 **Interpretation**
 
-- A *struct* (Structure) is a collection of variables (fields).
 - A *struct* is also a namespace.
   - See [Namespace](#namespace).
   ```rust
@@ -283,7 +287,9 @@ TODO
       y ^int;
     };
   ```
-- A *struct* cannot be empty.
+- Structs can only be defined inside of namespaces.
+  - See [Namespace](#namespace).
+A *struct* cannot be empty.
   ```rust
   $Vector2 = {} // ERROR
   ```
@@ -360,6 +366,8 @@ TODO
   ```
 # Enum
 
+An Enum (Enumeration) is a collection of scoped, named & unique integer values (fields)
+
 **Syntax**
 
 Tag | Syntax
@@ -374,16 +382,26 @@ Tag | Syntax
 &emsp; \<number>         | See [Literals](#literals)
 &emsp; \<compexpr>       | See [Expressions](#expressions)
 
+**Parentship**
+
+Tag | Parent | Comment
+--- | ------ | ------
+\<enum> | \<namespace> | See [Namespace](#namespace)
+
 **Context**
 
 TODO
 
+- The first enum field, if not explicitely set, is equal to 0.
+- Each next enum field, if not explicitely set, is 1 higher than the previous value. 
+
 **Interpretation**
 
-- An Enum (Enumeration) is a collection of scoped, named & unique integer values (fields)
 - Enum fields are of type `i32`
   - See `<primitive>` in [Types](#types) for the type of `i32`.
-- Enums are also namespaces.
+- Enums can only be defined inside of namespaces.
+  - See [Namespace](#namespace)
+ Enums are also namespaces.
   - See [Namespace](#namespace).
 - Enum fields can be accessed using the colon `:` operator
   - See [Operators](#operators) for the *enum field access* operator.
@@ -419,9 +437,7 @@ TODO
         HORSE // 101
     }
     ```
-- The first enum field, if not explicitely set, is equal to 0.
-- Each next enum field, if not explicitely set, is 1 higher than the previous value. 
-
+    
 **Examples**
 
 ```rust
@@ -435,19 +451,27 @@ c #Color = #Color:RED;
   
 # Alias
 
+An *alias* is a different name for a specified type.
+
+**Syntax**
+
 Tag | Syntax | Comment
 --- | ------ | -------
-\<alias> | `^ <name> [<generics>] = <var_type> ;` | Type alias
-\<alias> | `:^ <name> = : <name> ;` | [Namespace](#namespace) alias
+\<alias> | `^ <name> = <type> ;` where `<type>` excludes both `<struct_type>` and `<enum_type>` | Type Alias
+\<alias> | `:^ <name> = : <name> ;`      | [Namespace](#namespace) alias
 \<alias> | `:^ <name> = <namespace_access> ;` where `<namespace_access>` is a sub-namespace access | Sub-[namespace](#namespace) alias
-\<alias> | `$^ <name> [<generics>] = <struct_type> ;` | [Struct](#struct) alias
-\<alias> | `#^ <name> = <enum_type> ;` | [Enum](#enum) alias
+\<alias> | `$^ <name> = <struct_type> ;` | [Struct](#struct) alias
+\<alias> | `#^ <name> = <enum_type> ;`   | [Enum](#enum) alias
 &emsp; \<name>             | See [Names](#names)
-&emsp; \<generics>         | See [Generics](#generics)
 &emsp; \<namespace_access> | See [Namespace](#namespace)
-&emsp; \<struct_type> <br> &emsp; \<enum_type> | See [Types](#types)
+&emsp; \<type>, <br> &emsp; \<struct_type> <br> &emsp; \<enum_type> | See [Types](#types)
 
-- An *alias* is a different name for a specified type.
+**Context**
+
+TODO
+
+**Interpretation**
+
 - Examples:
   ```rust
   ^char = u8;
@@ -474,15 +498,24 @@ Tag | Syntax | Comment
 
 # Namespace
 
+A namespace is a scoped collection of:
+  - [Functions](#functions),
+  - [Structs](#struct),
+  - [Enums](#enum),
+  - [Aliases](#alias), and
+  - Other namespaces
+
+**Syntax**
+
 Tag | Syntax | Comment
 --- | ------ | -------
 \<namespace>        | `: <name> = <namespace_block> ;`
-\<namespace>        | `: <name> = <string> ;` | Module import
+\<namespace>        | `: <name> = <string> ;`                              | Module import
 \<namespace_block>  | `{ <namespace_stmt> {<namespace_stmt>} }`
 \<namespace_stmt>   | `<func> | <struct> | <enum> | <namespace> | <alias>`
-\<namespace_entity> | `^ <name>`  | Alias access / Namespace alias
-\<namespace_entity> | `<struct_type> | <enum_type> | <name>`  | Struct / Enum / Namespace
-\<namespace_entity> | `<name> ()` | Function
+\<namespace_entity> | `^ <name>`                                           | Alias access / Namespace alias
+\<namespace_entity> | `<struct_type> | <enum_type> | <name>`               | Struct / Enum / Namespace
+\<namespace_entity> | `<name> ()`                                          | Function
 \<namespace_access> | `: <namespace_entity> : <namespace_entity> {: <namespace_entity>}`
 &emsp; \<name>   | See [Names](#names)
 &emsp; \<string> | See [Literals](#literals)
@@ -491,12 +524,17 @@ Tag | Syntax | Comment
 &emsp; \<enum>   | See [Enum](#enum)
 &emsp; \<alias>  | See [Alias](#alias)
 
-- A namespace is a scoped collection of:
-  - [Functions](#functions),
-  - [Structs](#struct),
-  - [Enums](#enum),
-  - [Aliases](#alias), and
-  - Other namespaces
+**Parentship**
+
+Tag | Parent | Comment
+--- | ------ | -------
+\<namespace> | \<namespace> | See **Context**
+
+**Context**
+
+- The global scope is also considered a namespace.
+
+**Interpretation**
 
 - Namespaces can be imported from other files. This concept forms the basis of [Modules](#modules).
 - [Functions](#functions), [Structs](#struct) and [Enums](#enum) are all namespaces.
