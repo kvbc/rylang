@@ -19,3 +19,4 @@ main() void {
 
     $Vector2:add(a, b);
 }
+

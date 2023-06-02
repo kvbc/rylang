@@ -16,6 +16,7 @@ Notes
 - block labels - `Block`
 - switch / match
 - function parameters immutable - `<func_type>`
+- anon struct types - `<struct_type>` (see notes/notes4.rs)
 - compile-time expressions - `Expressions`
 - named arguments - `() operator`
   ```rust
@@ -34,7 +35,7 @@ Notes
   v $Vector2 = :Vector2:new(y=0);
   ```
 
-# Variables :white_check_mark:
+# Variables
 
 TODO: Explain what's a variable
 
@@ -42,11 +43,11 @@ TODO: Explain what's a variable
 
 Tag | Syntax | Comment
 --- | ------ | -------
-\<var>         | `<name> <type> = <expr> ;` where `<type>` excludes `<struct_type>`
-\<var>         | `<name> <struct_type> = <struct_literal> ;`
+\<var>         | `<name> <type> = <expr> ;` where `<type>` excludes `<struct_type>`               | Non-struct variable
+\<var>         | `<name> <struct_type> = <struct_literal> ;`                                      | Struct literal
 \<var>         | `<name> <struct_type> = <expr> ;` where `<expr>` results in type `<struct_type>` | Struct copy
-&emsp; \<name> | See [Names](#names)
-&emsp; \<expr> | See [Expressions](#expressions)
+&emsp; \<name>           | See [Names](#names)
+&emsp; \<expr>           | See [Expressions](#expressions)
 &emsp; \<struct_literal> | See [Literals](#literals)
 &emsp; \<type>, <br> &emsp; \<struct_type> | See [Types](#types)
 
@@ -58,10 +59,12 @@ Tag | Parent | Comment
 
 **Context**
 
+TODO
+
 - Variable shadowing is disallowed.
   ```rust
   main ()void {
-    x u8 = 1;
+  	x u8 = 1;
     {
         x u8 = 2; // ERROR: variable redefinition
     }
@@ -119,6 +122,7 @@ Tag | Parent | Comment
 val u8 = 10;
 ptr *u8 = &val;
 ```
+
 ```rust
 $Vector2 = { x i32; y i32; };
 pos $Vector2 = {
@@ -126,6 +130,7 @@ pos $Vector2 = {
     .y = 0
 };
 ```
+
 ```rust
 $A = { x j32; };
 $B = { a $A; };
@@ -159,6 +164,10 @@ Tag | Syntax
 Tag | Parent | Comment 
 --- | ------ | -------
 \<func> | \<namespace> | See **Interpretation**
+
+**Context**
+
+TODO
 
 **Interpretation**
 
@@ -242,20 +251,27 @@ main ()void = {
 
 # Struct
 
+**Syntax**
+
 Tag | Syntax
 --- | ------
-\<struct>        | `$ <name> [<generics>] = <struct_block> ;`
+\<struct>        | `$ <name> = <struct_block> ;`
 \<struct_block>  | `{ <struct_stmt> {<struct_stmt>} }`
 \<struct_stmt>   | `<struct_field> | <namespace_stmt>`
-\<struct_field>  | `<name> <var_type> [= <compexpr>] ;` where `<var_type>` isn't the defined struct itself
+\<struct_field>  | `<name> <type> [= <compexpr>] ;` where `<type>` isn't the defined struct itself
 \<struct_field>  | `<name> <struct_type> [= <struct_literal>] ;` where `<struct_type>` isn't the defined struct itself
 &emsp; \<name>           | See [Names](#names)
 &emsp; \<var>            | See [Variables](#variables)
 &emsp; \<var_type>       | See [Types](#types)
-&emsp; \<generics>       | See [Generics](#generics)
 &emsp; \<namespace_stmt> | See [Namespace](#namespace)
 &emsp; \<compexpr>       | See [Expressions](#expressions)
 &emsp; \<struct_literal> | See [Literals](#literals)
+
+**Context**
+
+TODO
+
+**Interpretation**
 
 - A *struct* (Structure) is a collection of variables (fields).
 - A *struct* is also a namespace.
@@ -271,6 +287,7 @@ Tag | Syntax
   ```rust
   $Vector2 = {} // ERROR
   ```
+- See `<struct_type>` in [Types](#types) for anonymous structs.
 - See [Generics](#generics) for struct generics.
 - A *struct* field cannot be of the same type as the defined struct.
   ```rust
@@ -343,29 +360,39 @@ Tag | Syntax
   ```
 # Enum
 
+**Syntax**
+
 Tag | Syntax
 --- | ------
 \<enum>        | `# <name> = <enum_block> ;`
 \<enum_block>  | `{ <enum_stmt> {<enum_stmt>} }`
 \<enum_stmt>   | `<enum_field> | <namespace_stmt>`
-\<enum_field>  | `<name> [= <compexpr>] ;` where `<compexpr>` results in `i32`
+\<enum_field>  | `<name> [= <compexpr>] ;` where `<compexpr>` results in type `i32`
 \<enum_access> | `<enum_type> : <name>`
 &emsp; \<name>           | See [Names](#names)
 &emsp; \<namespace_stmt> | See [Namespace](#namespace)
 &emsp; \<number>         | See [Literals](#literals)
 &emsp; \<compexpr>       | See [Expressions](#expressions)
 
-- *Enum* (Enumeration) is a collection of scoped, named, unique integer values (fields)
-- *Enum* fields are of type `i32`
-- *Enums* are also namespaces.
+**Context**
+
+TODO
+
+**Interpretation**
+
+- An Enum (Enumeration) is a collection of scoped, named & unique integer values (fields)
+- Enum fields are of type `i32`
+  - See `<primitive>` in [Types](#types) for the type of `i32`.
+- Enums are also namespaces.
   - See [Namespace](#namespace).
-- *Enum* fields can be accessed using the colon `:` operator
+- Enum fields can be accessed using the colon `:` operator
+  - See [Operators](#operators) for the *enum field access* operator.
   ```rust
   var #Enum = #Enum:FIELD;
   ```
 - *Enum* fields can be explicitely set.
-  - The set value must be a compile-time expression resulting in a value of type `i32`.
-    - See [Expressions](#expressions) for the definition of compile-time expressions.
+  - The set value must be a *compile-time* expression resulting in a value of type `i32`.
+    - See [Expressions](#expressions) for the definition of a *compile-time* expression `compexpr`.
     ```rust
     x i32 = 10;
     #Color = {
@@ -392,17 +419,20 @@ Tag | Syntax
         HORSE // 101
     }
     ```
-- The first *enum* field, if not explicitely set, is equal to 0.
-- Each next *enum* field, if not explicitely set, is 1 higher than the previous value. 
-- Examples:
-  ```rust
-  #Color = {
-    RED;   // 0
-    GREEN; // 1
-    BLUE;  // 2
-  };
-  c #Color = #Color:RED;
-  ```
+- The first enum field, if not explicitely set, is equal to 0.
+- Each next enum field, if not explicitely set, is 1 higher than the previous value. 
+
+**Examples**
+
+```rust
+#Color = {
+  RED;   // 0
+  GREEN; // 1
+  BLUE;  // 2
+};
+c #Color = #Color:RED;
+```
+  
 # Alias
 
 Tag | Syntax | Comment
