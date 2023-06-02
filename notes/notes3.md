@@ -164,7 +164,7 @@ Tag | Syntax
 --- | ------
 \<func>       | `<name> <func_type> = <func_block> ;`
 \<func_block> | `{ <func_stmt> {<func_stmt>} }`
-\<func_stmt>  | `<stmt> | <namespace_stmt>`
+\<func_stmt>  | ` <stmt> | <namespace_stmt> `
 &emsp; \<func_type>      | See [Types](#types)
 &emsp; \<name>           | See [Names](#names)
 &emsp; \<stmt>           | See [Statements](#statements)
