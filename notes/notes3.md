@@ -478,8 +478,8 @@ Tag | Syntax | Comment
 \<namespace>        | `: <name> = <namespace_block> ;`
 \<namespace>        | `: <name> = <string> ;` | Module import
 \<namespace_block>  | `{ <namespace_stmt> {<namespace_stmt>} }`
-\<namespace_stmt>   | `<func> | <struct> | <enum> | <namespace>`
-\<namespace_entity> | `<struct_type> | <enum_type> | <name> | (<name>())` | Struct / Enum / Namespace / Function
+\<namespace_stmt>   | `<func> \| <struct> \| <enum> \| <namespace>`
+\<namespace_entity> | `<struct_type> \| <enum_type> \| <name> \| (<name>())` | Struct / Enum / Namespace / Function
 \<namespace_access> | `: <namespace_entity> : <namespace_entity> {: <namespace_entity>}`
 &emsp; \<name>   | See [Names](#names)
 &emsp; \<string> | See [Literals](#literals)
