@@ -164,7 +164,7 @@ Tag | Syntax
 --- | ------
 \<func>       | `<name> <func_type> = <func_block> ;`
 \<func_block> | `{ <func_stmt> {<func_stmt>} }`
-\<func_stmt>  | `<stmt> | <namespace_stmt>`
+\<func_stmt>  | `<stmt> \| <namespace_stmt>`
 &emsp; \<func_type>      | See [Types](#types)
 &emsp; \<name>           | See [Names](#names)
 &emsp; \<stmt>           | See [Statements](#statements)
@@ -270,7 +270,7 @@ Tag | Syntax
 --- | ------
 \<struct>        | `$ <name> = <struct_block> ;`
 \<struct_block>  | `{ <struct_stmt> {<struct_stmt>} }`
-\<struct_stmt>   | `<struct_field> | <namespace_stmt>`
+\<struct_stmt>   | `<struct_field> \| <namespace_stmt>`
 \<struct_field>  | `<name> <type> [= <compexpr>] ;` where `<type>` isn't the defined struct itself
 \<struct_field>  | `<name> <struct_type> [= <struct_literal>] ;` where `<struct_type>` isn't the defined struct itself
 &emsp; \<name>           | See [Names](#names)
@@ -387,7 +387,7 @@ Tag | Syntax
 --- | ------
 \<enum>        | `# <name> = <enum_block> ;`
 \<enum_block>  | `{ <enum_stmt> {<enum_stmt>} }`
-\<enum_stmt>   | `<enum_field> | <namespace_stmt>`
+\<enum_stmt>   | `<enum_field> \| <namespace_stmt>`
 \<enum_field>  | `<name> [= <compexpr>] ;` where `<compexpr>` results in type `i32`
 \<enum_access> | `<enum_type> : <name>`
 &emsp; \<name>           | See [Names](#names)
