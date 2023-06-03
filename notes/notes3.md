@@ -663,9 +663,10 @@ b i32 = if( a == 1 ) {
 
 Tag | Syntax | Comment
 --- | ------ | -------
-\<loop> | `loop ( <stmt> ; <expr> ; <expr> ; <stmt> )` where both `expr` result in `bool` | start statement `;` start break condition `;` end break condition `;` end statement
+\<loop> | `loop ( <stmt> ; <expr> ; <expr> ; <stmt> )` where both `<expr>` result in `bool` | start statement `;` start break condition `;` end break condition `;` end statement
 &emsp; \<stmt> | See [Statements](#statements)
 &emsp; \<expr> | See [Expressions](#expressions)
+&emsp; `bool`  | See `<primitive>` in [Types](#types)
 
 **Parentship**
 
