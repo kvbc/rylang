@@ -5,16 +5,6 @@ Note
 [ ] [go](https://go.dev/ref/spec)
 [ ] [nim](https://nim-lang.org/docs/manual.html)
 
-Good syntax
-- `Variables`
-- `Functions`
-- `Struct`
-- `Enum`
-- `Namespace`
-
-Good info
-- TBD
-
 Notes
 - raw string \`single back ticks\` - `Literals`
 - variadic arguments - `<func_type>`
@@ -23,7 +13,6 @@ Notes
 - using / use
 - struct literal - `Literals`
 - union
-- block labels - `Block`
 - switch / match
 - function parameters immutable - `<func_type>`
 - anon struct types - `<struct_type>` (see notes/notes4.rs)
@@ -46,17 +35,42 @@ Notes
   ```
 
 Table of Contents
-- [Variables](#variables)
-- [Functions][#functions]
-- [Struct](#struct)
-- [Enum](#enum)
-- [Namespace](#namespace)
-- [Block](#block)
-- [Control Flow](#control-flow)
 
-# Variables
+1. [Variables](#variables)
+2. [Functions](#functions)
+3. [Struct](#struct)
+4. [Enum](#enum)
+5. [Namespace](#namespace)
+    5.1. [Modules](#modules)
+6. [Block](#block)
+7. [Control Flow](#7-control-flow)
+    7.1 [If / Else](#71-if--else)
+    7.2 [Loop](#72-loop)
+        7.2.1 [Continue](#721-continue)
+8. [Comments](#8-comments)
+9. Statements
+10. Expressions
+11. Literals
+12. Operators
+13. Types
+14. Names
 
-A variable is a named container of data.
+Good syntax
+- 1. `Variables`
+- 2. `Functions`
+- 3. `Struct`
+- 4. `Enum`
+- 5. `Namespace`
+- 6. `Block`
+- 7. `Control Flow`
+- 8. `Comments`
+
+Good info
+- TBD
+
+# 1. Variables
+
+A variable is a named container for data.
 
 **Syntax**
 
@@ -161,7 +175,7 @@ b $B = {
 };
 ```
 
-# Functions
+# 2. Functions
 
 A function is an ordered sequence of statements that get executed whenever you call it.
   - See [Statements](#statements) for the definition of a statement `<stmt>`.
@@ -269,7 +283,7 @@ main ()void = {
 }
 ```
 
-# Struct
+# 3. Struct
 
 A *struct* (Structure) is a collection of variables (fields).
 
@@ -386,7 +400,7 @@ TODO
     pos $Vector2 = $Vector2:new(0, 0);
   }
   ```
-# Enum
+# 4. Enum
 
 An Enum (Enumeration) is a collection of scoped, named & unique integer values (fields)
 
@@ -471,7 +485,7 @@ TODO
 c #Color = #Color:RED;
 ```
   
-# Namespace
+# 5. Namespace
 
 A namespace is a scoped collection of:
   - [Functions](#functions),
@@ -523,99 +537,7 @@ Tag | Parent | Comment
 
 TODO
 
-# Block
-
-A block is a collection of statements.
-- See `<stmt>` in [Statements](#statements) for the definition of a *statement*.
-
-A block can be "broke from" using the `break` statement.
-
-**Syntax**
-
-Tag | Syntax
---- | ------
-\<block> | `[<string>] { <stmt> {<stmt>} }`
-\<break> | `break [<string>] [<expr>] ;`
-&emsp; \<string> | See [Literals](#literals)
-&emsp; \<stmt> | See [Statements](#statements)
-&emsp; \<expr> | See [Expressions](#expressions)
-
-**Context**
-
-TODO
-
-**Interpretation**
-
-- All blocks can be labeled with a preceding string literal.
-- Break statements can be optionally provided the block label to break from (as a string literal) and an expression to return from a block
-	```rust
-		max usize = 10;
-		x isize = for( a usize = 0; a < max; a += 1 ) "a" {
-			for( b usize = 0; b < max; b += 1 ) "b" {
-				if a + b == a * b {
-					break "a" (a + b);
-				}
-			}
-		}
-	```
-
-**Examples&**
-
-```rust
-for( x usize = 0;; x < 10; x += 1) "x" {
-	for( y usize = 0;; y < 10; y += 1) "y" {
-		for( z usize = 0;; z < 10; z += 1) "z" {
-			if z < 5 { break "x"; }
-		}
-	}
-}
-```
-
-# Control Flow
-
-**If / Else**
-
-Tag | Syntax
---- | ------
-\<if>   | `if <expr> <block> {<elif>} [<else>]`
-\<elif> | `elif <expr> <block>`
-\<else> | `else <block>` 
-
-- Examples:
-  ```rust
-  a i32 = 1;
-  b i32 = if( a == 1 ) {
-    break 10;
-  } elif( a == 2 ) {
-    break 20;
-  } elif( a == 3 ) {
-    break 30;
-  } else {
-    break 0;
-  }
-  ```
-
-**Loop**
-
-Type | Tag | Syntax
----- | --- | ------
-\<expr> | \<loop> | `loop ( <var> ; <bool_expr> ; <bool_expr> ; <stmt> )`
-
-- Examples:
-  ```rust
-  loop( u32 i = 0;; i++ ) {}
-  loop( u32 i = 0; i < 10;; i++ ) {}
-  loop( u32 i = 0;; i < 10; i++ ) {}
-  loop( u32 i = 0; i < 10; i < 10; i++ ) {}
-  ```
-
-**Loop -- continue**
-
-Tag | Syntax
---- | ------
-\<continue> | `continue ;`
-
-# Modules
+## 5.1. Modules
 
 ```rust
 // main.ry
@@ -643,48 +565,152 @@ main ()void = {
 }
 ```
 
-# Generics
+# 6. Block
 
-Tag | Syntax | Examples
---- | ------ | --------
-\<generics> | `< <name> {,<name>} >` | `<T>`, `<T1, T2>`, `<A, B, C>`
+A block is a collection of statements.
+- See `<stmt>` in [Statements](#statements) for the definition of a *statement*.
 
-- Generics can only be applied within struct and alias definitions.
-  - See [Struct](#struct)
-  - See [Alias](#alias)
-- Examples
-  - Struct
-    ```rust
-    $Pair<T> = {
-      a T;
-      b T;
-    };
-    {
-      pair $Pair<i32>;
-      pair.a = -10;
-      pair.b = 5;
-    } {
-      pair $Pair<bool>;
-      pair.a = false;
-      pair.b = true;
+A block can be "broke from" using the `break` statement.
+
+**Syntax**
+
+Tag | Syntax
+--- | ------
+\<block> | `[<string>] { <stmt> {<stmt>} }`
+\<break> | `break [<string>] [<expr>] ;`
+&emsp; \<string> | See [Literals](#literals)
+&emsp; \<stmt> | See [Statements](#statements)
+&emsp; \<expr> | See [Expressions](#expressions)
+
+**Context**
+
+TODO
+
+**Interpretation**
+
+- All blocks can be labeled with a preceding string literal.
+- Break statements can be optionally provided the block label to break from (as a string literal) and an expression to return from a block
+	```rust
+    max usize = 10;
+    x isize = "x" {
+        for( a usize = max;; a > 0; a -= 1 ) {
+            for( b usize = max;; b > 0; b -= 1 ) {
+                if( a + b == a * b ) {
+                    break "x" (a + b);
+                }
+            }
+        }
+        break -1;
     }
-    ```
-  - Alias
-    ```rust
-    ^func<Ta, Tb, Tret> = (a Ta, b Tb)Tret;
-    ```
-    ```rust
-    $Pair<T> = {
-      a T;
-      b T;
-    };
-    $^IntPair = $Pair<i32>;
-    p $^IntPair;
-    p.a = 1;
-    p.b = 2;
-    ```
+	```
+
+**Examples**
+
+```rust
+for( x usize = 0;; x < 10; x += 1 ) "x" {
+	for( y usize = 0;; y < 10; y += 1 ) {
+		for( z usize = 0;; z < 10; z += 1) {
+			if z < 5 { break "x"; }
+		}
+	}
+}
+```
+
+# 7. Control Flow
+
+## 7.1. If / Else
+
+**Syntax**
+
+Tag | Syntax
+--- | ------
+\<if>   | `if ( <expr> ) <block> {<elif>} [<else>]`
+\<elif> | `elif ( <expr> ) <block>`
+\<else> | `else <block>` 
+&emsp; \<expr>  | See [Expressions](#expressions)
+&emsp; \<block> | See [Block](#6-block)
+
+**Parentship**
+
+Tag | Parent | Comment
+--- | ------ | -------
+\<if> | \<expr> | See **Interpretation** & [Expressions](#expressions)
+
+**Context**
+
+TODO
+
+**Interpretation**
+
+**Examples**
+
+```rust
+a i32 = 1;
+b i32 = if( a == 1 ) {
+    break 10;
+} elif( a == 2 ) {
+    break 20;
+} elif( a == 3 ) {
+    break 30;
+} else {
+    break 0;
+}
+  ```
+
+## 7.2. Loop
+
+**Syntax**
+
+Tag | Syntax | Comment
+--- | ------ | -------
+\<loop> | `loop ( <stmt> ; <expr> ; <expr> ; <stmt> )` where both `expr` result in `bool` | start statement `;` start break condition `;` end break condition `;` end statement
+&emsp; \<stmt> | See [Statements](#statements)
+&emsp; \<expr> | See [Expressions](#expressions)
+
+**Parentship**
+
+Tag | Parent | Comment
+--- | ------ | -------
+\<loop> | \<expr> | See **Interpretation** & [Expressions](#expressions)
+
+**Context**
+
+TODO
+
+**Interpretation**
+
+TODO
+
+**Examples**
+
+```rust
+loop( u32 i = 0;; i++ ) {}
+loop( u32 i = 0; i < 10;; i++ ) {}
+loop( u32 i = 0;; i < 10; i++ ) {}
+loop( u32 i = 0; i < 10; i < 10; i++ ) {}
+```
+
+### 7.2.1. Continue
+
+**Syntax**
+
+Tag | Syntax
+--- | ------
+\<continue> | `continue ;`
+
+**Context**
+
+TODO
+
+**Interpretation**
+
+TODO
+
+**Examples**
+
+TODO
     
-# Comments
+# 8. Comments
 
 ```rust
 // single-line comment
