@@ -13,7 +13,6 @@ Notes
 - using / use
 - struct literal - `Literals`
 - union
-- switch / match
 - function parameters immutable - `<func_type>`
 - anon struct types - `<struct_type>` (see notes/notes4.rs)
 - compile-time expressions - `Expressions`
@@ -48,12 +47,13 @@ Table of Contents
     7.2 [Loop](#72-loop)
         7.2.1 [Continue](#721-continue)
 8. [Comments](#8-comments)
-9. Statements
-10. Expressions
-11. Literals
-12. Operators
-13. Types
-14. Names
+9. Literals
+10. Names
+11. Operators
+12. Statements
+13. Expressions
+14. Types
+15. Union
 
 Good syntax
 - 1. `Variables`
@@ -655,7 +655,7 @@ b i32 = if( a == 1 ) {
 } else {
     break 0;
 }
-  ```
+```
 
 ## 7.2. Loop
 
@@ -722,6 +722,24 @@ line
 comment
 */
 ```
+
+# 9. Literals
+
+Tag | Syntax
+--- | ------
+\<integer> | `0-9 {[_]0-9}`
+\<integer> | `0b 0|1 {[_]0|1}`
+\<integer> | `0x <hex_digit> {[_]<hex_digit>}`
+\<integer> | `0o 0-7 {[_]0-7}`
+&emsp; \<hex_digit> | `<digit> | (a - z) | (A - Z)`
+
+Tag | Syntax
+--- | ------
+\<float> | `<integer> . <integer>`
+
+Tag | Syntax
+--- | ------
+\<string> | `"  "`
 
 # Statements
 
