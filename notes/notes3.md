@@ -41,19 +41,28 @@ Table of Contents
 5. [Namespace](#namespace)
     5.1. [Modules](#modules)
 6. [Block](#block)
-7. [Control Flow](#7-control-flow)
-    7.1 [If / Else](#71-if--else)
-    7.2 [Loop](#72-loop)
-        7.2.1 [Continue](#721-continue)
-8. [Comments](#8-comments)
-9. [Literals](#9-literals)
-10. Names
-11. Operators
-12. Statements
-13. Expressions
-14. Types
-15. Union
-16. Macros
+7. [Control Flow](#control-flow)
+    7.1 [If / Elif / Else](#if-elif-else)
+    7.2 [Loop](#loop)
+    &emsp; 7.2.1 [Continue](#continue)
+8. [Comments](#comments)
+9. [Literals](#literals)
+    9.1. [Integer Literals](#integer-literals)
+    9.2. [Float Literals](#float-literals)
+    9.3. [String Literals](#string-literals)
+    9.4. [Struct Literals](#struct-literals)
+10. [Names](#names)
+11. [Operators](#operators)
+    11.1. [Arithmetic Operators](#arithmetic-operators)
+    11.2. [Bitwise Operators](#bitwise-operators)
+    11.3. [Comparison Operators](#comparison-operators)
+    11.4. [Logical Operators](#logical-operators)
+    11.5. [Other Operators](#other-operators)
+12. [Statements](#statements)
+13. [Expressions](#expressions)
+14. [Types](#types)
+15. [Union](#union)
+16. [Macros](#macros)
 
 Good syntax
 - 1. `Variables`
@@ -68,7 +77,7 @@ Good syntax
 Good info
 - TBD
 
-# 1. Variables
+# 1. Variables {#variables}
 
 A variable is a named container for data.
 
@@ -175,7 +184,7 @@ b $B = {
 };
 ```
 
-# 2. Functions
+# 2. Functions {#functions}
 
 A function is an ordered sequence of statements that get executed whenever you call it.
   - See [Statements](#statements) for the definition of a statement `<stmt>`.
@@ -283,7 +292,7 @@ main ()void = {
 }
 ```
 
-# 3. Struct
+# 3. Struct {#struct}
 
 A *struct* (Structure) is a collection of variables (fields).
 
@@ -399,7 +408,7 @@ TODO
     pos $Vector2 = $Vector2:new(0, 0);
   }
   ```
-# 4. Enum
+# 4. Enum {#enum}
 
 An Enum (Enumeration) is a collection of scoped, named & unique integer values (fields)
 
@@ -484,7 +493,7 @@ TODO
 c #Color = #Color:RED;
 ```
   
-# 5. Namespace
+# 5. Namespace {#namespace}
 
 A namespace is a scoped collection of:
   - [Functions](#functions),
@@ -536,7 +545,7 @@ Tag | Parent | Comment
 
 TODO
 
-## 5.1. Modules
+## 5.1. Modules {#modules}
 
 ```rust
 // main.ry
@@ -564,7 +573,7 @@ main ()void = {
 }
 ```
 
-# 6. Block
+# 6. Block {#block}
 
 A block is a collection of statements.
 - See `<stmt>` in [Statements](#statements) for the definition of a *statement*.
@@ -615,9 +624,9 @@ for( x usize = 0;; x < 10; x += 1 ) "x" {
 }
 ```
 
-# 7. Control Flow
+# 7. Control Flow {#control-flow}
 
-## 7.1. If / Else
+## 7.1. If / Elif/ Else {#if-elif-else}
 
 **Syntax**
 
@@ -656,7 +665,7 @@ b i32 = if( a == 1 ) {
 }
 ```
 
-## 7.2. Loop
+## 7.2. Loop {#loop}
 
 **Syntax**
 
@@ -690,7 +699,7 @@ loop( u32 i = 0;; i < 10; i++ ) {}
 loop( u32 i = 0; i < 10; i < 10; i++ ) {}
 ```
 
-### 7.2.1. Continue
+### 7.2.1. Continue {#continue}
 
 **Syntax**
 
@@ -710,7 +719,7 @@ TODO
 
 TODO
     
-# 8. Comments
+# 8. Comments {#comments}
 
 ```rust
 // single-line comment
@@ -723,9 +732,9 @@ comment
 */
 ```
 
-# 9. Literals
+# 9. Literals {#literals}
 
-## 9.1 Integer
+## 9.1 Integer Literals {#integer-literals}
 
 **Syntax**
 
@@ -741,7 +750,7 @@ Tag(s) | Syntax
 
 TODO
 
-## 9.2. Float
+## 9.2. Float Literals {#float-literals}
 
 Tag | Syntax
 --- | ------
@@ -750,7 +759,7 @@ Tag | Syntax
 \<float_exp> | `e +|- <dec_int>`
 &emsp; \<dec_int> | See **Integer**
 
-## 9.3. String
+## 9.3. String Literals {#string-literals}
 
 TODO
 
@@ -759,7 +768,7 @@ Tag | Syntax
 \<string> | `" {<string_char>} "`
 &emsp; \<string_char> | Any valid UTF-8 character.
 
-## 9.4. Struct
+## 9.4. Struct Literals {#struct-literals}
 
 Tag | Syntax | Comment
 --- | ------ | -------
@@ -768,30 +777,23 @@ Tag | Syntax | Comment
 &emsp; \<name> | See [Names](#names)
 &emsp; \<expr> | See [Expressions](#expressions)
 
-# Statements
+# 10. Names {#names}
 
-[var](#variables)
-[function](#functions)
-[struct](#struct)
-[enum](#enum)
-[namespace](#namespace)
-[alias](#alias)
+**Syntax**
 
-[if / elif / else](#control-flow)
-[loop](#control-flow)
-[block](#block)
-[break](#block)
-[breakif](#block)
+Tag | Syntax
+--- | ------
+\<name>            | `<name_start_char> {<name_char>}`
+\<name_start_char> | `_ | a-z | A-Z`
+\<name_char>       | `<name_start_char> | 0-9`
 
-# Expressions
+**Examples**
 
-[if / elif / else](#control-flow)
-[loop](#control-flow)
-[block](#block)
+TODO
 
-# Operators
+# 11. Operators {#operators}
 
-**Arithmetic**
+## 11.1. Arithmetic Operators {#arithmetic-operators}
 
 Type | Operator | Name | Syntax
 ---- | -------- | ---- | ------
@@ -802,7 +804,7 @@ Binary | `*`   | multiplication     | `<expr> * <expr>`
 Binary | `/`   | division           | `<expr> / <expr>`
 Binary | `%`   | modulo (remainder) | `<expr> % <expr>`
 
-Assign
+Assignment
 
 Type | Operator | Name | Syntax
 ---- | -------- | ---- | ------
@@ -812,7 +814,7 @@ Binary | `*=`   | multiplication     | `<name> *= <expr> ;`
 Binary | `/=`   | division           | `<name> /= <expr> ;`
 Binary | `%=`   | modulo (remainder) | `<name> %= <expr> ;`
 
-**Bitwise**
+## 11.2. Bitwise Operators {#bitwise-operators}
 
 Type | Operator | Name | Syntax
 ---- | -------- | ---- | ------
@@ -823,7 +825,7 @@ Binary | `&`  | bitwise AND         | `<expr> & <expr>`
 Binary | `<<` | bitwise left shift  | `<expr> << <expr>`
 Binary | `>>` | bitwise right shift | `<expr> >> <expr>`
 
-Assign
+Assignment
 
 Type | Operator | Name | Syntax
 ---- | -------- | ---- | ------
@@ -833,7 +835,7 @@ Binary | `&=`  | bitwise AND         | `<name> &= <expr>`
 Binary | `<<=` | bitwise left shift  | `<name> <<= <expr>`
 Binary | `>>=` | bitwise right shift | `<name> >>= <expr>`
 
-**Comparison**
+## 11.3. Comparison Operators {#comparison-operators}
 
 Type | Operator | Name
 ---- | -------- | ----
@@ -844,7 +846,7 @@ Binary | `<=` | less or equal
 Binary | `> ` | greater
 Binary | `>=` | greater or equal
 
-**Logical**
+## 11.4. Logical Operators {#logical-operators}
 
 Type | Operator | Name
 ---- | -------- | ----
@@ -852,7 +854,7 @@ Unary  | `!`  | logical NOT
 Binary | `||` | logical OR
 Binary | `&&` | logical AND
 
-**Other**
+## 11.5. Other Operators {#other-operators}
 
 Ternary
 
@@ -877,7 +879,29 @@ Binary | `as` | \<as> | `<expr> as <type>`
 **Associativity**
 **Precedence**
 
-# Types
+# 12. Statements {#statements}
+
+[var](#variables)
+[function](#functions)
+[struct](#struct)
+[enum](#enum)
+[namespace](#namespace)
+[alias](#alias)
+
+[if / elif / else](#control-flow)
+[loop](#control-flow)
+[block](#block)
+[break](#block)
+[breakif](#block)
+
+# 13. Expressions {#expressions}
+
+[if / elif / else](#control-flow)
+[loop](#control-flow)
+[block](#block)
+
+
+# 14. Types {#types}
 
 **Primitives**
 
@@ -909,3 +933,7 @@ Tag | Syntax
 See [as](#as) in [Operators](#operators)
 
 `3 as f32`
+
+# 15. Union {#union}
+
+# 16. Macros {#macros}
