@@ -1,18 +1,16 @@
-Note
-[x] [zig](https://ziglang.org/documentation/master/)
-[x] [odin](https://odin-lang.org/docs/overview/)
-[ ] [rust](https://www.rust-lang.org/learn)
-[ ] [go](https://go.dev/ref/spec)
-[ ] [nim](https://nim-lang.org/docs/manual.html)
+Other Language Specs
+- [x] [zig](https://ziglang.org/documentation/master/)
+- [x] [odin](https://odin-lang.org/docs/overview/)
+- [ ] [rust](https://www.rust-lang.org/learn)
+- [ ] [go](https://go.dev/ref/spec)
+- [ ] [nim](https://nim-lang.org/docs/manual.html)
 
-Notes
+Consider
 - raw string \`single back ticks\` - `Literals`
 - variadic arguments - `<func_type>`
 - pointer arrays - `Types`
 - using / use
-- struct literal - `Literals`
 - see `notes/func.rs` for new `<func_type>` ideas.
-- union
 - function parameters immutable - `<func_type>`
 - anon struct types - `<struct_type>` (see notes/notes4.rs)
 - compile-time expressions - `Expressions`
