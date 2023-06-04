@@ -5,6 +5,8 @@ Other Language Specs
 - [ ] [go](https://go.dev/ref/spec)
 - [ ] [nim](https://nim-lang.org/docs/manual.html)
 
+---
+
 Consider
 - raw string \`single back ticks\` - `Literals`
 - variadic arguments - `<func_type>`
@@ -30,37 +32,43 @@ Consider
   v $Vector2 = :Vector2:new(y=0);
   ```
 
+---
+
 Table of Contents
 
-1. [Variables](#variables)
-2. [Functions](#functions)
-3. [Struct](#struct)
-4. [Enum](#enum)
-5. [Namespace](#namespace) \
-    5.1. [Modules](#modules)
-6. [Block](#block)
-7. [Control Flow](#control-flow) \
-    7.1 [If / Elif / Else](#if-elif-else) \
-    7.2 [Loop](#loop) \
-    &emsp; 7.2.1 [Continue](#continue)
-8. [Comments](#comments)
-9. [Literals](#literals) \
-    9.1. [Integer Literals](#integer-literals) \
-    9.2. [Float Literals](#float-literals) \
-    9.3. [String Literals](#string-literals) \
-    9.4. [Struct Literals](#struct-literals)
-10. [Names](#names)
-11. [Operators](#operators) \
-    11.1. [Arithmetic Operators](#arithmetic-operators) \
-    11.2. [Bitwise Operators](#bitwise-operators) \
-    11.3. [Comparison Operators](#comparison-operators) \
-    11.4. [Logical Operators](#logical-operators) \
-    11.5. [Other Operators](#other-operators)
-12. [Statements](#statements)
-13. [Expressions](#expressions)
-14. [Types](#types)
-16. [Macros](#macros)
-15. [Union](#union)
+1. [Lexical Analysis](#lexical-analysis) \
+    1.1. [Names](#names)
+    1.2. [Comments](#comments)
+    1.3. [Literals](#literals) \
+    &emsp; 1.3.1. [Integer Literals](#integer-literals) \
+    &emsp; 1.3.2. [Float Literals](#float-literals) \
+    &emsp; 1.3.3. [String Literals](#string-literals) \
+    &emsp; 1.3.4. [Struct Literals](#struct-literals)
+2. [Definitions](#definitions) \
+    2.1. [Variables](#variables)
+    2.2. [Functions](#functions)
+    2.3. [Struct](#struct)
+    2.4. [Enum](#enum)
+    2.5. [Union](#union)
+    2.6. [Namespace](#namespace)
+    &emsp; 2.6.1. [Modules](#modules)
+3. [Operators](#operators) \
+    3.1. [Arithmetic Operators](#arithmetic-operators) \
+    3.2. [Bitwise Operators](#bitwise-operators) \
+    3.3. [Comparison Operators](#comparison-operators) \
+    3.4. [Logical Operators](#logical-operators) \
+    3.5. [Other Operators](#other-operators)
+4. [Expressions](#expressions)
+    4.1. [Block](#block)
+    4.2. [Control Flow](#control-flow) \
+        &emsp; 4.2.1. [If / Elif / Else](#if-elif-else) \
+        &emsp; 4.2.2. [Loop](#loop) \
+        &emsp; &emsp; 4.2.2.1. [Continue](#continue)
+5. [Statements](#statements)
+6. [Types](#types)
+7. [Macros](#macros)
+
+---
 
 Good syntax
 - 1. `Variables`
@@ -75,7 +83,85 @@ Good syntax
 Good info
 - TBD
 
-# 1. Variables {#variables}
+---
+
+# 1. Lexical Analysis {#lexical-analysis}
+
+## 1.1. Names {#names}
+
+**Syntax**
+
+Tag | Syntax
+--- | ------
+\<name>            | `<name_start_char> {<name_char>}`
+\<name_start_char> | `_ | a-z | A-Z`
+\<name_char>       | `<name_start_char> | 0-9`
+
+**Examples**
+
+TODO
+
+## 1.2. Comments {#comments}
+
+```rust
+// single-line comment
+```
+```rust
+/*
+multi
+line
+comment
+*/
+```
+
+## 1.3. Literals {#literals}
+
+### 1.3.1. Integer Literals {#integer-literals}
+
+**Syntax**
+
+Tag(s) | Syntax
+------ | ------
+\<integer>, <br> \<dec_int> | `0-9 {[_]0-9}`
+\<integer> | `0b 0|1 {[_]0|1}`
+\<integer> | `0x <hex_digit> {[_]<hex_digit>}`
+&emsp; \<hex_digit> | `(0 - 9) | (a - z) | (A - Z)`
+\<integer> | `0o 0-7 {[_]0-7}`
+
+**Examples**
+
+TODO
+
+### 1.3.2. Float Literals {#float-literals}
+
+Tag | Syntax
+--- | ------
+\<float> | `<dec_int> . <dec_int> [<float_exp>]`
+\<float> | `<dec_int> <float_exp>`
+\<float_exp> | `e +|- <dec_int>`
+&emsp; \<dec_int> | See **Integer**
+
+### 1.3.3. String Literals {#string-literals}
+
+TODO
+
+Tag | Syntax
+--- | ------
+\<string> | `" {<string_char>} "`
+&emsp; \<string_char> | Any valid UTF-8 character.
+
+### 1.3.4. Struct Literals {#struct-literals}
+
+Tag | Syntax | Comment
+--- | ------ | -------
+\<struct_literal> | `{ {<struct_literal_field>} }`
+\<struct_literal_field> | `[. <name> =] <expr> [;]` see **Comment** | The semicolon `;` can only be omitted when it's the last field.
+&emsp; \<name> | See [Names](#names)
+&emsp; \<expr> | See [Expressions](#expressions)
+
+# 2. Definitions {#definitions}
+
+## 2.1. Variables {#variables}
 
 A variable is a named container for data.
 
@@ -182,7 +268,7 @@ b $B = {
 };
 ```
 
-# 2. Functions {#functions}
+## 2.2. Functions {#functions}
 
 A function is an ordered sequence of statements that get executed whenever you call it.
   - See [Statements](#statements) for the definition of a statement `<stmt>`.
@@ -290,7 +376,7 @@ main ()void = {
 }
 ```
 
-# 3. Struct {#struct}
+## 2.3. Struct {#struct}
 
 A *struct* (Structure) is a collection of variables (fields).
 
@@ -406,7 +492,7 @@ TODO
     pos $Vector2 = $Vector2:new(0, 0);
   }
   ```
-# 4. Enum {#enum}
+## 2.4. Enum {#enum}
 
 An Enum (Enumeration) is a collection of scoped, named & unique integer values (fields)
 
@@ -491,7 +577,9 @@ TODO
 c #Color = #Color:RED;
 ```
   
-# 5. Namespace {#namespace}
+## 2.5. Union {#union}
+
+## 2.6. Namespace {#namespace}
 
 A namespace is a scoped collection of:
   - [Functions](#functions),
@@ -543,7 +631,7 @@ Tag | Parent | Comment
 
 TODO
 
-## 5.1. Modules {#modules}
+### 2.6.1. Modules {#modules}
 
 ```rust
 // main.ry
@@ -571,7 +659,97 @@ main ()void = {
 }
 ```
 
-# 6. Block {#block}
+# 3. Operators {#operators}
+
+## 3.1. Arithmetic Operators {#arithmetic-operators}
+
+Type | Operator | Name | Syntax
+---- | -------- | ---- | ------
+Unary  | `-`   | negation           | `- <expr>`
+Binary | `+`   | addition           | `<expr> + <expr>`
+Binary | `-`   | subtraction        | `<expr> - <expr>`
+Binary | `*`   | multiplication     | `<expr> * <expr>`
+Binary | `/`   | division           | `<expr> / <expr>`
+Binary | `%`   | modulo (remainder) | `<expr> % <expr>`
+
+Assignment
+
+Type | Operator | Name | Syntax
+---- | -------- | ---- | ------
+Binary | `+=`   | addition           | `<name> += <expr> ;`
+Binary | `-=`   | subtraction        | `<name> -= <expr> ;`
+Binary | `*=`   | multiplication     | `<name> *= <expr> ;`
+Binary | `/=`   | division           | `<name> /= <expr> ;`
+Binary | `%=`   | modulo (remainder) | `<name> %= <expr> ;`
+
+## 3.2. Bitwise Operators {#bitwise-operators}
+
+Type | Operator | Name | Syntax
+---- | -------- | ---- | ------
+Unary  | `~`  | bitwise negation    | `~ <expr>`
+Binary | `|`  | bitwise OR          | `<expr> | <expr>`
+Binary | `^`  | bitwise XOR         | `<expr> ^ <expr>`
+Binary | `&`  | bitwise AND         | `<expr> & <expr>`
+Binary | `<<` | bitwise left shift  | `<expr> << <expr>`
+Binary | `>>` | bitwise right shift | `<expr> >> <expr>`
+
+Assignment
+
+Type | Operator | Name | Syntax
+---- | -------- | ---- | ------
+Binary | `|=`  | bitwise OR          | `<name> |= <expr>`
+Binary | `^=`  | bitwise XOR         | `<name> ^= <expr>`
+Binary | `&=`  | bitwise AND         | `<name> &= <expr>`
+Binary | `<<=` | bitwise left shift  | `<name> <<= <expr>`
+Binary | `>>=` | bitwise right shift | `<name> >>= <expr>`
+
+## 3.3. Comparison Operators {#comparison-operators}
+
+Type | Operator | Name
+---- | -------- | ----
+Binary | `==` | equals
+Binary | `!=` | not equals
+Binary | `< ` | less
+Binary | `<=` | less or equal
+Binary | `> ` | greater
+Binary | `>=` | greater or equal
+
+## 3.4. Logical Operators {#logical-operators}
+
+Type | Operator | Name
+---- | -------- | ----
+Unary  | `!`  | logical NOT
+Binary | `||` | logical OR
+Binary | `&&` | logical AND
+
+## 3.5. Other Operators {#other-operators}
+
+Ternary
+
+Type | Operator | Tag | Syntax
+---- | :------: | --- | ------
+Ternary | `?:` | \<ternary> | `( <expr> ) ? ( <expr> ) : ( <expr> )`
+
+Address
+
+Type | Operator | Tag | Syntax
+---- | :------: | --- | ------
+Unary | `&` | \<address> | `& <name>`
+
+###### as
+
+See [Conversion](#types-conversion) in [Types](#types)
+
+Type | Operator | Tag | Syntax
+---- | :------: | --- | ------
+Binary | `as` | \<as> | `<expr> as <type>`
+
+**Associativity**
+**Precedence**
+
+# 4. Expressions {#expressions}
+
+## 4.1. Block {#block}
 
 A block is a collection of statements.
 - See `<stmt>` in [Statements](#statements) for the definition of a *statement*.
@@ -622,9 +800,9 @@ for( x usize = 0;; x < 10; x += 1 ) "x" {
 }
 ```
 
-# 7. Control Flow {#control-flow}
+## 4.2. Control Flow {#control-flow}
 
-## 7.1. If / Elif/ Else {#if-elif-else}
+### 4.2.1. If / Elif/ Else {#if-elif-else}
 
 **Syntax**
 
@@ -663,7 +841,7 @@ b i32 = if( a == 1 ) {
 }
 ```
 
-## 7.2. Loop {#loop}
+### 4.2.2. Loop {#loop}
 
 **Syntax**
 
@@ -697,7 +875,7 @@ loop( u32 i = 0;; i < 10; i++ ) {}
 loop( u32 i = 0; i < 10; i < 10; i++ ) {}
 ```
 
-### 7.2.1. Continue {#continue}
+#### 4.2.2.1. Continue {#continue}
 
 **Syntax**
 
@@ -716,168 +894,8 @@ TODO
 **Examples**
 
 TODO
-    
-# 8. Comments {#comments}
 
-```rust
-// single-line comment
-```
-```rust
-/*
-multi
-line
-comment
-*/
-```
-
-# 9. Literals {#literals}
-
-## 9.1 Integer Literals {#integer-literals}
-
-**Syntax**
-
-Tag(s) | Syntax
------- | ------
-\<integer>, <br> \<dec_int> | `0-9 {[_]0-9}`
-\<integer> | `0b 0|1 {[_]0|1}`
-\<integer> | `0x <hex_digit> {[_]<hex_digit>}`
-&emsp; \<hex_digit> | `(0 - 9) | (a - z) | (A - Z)`
-\<integer> | `0o 0-7 {[_]0-7}`
-
-**Examples**
-
-TODO
-
-## 9.2. Float Literals {#float-literals}
-
-Tag | Syntax
---- | ------
-\<float> | `<dec_int> . <dec_int> [<float_exp>]`
-\<float> | `<dec_int> <float_exp>`
-\<float_exp> | `e +|- <dec_int>`
-&emsp; \<dec_int> | See **Integer**
-
-## 9.3. String Literals {#string-literals}
-
-TODO
-
-Tag | Syntax
---- | ------
-\<string> | `" {<string_char>} "`
-&emsp; \<string_char> | Any valid UTF-8 character.
-
-## 9.4. Struct Literals {#struct-literals}
-
-Tag | Syntax | Comment
---- | ------ | -------
-\<struct_literal> | `{ {<struct_literal_field>} }`
-\<struct_literal_field> | `[. <name> =] <expr> [;]` see **Comment** | The semicolon `;` can only be omitted when it's the last field.
-&emsp; \<name> | See [Names](#names)
-&emsp; \<expr> | See [Expressions](#expressions)
-
-# 10. Names {#names}
-
-**Syntax**
-
-Tag | Syntax
---- | ------
-\<name>            | `<name_start_char> {<name_char>}`
-\<name_start_char> | `_ | a-z | A-Z`
-\<name_char>       | `<name_start_char> | 0-9`
-
-**Examples**
-
-TODO
-
-# 11. Operators {#operators}
-
-## 11.1. Arithmetic Operators {#arithmetic-operators}
-
-Type | Operator | Name | Syntax
----- | -------- | ---- | ------
-Unary  | `-`   | negation           | `- <expr>`
-Binary | `+`   | addition           | `<expr> + <expr>`
-Binary | `-`   | subtraction        | `<expr> - <expr>`
-Binary | `*`   | multiplication     | `<expr> * <expr>`
-Binary | `/`   | division           | `<expr> / <expr>`
-Binary | `%`   | modulo (remainder) | `<expr> % <expr>`
-
-Assignment
-
-Type | Operator | Name | Syntax
----- | -------- | ---- | ------
-Binary | `+=`   | addition           | `<name> += <expr> ;`
-Binary | `-=`   | subtraction        | `<name> -= <expr> ;`
-Binary | `*=`   | multiplication     | `<name> *= <expr> ;`
-Binary | `/=`   | division           | `<name> /= <expr> ;`
-Binary | `%=`   | modulo (remainder) | `<name> %= <expr> ;`
-
-## 11.2. Bitwise Operators {#bitwise-operators}
-
-Type | Operator | Name | Syntax
----- | -------- | ---- | ------
-Unary  | `~`  | bitwise negation    | `~ <expr>`
-Binary | `|`  | bitwise OR          | `<expr> | <expr>`
-Binary | `^`  | bitwise XOR         | `<expr> ^ <expr>`
-Binary | `&`  | bitwise AND         | `<expr> & <expr>`
-Binary | `<<` | bitwise left shift  | `<expr> << <expr>`
-Binary | `>>` | bitwise right shift | `<expr> >> <expr>`
-
-Assignment
-
-Type | Operator | Name | Syntax
----- | -------- | ---- | ------
-Binary | `|=`  | bitwise OR          | `<name> |= <expr>`
-Binary | `^=`  | bitwise XOR         | `<name> ^= <expr>`
-Binary | `&=`  | bitwise AND         | `<name> &= <expr>`
-Binary | `<<=` | bitwise left shift  | `<name> <<= <expr>`
-Binary | `>>=` | bitwise right shift | `<name> >>= <expr>`
-
-## 11.3. Comparison Operators {#comparison-operators}
-
-Type | Operator | Name
----- | -------- | ----
-Binary | `==` | equals
-Binary | `!=` | not equals
-Binary | `< ` | less
-Binary | `<=` | less or equal
-Binary | `> ` | greater
-Binary | `>=` | greater or equal
-
-## 11.4. Logical Operators {#logical-operators}
-
-Type | Operator | Name
----- | -------- | ----
-Unary  | `!`  | logical NOT
-Binary | `||` | logical OR
-Binary | `&&` | logical AND
-
-## 11.5. Other Operators {#other-operators}
-
-Ternary
-
-Type | Operator | Tag | Syntax
----- | :------: | --- | ------
-Ternary | `?:` | \<ternary> | `( <expr> ) ? ( <expr> ) : ( <expr> )`
-
-Address
-
-Type | Operator | Tag | Syntax
----- | :------: | --- | ------
-Unary | `&` | \<address> | `& <name>`
-
-###### as
-
-See [Conversion](#types-conversion) in [Types](#types)
-
-Type | Operator | Tag | Syntax
----- | :------: | --- | ------
-Binary | `as` | \<as> | `<expr> as <type>`
-
-**Associativity**
-**Precedence**
-
-# 12. Statements {#statements}
+# 5. Statements {#statements}
 
 [var](#variables)
 [function](#functions)
@@ -892,14 +910,7 @@ Binary | `as` | \<as> | `<expr> as <type>`
 [break](#block)
 [breakif](#block)
 
-# 13. Expressions {#expressions}
-
-[if / elif / else](#control-flow)
-[loop](#control-flow)
-[block](#block)
-
-
-# 14. Types {#types}
+# 6. Types {#types}
 
 **Primitives**
 
@@ -932,6 +943,4 @@ See [as](#as) in [Operators](#operators)
 
 `3 as f32`
 
-# 15. Union {#union}
-
-# 16. Macros {#macros}
+# 7. Macros {#macros}
