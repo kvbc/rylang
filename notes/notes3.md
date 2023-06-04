@@ -41,20 +41,20 @@ Table of Contents
 6. [Block](#block)
 7. [Control Flow](#control-flow) \
     7.1 [If / Elif / Else](#if-elif-else) \
-    7.2 [Loop](#loop)
+    7.2 [Loop](#loop) \
     &emsp; 7.2.1 [Continue](#continue)
 8. [Comments](#comments)
-9. [Literals](#literals)
-    9.1. [Integer Literals](#integer-literals)
-    9.2. [Float Literals](#float-literals)
-    9.3. [String Literals](#string-literals)
+9. [Literals](#literals) \
+    9.1. [Integer Literals](#integer-literals) \
+    9.2. [Float Literals](#float-literals) \
+    9.3. [String Literals](#string-literals) \
     9.4. [Struct Literals](#struct-literals)
 10. [Names](#names)
-11. [Operators](#operators)
-    11.1. [Arithmetic Operators](#arithmetic-operators)
-    11.2. [Bitwise Operators](#bitwise-operators)
-    11.3. [Comparison Operators](#comparison-operators)
-    11.4. [Logical Operators](#logical-operators)
+11. [Operators](#operators) \
+    11.1. [Arithmetic Operators](#arithmetic-operators) \
+    11.2. [Bitwise Operators](#bitwise-operators) \
+    11.3. [Comparison Operators](#comparison-operators) \
+    11.4. [Logical Operators](#logical-operators) \
     11.5. [Other Operators](#other-operators)
 12. [Statements](#statements)
 13. [Expressions](#expressions)
