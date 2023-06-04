@@ -8,15 +8,14 @@ Note
 Notes
 - raw string \`single back ticks\` - `Literals`
 - variadic arguments - `<func_type>`
-- default argument values - `<func_type>`
 - pointer arrays - `Types`
 - using / use
 - struct literal - `Literals`
+- see `notes/func.rs` for new `<func_type>` ideas.
 - union
 - function parameters immutable - `<func_type>`
 - anon struct types - `<struct_type>` (see notes/notes4.rs)
 - compile-time expressions - `Expressions`
-- named arguments - `() operator`
   ```rust
   $Vector2 = {
     x i32;
@@ -47,13 +46,14 @@ Table of Contents
     7.2 [Loop](#72-loop)
         7.2.1 [Continue](#721-continue)
 8. [Comments](#8-comments)
-9. Literals
+9. [Literals](#9-literals)
 10. Names
 11. Operators
 12. Statements
 13. Expressions
 14. Types
 15. Union
+16. Macros
 
 Good syntax
 - 1. `Variables`
@@ -76,13 +76,13 @@ A variable is a named container for data.
 
 Tag | Syntax | Comment
 --- | ------ | -------
-\<var>         | `<name> <type> = <expr> ;` where `<type>` is not `<struct_type>`                 | Non-struct variable
-\<var>         | `<name> <struct_type> = <struct_literal> ;`                                      | Struct literal
-\<var>         | `<name> <struct_type> = <expr> ;` where `<expr>` results in type `<struct_type>` | Struct copy
+\<var>         | `<name> <type> = <expr> ;` where `<type>` is neither `<struct_type>` nor `<func_type>` | Non-struct variable
+\<var>         | `<name> <struct_type> = <struct_literal> ;`                                            | Struct literal
+\<var>         | `<name> <struct_type> = <expr> ;` where `<expr>` results in type `<struct_type>`       | Struct copy
 &emsp; \<name>           | See [Names](#names)
 &emsp; \<expr>           | See [Expressions](#expressions)
 &emsp; \<struct_literal> | See [Literals](#literals)
-&emsp; \<type>, <br> &emsp; \<struct_type> | See [Types](#types)
+&emsp; \<type>, <br> &emsp; \<struct_type>, <br> &emsp; \<func_type> | See [Types](#types)
 
 **Parentship**
 
@@ -187,7 +187,7 @@ Tag | Syntax
 --- | ------
 \<func>       | `<name> <func_type> = <func_block> ;`
 \<func_block> | `{ <func_stmt> {<func_stmt>} }`
-\<func_stmt>  | `<stmt> \| <namespace_stmt>`
+\<func_stmt>  | `<stmt> | <namespace_stmt>`
 &emsp; \<func_type>      | See [Types](#types)
 &emsp; \<name>           | See [Names](#names)
 &emsp; \<stmt>           | See [Statements](#statements)
@@ -289,13 +289,12 @@ A *struct* (Structure) is a collection of variables (fields).
 
 **Syntax**
 
-Tag | Syntax
---- | ------
+Tag | Syntax | Comment
+--- | ------ | -------
 \<struct>        | `$ <name> = <struct_block> ;`
 \<struct_block>  | `{ <struct_stmt> {<struct_stmt>} }`
-\<struct_stmt>   | `<struct_field> \| <namespace_stmt>`
-\<struct_field>  | `<name> <type> [= <compexpr>] ;` where `<type>` isn't the defined struct itself
-\<struct_field>  | `<name> <struct_type> [= <struct_literal>] ;` where `<struct_type>` isn't the defined struct itself
+\<struct_stmt>   | `<struct_field> | <namespace_stmt>`
+\<struct_field>  | `<name> <type> [= <compexpr>] ;` where `<type>` isn't the defined struct itself | <li>The semicolon `;` might be omitted if it's the last field in a struct.</li> <li>Struct fields follow the same rules as regular [variables](#1-variables)</li>
 &emsp; \<name>           | See [Names](#names)
 &emsp; \<var>            | See [Variables](#variables)
 &emsp; \<var_type>       | See [Types](#types)
@@ -410,7 +409,7 @@ Tag | Syntax
 --- | ------
 \<enum>        | `# <name> = <enum_block> ;`
 \<enum_block>  | `{ <enum_stmt> {<enum_stmt>} }`
-\<enum_stmt>   | `<enum_field> \| <namespace_stmt>`
+\<enum_stmt>   | `<enum_field> | <namespace_stmt>`
 \<enum_field>  | `<name> [= <compexpr>] ;` where `<compexpr>` results in type `i32`
 \<enum_access> | `<enum_type> : <name>`
 &emsp; \<name>           | See [Names](#names)
@@ -501,8 +500,8 @@ Tag | Syntax | Comment
 \<namespace>        | `: <name> = <namespace_block> ;`
 \<namespace>        | `: <name> = <string> ;` | Module import
 \<namespace_block>  | `{ <namespace_stmt> {<namespace_stmt>} }`
-\<namespace_stmt>   | `<func> \| <struct> \| <enum> \| <namespace>`
-\<namespace_entity> | `<struct_type> \| <enum_type> \| <name> \| (<name>())` | Struct / Enum / Namespace / Function
+\<namespace_stmt>   | `<func> | <struct> | <enum> | <namespace>`
+\<namespace_entity> | `<struct_type> | <enum_type> | <name> | (<name>())` | Struct / Enum / Namespace / Function
 \<namespace_access> | `: <namespace_entity> : <namespace_entity> {: <namespace_entity>}`
 &emsp; \<name>   | See [Names](#names)
 &emsp; \<string> | See [Literals](#literals)
@@ -726,21 +725,48 @@ comment
 
 # 9. Literals
 
-Tag | Syntax
---- | ------
-\<integer> | `0-9 {[_]0-9}`
+## 9.1 Integer
+
+**Syntax**
+
+Tag(s) | Syntax
+------ | ------
+\<integer>, <br> \<dec_int> | `0-9 {[_]0-9}`
 \<integer> | `0b 0|1 {[_]0|1}`
 \<integer> | `0x <hex_digit> {[_]<hex_digit>}`
+&emsp; \<hex_digit> | `(0 - 9) | (a - z) | (A - Z)`
 \<integer> | `0o 0-7 {[_]0-7}`
-&emsp; \<hex_digit> | `<digit> | (a - z) | (A - Z)`
+
+**Examples**
+
+TODO
+
+## 9.2. Float
 
 Tag | Syntax
 --- | ------
-\<float> | `<integer> . <integer>`
+\<float> | `<dec_int> . <dec_int> [<float_exp>]`
+\<float> | `<dec_int> <float_exp>`
+\<float_exp> | `e +|- <dec_int>`
+&emsp; \<dec_int> | See **Integer**
+
+## 9.3. String
+
+TODO
 
 Tag | Syntax
 --- | ------
-\<string> | `"  "`
+\<string> | `" {<string_char>} "`
+&emsp; \<string_char> | Any valid UTF-8 character.
+
+## 9.4. Struct
+
+Tag | Syntax | Comment
+--- | ------ | -------
+\<struct_literal> | `{ {<struct_literal_field>} }`
+\<struct_literal_field> | `[. <name> =] <expr> [;]` see **Comment** | The semicolon `;` can only be omitted when it's the last field.
+&emsp; \<name> | See [Names](#names)
+&emsp; \<expr> | See [Expressions](#expressions)
 
 # Statements
 
