@@ -36,11 +36,11 @@ Table of Contents
 2. [Functions](#functions)
 3. [Struct](#struct)
 4. [Enum](#enum)
-5. [Namespace](#namespace)
+5. [Namespace](#namespace) \
     5.1. [Modules](#modules)
 6. [Block](#block)
-7. [Control Flow](#control-flow)
-    7.1 [If / Elif / Else](#if-elif-else)
+7. [Control Flow](#control-flow) \
+    7.1 [If / Elif / Else](#if-elif-else) \
     7.2 [Loop](#loop)
     &emsp; 7.2.1 [Continue](#continue)
 8. [Comments](#comments)
@@ -59,8 +59,8 @@ Table of Contents
 12. [Statements](#statements)
 13. [Expressions](#expressions)
 14. [Types](#types)
-15. [Union](#union)
 16. [Macros](#macros)
+15. [Union](#union)
 
 Good syntax
 - 1. `Variables`
