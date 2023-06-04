@@ -37,21 +37,21 @@ Consider
 Table of Contents
 
 1. [Lexical Analysis](#lexical-analysis) \
-    1.1. [Names](#names) \
-    1.2. [Comments](#comments) \
+    1.1. [Names](#names) ✔️ \
+    1.2. [Comments](#comments) ✔️ \
     1.3. [Literals](#literals) \
-    &emsp; 1.3.1. [Integer Literals](#integer-literals) \
-    &emsp; 1.3.2. [Float Literals](#float-literals) \
+    &emsp; 1.3.1. [Integer Literals](#integer-literals) ✔️ \
+    &emsp; 1.3.2. [Float Literals](#float-literals) ✔️ \
     &emsp; 1.3.3. [String Literals](#string-literals) \
-    &emsp; 1.3.4. [Struct Literals](#struct-literals)
+    &emsp; 1.3.4. [Struct Literals](#struct-literals) ✔️
 2. [Definitions](#definitions) \
-    2.1. [Variables](#variables) \
-    2.2. [Functions](#functions) \
-    2.3. [Struct](#struct) \
-    2.4. [Enum](#enum) \
+    2.1. [Variables](#variables) ✔️ \
+    2.2. [Functions](#functions) ✔️ \
+    2.3. [Struct](#struct) ✔️ \
+    2.4. [Enum](#enum) ✔️ \
     2.5. [Union](#union) \
-    2.6. [Namespace](#namespace) \
-    &emsp; 2.6.1. [Modules](#modules)
+    2.6. [Namespace](#namespace) ✔️ \
+    &emsp; 2.6.1. [Modules](#modules) ✔️
 3. [Operators](#operators) \
     3.1. [Arithmetic Operators](#arithmetic-operators) \
     3.2. [Bitwise Operators](#bitwise-operators) \
@@ -59,26 +59,16 @@ Table of Contents
     3.4. [Logical Operators](#logical-operators) \
     3.5. [Other Operators](#other-operators)
 4. [Expressions](#expressions) \
-    4.1. [Block](#block) \
-    4.2. [Control Flow](#control-flow) \
-        &emsp; 4.2.1. [If / Elif / Else](#if-elif-else) \
-        &emsp; 4.2.2. [Loop](#loop) \
-        &emsp; &emsp; 4.2.2.1. [Continue](#continue)
+    4.1. [Block](#block) ✔️ \
+    4.2. [Control Flow](#control-flow) ✔️ \
+        &emsp; 4.2.1. [If / Elif / Else](#if-elif-else) ✔️ \
+        &emsp; 4.2.2. [Loop](#loop) ✔️ \
+        &emsp; &emsp; 4.2.2.1. [Continue](#continue) ✔️
 5. [Statements](#statements) 
 6. [Types](#types)
 7. [Macros](#macros)
 
 ---
-
-Good syntax
-- 1. `Variables`
-- 2. `Functions`
-- 3. `Struct`
-- 4. `Enum`
-- 5. `Namespace`
-- 6. `Block`
-- 7. `Control Flow`
-- 8. `Comments`
 
 Good info
 - TBD
