@@ -145,7 +145,7 @@ Tag | Syntax
 Tag | Syntax | Comment
 --- | ------ | -------
 \<struct_literal> | `{ {<struct_literal_field>} }`
-\<struct_literal_field> | `[. <name> =] <expr> [;]` see **Comment** | The semicolon `;` can only be omitted when it's the last field.
+\<struct_literal_field> | `[<name> =] <expr> [;]` see **Comment** | The semicolon `;` can only be omitted when it's the last field.
 &emsp; \<name> | See [Names](#names)
 &emsp; \<expr> | See [Expressions](#expressions)
 
