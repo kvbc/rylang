@@ -1,35 +1,18 @@
-Other Language Specs
+Other Languages
 - [x] [zig](https://ziglang.org/documentation/master/)
-- [x] [odin](https://odin-lang.org/docs/overview/)
-- [ ] [rust](https://www.rust-lang.org/learn)
+- [x] [odin](https://odin-lang.org/docs/overview/) - no spec
+- [ ] [rust](https://www.rust-lang.org/learn) - no spec
 - [ ] [go](https://go.dev/ref/spec)
 - [ ] [nim](https://nim-lang.org/docs/manual.html)
 
 ---
 
 Consider
-- variadic arguments - `<func_type>`
 - pointer arrays - `Types`
-- using / use
 - see `notes/func.rs` for new `<func_type>` ideas.
 - function parameters immutable - `<func_type>`
 - anon struct types - `<struct_type>` (see notes/notes4.rs)
 - compile-time expressions - `Expressions`
-  ```rust
-  $Vector2 = {
-    x i32;
-    y i32;
-  };
-  :Vector2 = {
-    new (x i32 = 0, y i32)$Vector2 = {
-      v $Vector2;
-      v.x = x;
-      v.y = y;
-      break v;
-    }
-  };
-  v $Vector2 = :Vector2:new(y=0);
-  ```
 
 ---
 
@@ -52,6 +35,7 @@ Table of Contents
     2.4. [Enum](#enum) ✔️ \
     2.5. [Namespace](#namespace) ✔️ \
     &emsp; 2.5.1. [Modules](#modules) ✔️
+    &emsp; 2.5.2. [Use](#use) ✔️
 3. [Operators](#operators) \
     3.1. [Arithmetic Operators](#arithmetic-operators) \
     3.2. [Bitwise Operators](#bitwise-operators) \
@@ -64,6 +48,7 @@ Table of Contents
         &emsp; 4.2.1. [If / Elif / Else](#if-elif-else) ✔️ \
         &emsp; 4.2.2. [Loop](#loop) ✔️ \
         &emsp; &emsp; 4.2.2.1. [Continue](#continue) ✔️
+    4.3. [Compile-time Expressions](compile-time-expressions)
 5. [Statements](#statements) 
 6. [Types](#types)
 7. [Macros](#macros)
@@ -83,11 +68,11 @@ Good info
 Tag | Syntax
 --- | ------
 \<new_line> | `\n | \r | \r\n` or `LF | CR | CRLF`
-\<src_char> | Any valid [UTF-8](https://en.wikipedia.org/wiki/UTF-8) character
+\<src_char> | Any valid [UTF-8](https://en.wikipedia.org/wiki/UTF-8) character (0 - 255)
 
 **Interpretation**
 
-- The only valid line encodings are considered:
+- The only valid line encodings are:
   - LF
   - CR
   - CRLF
@@ -107,7 +92,7 @@ Tag | Syntax
 
 - A name cannot start with a digit.
 - Names (identifiers) can only consist of:
-  - an underscore `_`,
+  - underscores `_`,
   - lowercase and uppercase letters from `aA` to `zZ`,
   - digits from `0` to `9`
 
@@ -132,8 +117,12 @@ __Big_Word__
 Tag | Syntax | Comment
 --- | ------ | -------
 \<comment> | `// {<src_char>} [<new_line>]` where `<src_char>` is not `<new_line>` | Single-line comment
-\<comment> | `/* {<src_char>} */` | Multiple multi-line comments can be nested inside of each other
+\<comment> | `/* {<src_char>} */` | Multi-line comment
 &emsp; \<src_char>, <br> \<new_line> | See [Lexical Analysis](#lexical-analysis)
+
+**Context**
+
+- Multiple multi-line comments can be nested inside of each other.
 
 **Examples**
 
@@ -156,17 +145,44 @@ comment
 
 **Syntax**
 
-Tag(s) | Syntax
------- | ------
-\<dec_int>, <br> \<integer> | `0-9 {[_]0-9}`
-\<integer> | `0b 0|1 {[_]0|1}`
-\<integer> | `0x <hex_digit> {[_]<hex_digit>}`
-&emsp; \<hex_digit> | `(0 - 9) | (a - z) | (A - Z)`
-\<integer> | `0o 0-7 {[_]0-7}`
+Tag(s) | Syntax | Comment
+------ | ------ | -------
+\<dec_int>, <br> \<integer> | `0-9 {[_]0-9}` | Decimal integer literal
+\<integer> | `0b 0|1 {[_]0|1}` | Binary integer literal
+\<integer> | `0x <hex_digit> {[_]<hex_digit>}` | Hexadecimal integer literal
+&emsp; \<hex_digit> | `(0 - 9) | (a - z) | (A - Z)` | Hexadecimal digit
+\<integer> | `0o 0-7 {[_]0-7}` | Octal integer literal
 
 **Examples**
 
-TODO
+```rust
+// decimal
+00100 // == 100
+2_0_1 // == 201
+69
+
+// bin
+0b1111_1111_1111_0000 // == 255.255.255.0
+0b0_0_0_1 // == 1
+0b110 // == 6
+
+// hex
+0x7A
+0x6_9
+0x0_01_35 // == 0x135
+
+// oct
+0o23
+0o7_7
+0o1_2_3
+
+_420   // INVALID
+2137_  // INVALID
+_1_    // INVALID
+0x_1   // INVALID
+0x23_  // INVALID
+0x_0_  // INVALID
+```
 
 ### 1.3.2. Float Literals {#float-literals}
 
@@ -196,11 +212,17 @@ Tag | Syntax | Comment
 &emsp; \<src_char> | See [Lexical Analysis](#lexical-analysis)
 &emsp; \<integer>  | See [Integer Literals](#integer-literals)
 
+**Interpretation**
+
+TODO
+
 **Examples**
 
 TODO
 
 ### 1.3.4. Struct Literals {#struct-literals}
+
+**Syntax**
 
 Tag | Syntax | Comment
 --- | ------ | -------
@@ -208,6 +230,14 @@ Tag | Syntax | Comment
 \<struct_literal_field> | `[<name> =] <expr> [;]` see **Comment** | The semicolon `;` can only be omitted if it's the last field.
 &emsp; \<name> | See [Names](#names)
 &emsp; \<expr> | See [Expressions](#expressions)
+
+**Interpretation**
+
+TODO
+
+**Examples**
+
+TODO
 
 ## 1.4. Semicolons {#semicolons}
 
@@ -677,8 +707,8 @@ Tag | Syntax | Comment
 \<namespace>        | `: <name> = <string> ;` | Module import
 \<namespace_block>  | `{ <namespace_stmt> {<namespace_stmt>} }`
 \<namespace_stmt>   | `<func> | <struct> | <enum> | <namespace>`
-\<namespace_entity> | `<struct_type> | <enum_type> | <name> | (<name>())` | Struct / Enum / Namespace / Function
-\<namespace_access> | `: <namespace_entity> : <namespace_entity> {: <namespace_entity>}`
+\<namespace_entity> | `<struct_type> | <enum_type> | <name> | <name>()` | Struct / Enum / Namespace / Function
+\<namespace_access> | `<namespace_entity> : <namespace_entity> {: <namespace_entity>}`
 &emsp; \<name>   | See [Names](#names)
 &emsp; \<string> | See [Literals](#literals)
 &emsp; \<func>   | See [Functions](#functions)
@@ -738,6 +768,47 @@ main ()void = {
   x i32;
   y i32;
 }
+```
+
+### 2.5.2. Use {#use}
+
+**Syntax**
+
+Tag | Syntax
+--- | ------
+\<use> | `use (<namespace_entity> | <namespace_access>) ;`
+&emsp; \<namespace_entity>, <br> \<namespace_access> | See [Namespace](#namespace)
+
+**Interpretation**
+
+TODO
+
+**Examples**
+
+```rust
+:a = {
+  :b = {
+    :c = {
+      $Vector2 = {
+        x isize;
+        y isize;
+      };
+    };
+  };
+};
+
+main ${} -> void = {
+  {
+    v a:b:c:$Vector2 = {
+      x = 1;
+      y = 2;
+    };
+  };
+  {
+    use a:b:c;
+    v $Vector2 = {1; 2};
+  };
+};
 ```
 
 # 3. Operators {#operators}
@@ -967,6 +1038,22 @@ Tag | Syntax
 **Context**
 
 TODO
+
+**Interpretation**
+
+TODO
+
+**Examples**
+
+TODO
+
+## 4.3. Compile-time expressions {#compile-time-expressions}
+
+**Syntax**
+
+Tag | Syntax
+--- | ------
+\<comp_expr> | `comp <expr>`
 
 **Interpretation**
 
