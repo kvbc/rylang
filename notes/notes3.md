@@ -8,7 +8,6 @@ Other Language Specs
 ---
 
 Consider
-- raw string \`single back ticks\` - `Literals`
 - variadic arguments - `<func_type>`
 - pointer arrays - `Types`
 - using / use
@@ -36,30 +35,31 @@ Consider
 
 Table of Contents
 
-1. [Lexical Analysis](#lexical-analysis) \
+1. [Lexical Analysis](#lexical-analysis) ✔️ \
     1.1. [Names](#names) ✔️ \
     1.2. [Comments](#comments) ✔️ \
-    1.3. [Literals](#literals) \
+    1.3. [Literals](#literals) ✔️ \
     &emsp; 1.3.1. [Integer Literals](#integer-literals) ✔️ \
     &emsp; 1.3.2. [Float Literals](#float-literals) ✔️ \
-    &emsp; 1.3.3. [String Literals](#string-literals) \
+    &emsp; 1.3.3. [String Literals](#string-literals) ✔️ \
     &emsp; 1.3.4. [Struct Literals](#struct-literals) ✔️
-2. [Definitions](#definitions) \
+    1.4. [Semicolons](#semicolons) ✔️
+2. [Definitions](#definitions) ✔️ \
     2.1. [Variables](#variables) ✔️ \
     2.2. [Functions](#functions) ✔️ \
     2.3. [Struct](#struct) ✔️ \
+    &emsp; 2.3.1. [Union](#union) ✔️ \
     2.4. [Enum](#enum) ✔️ \
-    2.5. [Union](#union) \
-    2.6. [Namespace](#namespace) ✔️ \
-    &emsp; 2.6.1. [Modules](#modules) ✔️
+    2.5. [Namespace](#namespace) ✔️ \
+    &emsp; 2.5.1. [Modules](#modules) ✔️
 3. [Operators](#operators) \
     3.1. [Arithmetic Operators](#arithmetic-operators) \
     3.2. [Bitwise Operators](#bitwise-operators) \
     3.3. [Comparison Operators](#comparison-operators) \
     3.4. [Logical Operators](#logical-operators) \
     3.5. [Other Operators](#other-operators)
-4. [Expressions](#expressions) \
-    4.1. [Block](#block) ✔️ \
+4. [Expressions](#expressions) ✔️ \
+    4.1. [Block](#block) (& `break`) ✔️ \
     4.2. [Control Flow](#control-flow) ✔️ \
         &emsp; 4.2.1. [If / Elif / Else](#if-elif-else) ✔️ \
         &emsp; 4.2.2. [Loop](#loop) ✔️ \
@@ -67,6 +67,7 @@ Table of Contents
 5. [Statements](#statements) 
 6. [Types](#types)
 7. [Macros](#macros)
+8. [Metadata](#metadata) ✔️
 
 ---
 
@@ -76,6 +77,21 @@ Good info
 ---
 
 # 1. Lexical Analysis {#lexical-analysis}
+
+**Syntax**
+
+Tag | Syntax
+--- | ------
+\<new_line> | `\n | \r | \r\n` or `LF | CR | CRLF`
+\<src_char> | Any valid [UTF-8](https://en.wikipedia.org/wiki/UTF-8) character
+
+**Interpretation**
+
+- The only valid line encodings are considered:
+  - LF
+  - CR
+  - CRLF
+- The source code is written in the UTF-8 encoding.
 
 ## 1.1. Names {#names}
 
@@ -87,11 +103,39 @@ Tag | Syntax
 \<name_start_char> | `_ | a-z | A-Z`
 \<name_char>       | `<name_start_char> | 0-9`
 
+**Interpretation**
+
+- A name cannot start with a digit.
+- Names (identifiers) can only consist of:
+  - an underscore `_`,
+  - lowercase and uppercase letters from `aA` to `zZ`,
+  - digits from `0` to `9`
+
 **Examples**
 
-TODO
+```
+_var
+a_b_c
+x__
+word
+_0
+__Big_Word__
+
+1_3      // invalid
+2_plus_2 // invalid
+```
 
 ## 1.2. Comments {#comments}
+
+**Syntax**
+
+Tag | Syntax | Comment
+--- | ------ | -------
+\<comment> | `// {<src_char>} [<new_line>]` where `<src_char>` is not `<new_line>` | Single-line comment
+\<comment> | `/* {<src_char>} */` | Multiple multi-line comments can be nested inside of each other
+&emsp; \<src_char>, <br> \<new_line> | See [Lexical Analysis](#lexical-analysis)
+
+**Examples**
 
 ```rust
 // single-line comment
@@ -102,6 +146,8 @@ multi
 line
 comment
 */
+
+/* or single line */
 ```
 
 ## 1.3. Literals {#literals}
@@ -112,7 +158,7 @@ comment
 
 Tag(s) | Syntax
 ------ | ------
-\<integer>, <br> \<dec_int> | `0-9 {[_]0-9}`
+\<dec_int>, <br> \<integer> | `0-9 {[_]0-9}`
 \<integer> | `0b 0|1 {[_]0|1}`
 \<integer> | `0x <hex_digit> {[_]<hex_digit>}`
 &emsp; \<hex_digit> | `(0 - 9) | (a - z) | (A - Z)`
@@ -124,30 +170,48 @@ TODO
 
 ### 1.3.2. Float Literals {#float-literals}
 
-Tag | Syntax
---- | ------
+**Syntax**
+
+Tag | Syntax | Comment
+--- | ------ | -------
 \<float> | `<dec_int> . <dec_int> [<float_exp>]`
 \<float> | `<dec_int> <float_exp>`
-\<float_exp> | `e +|- <dec_int>`
-&emsp; \<dec_int> | See **Integer**
+\<float_exp> | `e +|- <dec_int>` | Exponent
+&emsp; \<dec_int> | See [Integer Literals](#integer-literals)
 
-### 1.3.3. String Literals {#string-literals}
+**Examples**
 
 TODO
 
-Tag | Syntax
---- | ------
-\<string> | `" {<string_char>} "`
-&emsp; \<string_char> | Any valid UTF-8 character.
+### 1.3.3. String Literals {#string-literals}
+
+**Syntax**
+
+Tag | Syntax | Comment
+--- | ------ | -------
+\<string> | `" {<src_char>} "` | Raw string literal
+\<string> | `` ` {<src_char> | \<string_esc_seq>} ` `` where `<src_char>` is not `\` | Escapable string literal
+\<string_esc_seq> | <code>a \| b \| e \| f \| n \| r \| t \| v \| ` \| \ </code>
+\<string_esc_seq> | `<integer>`
+&emsp; \<src_char> | See [Lexical Analysis](#lexical-analysis)
+&emsp; \<integer>  | See [Integer Literals](#integer-literals)
+
+**Examples**
+
+TODO
 
 ### 1.3.4. Struct Literals {#struct-literals}
 
 Tag | Syntax | Comment
 --- | ------ | -------
 \<struct_literal> | `{ {<struct_literal_field>} }`
-\<struct_literal_field> | `[<name> =] <expr> [;]` see **Comment** | The semicolon `;` can only be omitted when it's the last field.
+\<struct_literal_field> | `[<name> =] <expr> [;]` see **Comment** | The semicolon `;` can only be omitted if it's the last field.
 &emsp; \<name> | See [Names](#names)
 &emsp; \<expr> | See [Expressions](#expressions)
+
+## 1.4. Semicolons {#semicolons}
+
+TODO
 
 # 2. Definitions {#definitions}
 
@@ -482,6 +546,35 @@ TODO
     pos $Vector2 = $Vector2:new(0, 0);
   }
   ```
+
+## 2.3.1. Union {#union}
+
+**Syntax**
+
+TODO
+
+**Interpretation**
+
+TODO
+
+**Examples**
+
+```rust
+@union $Value = {
+  int isize = 0;
+  ok bool = false;
+  float f32 = 0.0;
+};
+main ${} -> void = {
+  v $Value = {};
+  v.int = 10;
+  // ...
+  v.ok = true;
+  // ...
+  v.float = 3.141;
+};
+```
+
 ## 2.4. Enum {#enum}
 
 An Enum (Enumeration) is a collection of scoped, named & unique integer values (fields)
@@ -566,10 +659,8 @@ TODO
 };
 c #Color = #Color:RED;
 ```
-  
-## 2.5. Union {#union}
 
-## 2.6. Namespace {#namespace}
+## 2.5. Namespace {#namespace}
 
 A namespace is a scoped collection of:
   - [Functions](#functions),
@@ -621,7 +712,7 @@ Tag | Parent | Comment
 
 TODO
 
-### 2.6.1. Modules {#modules}
+### 2.5.1. Modules {#modules}
 
 ```rust
 // main.ry
@@ -934,3 +1025,24 @@ See [as](#as) in [Operators](#operators)
 `3 as f32`
 
 # 7. Macros {#macros}
+
+# 8. Metadata {#metadata}
+
+**Syntax**
+
+Tag | Syntax
+--- | ------
+\<meta> | `@ <name>`
+&emsp; \<name> | See [Names](#names)
+
+**Parentship**
+
+TODO
+
+**Interpretation**
+
+TODO
+
+**Examples**
+
+TODO
