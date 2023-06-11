@@ -12,47 +12,48 @@ Consider
 - see `notes/func.rs` for new `<func_type>` ideas.
 - function parameters immutable - `<func_type>`
 - anon struct types - `<struct_type>` (see notes/notes4.rs)
-- compile-time expressions - `Expressions`
 
 ---
 
 Table of Contents
 
-1. [Lexical Analysis](#lexical-analysis) ✔️ \
-    1.1. [Names](#names) ✔️ \
-    1.2. [Comments](#comments) ✔️ \
-    1.3. [Literals](#literals) ✔️ \
-    &emsp; 1.3.1. [Integer Literals](#integer-literals) ✔️ \
-    &emsp; 1.3.2. [Float Literals](#float-literals) ✔️ \
-    &emsp; 1.3.3. [String Literals](#string-literals) ✔️ \
-    &emsp; 1.3.4. [Struct Literals](#struct-literals) ✔️
-    1.4. [Semicolons](#semicolons) ✔️
-2. [Definitions](#definitions) ✔️ \
-    2.1. [Variables](#variables) ✔️ \
-    2.2. [Functions](#functions) ✔️ \
-    2.3. [Struct](#struct) ✔️ \
-    &emsp; 2.3.1. [Union](#union) ✔️ \
-    2.4. [Enum](#enum) ✔️ \
-    2.5. [Namespace](#namespace) ✔️ \
-    &emsp; 2.5.1. [Modules](#modules) ✔️
-    &emsp; 2.5.2. [Use](#use) ✔️
-3. [Operators](#operators) \
-    3.1. [Arithmetic Operators](#arithmetic-operators) \
-    3.2. [Bitwise Operators](#bitwise-operators) \
-    3.3. [Comparison Operators](#comparison-operators) \
-    3.4. [Logical Operators](#logical-operators) \
-    3.5. [Other Operators](#other-operators)
-4. [Expressions](#expressions) ✔️ \
-    4.1. [Block](#block) (& `break`) ✔️ \
-    4.2. [Control Flow](#control-flow) ✔️ \
-        &emsp; 4.2.1. [If / Elif / Else](#if-elif-else) ✔️ \
-        &emsp; 4.2.2. [Loop](#loop) ✔️ \
-        &emsp; &emsp; 4.2.2.1. [Continue](#continue) ✔️
-    4.3. [Compile-time Expressions](compile-time-expressions)
-5. [Statements](#statements) 
-6. [Types](#types)
-7. [Macros](#macros)
-8. [Metadata](#metadata) ✔️
+Chapter | Syntax | Info
+------- | :----: | ---- 
+1. [Lexical Analysis](#lexical-analysis)                          | ✔️
+&emsp; 1.1. [Names](#names)                                       | ✔️
+&emsp; 1.2. [Comments](#comments)                                 | ✔️
+&emsp; 1.3. [Literals](#literals)                                 | ✔️
+&emsp; &emsp; 1.3.1. [Integer Literals](#integer-literals)        | ✔️ 
+&emsp; &emsp; 1.3.2. [Float Literals](#float-literals)            | ✔️ 
+&emsp; &emsp; 1.3.3. [String Literals](#string-literals)          | ✔️ 
+&emsp; &emsp; 1.3.4. [Struct Literals](#struct-literals)          | ✔️
+&emsp; 1.4. [Semicolons](#semicolons)                             | ✔️
+2. [Definitions](#definitions)                                    | ✔️ 
+&emsp; 2.1. [Variables](#variables)                               | ✔️ 
+&emsp; 2.2. [Functions](#functions)                               | ✔️ 
+&emsp; 2.3. [Struct](#struct)                                     | ✔️ 
+&emsp; &emsp; 2.3.1. [Union](#union)                              | ✔️ 
+&emsp; 2.4. [Enum](#enum)                                         | ✔️ 
+&emsp; 2.5. [Namespace](#namespace)                               | ✔️ 
+&emsp; &emsp; 2.5.1. [Modules](#modules)                          | ✔️
+&emsp; &emsp; 2.5.2. [Use](#use)                                  | ✔️
+3. [Operators](#operators)                                        |
+&emsp; 3.1. [Arithmetic Operators](#arithmetic-operators)         |
+&emsp; 3.2. [Bitwise Operators](#bitwise-operators)               |
+&emsp; 3.3. [Comparison Operators](#comparison-operators)         |
+&emsp; 3.4. [Logical Operators](#logical-operators)               |
+&emsp; 3.5. [Other Operators](#other-operators)                   |
+4. [Expressions](#expressions)                                    | ✔️ 
+&emsp; 4.1. [Block](#block) (& `break`)                           | ✔️ 
+&emsp; 4.2. [Control Flow](#control-flow)                         | ✔️ 
+&emsp; &emsp; 4.2.1. [If / Elif / Else](#if-elif-else)            | ✔️ 
+&emsp; &emsp; 4.2.2. [Loop](#loop)                                | ✔️ 
+&emsp; &emsp; &emsp; 4.2.2.1. [Continue](#continue)               | ✔️
+&emsp; 4.3. [Compile-time Expressions](#compile-time-expressions) | ✔️
+5. [Statements](#statements)                                      |
+6. [Types](#types)                                                |
+7. [Macros](#macros)                                              |
+8. [Metadata](#metadata)                                          | ✔️
 
 ---
 
@@ -1053,7 +1054,12 @@ TODO
 
 Tag | Syntax
 --- | ------
-\<comp_expr> | `comp <expr>`
+\<comp_expr> | `comp ( <expr> )`
+\<comp_expr> | `comp <block>`
+
+**Context**
+
+- Metadata `@comp` can be used to mark [struct](#struct) fields and [variables](#variables) as being compile-time known.
 
 **Interpretation**
 
@@ -1061,7 +1067,38 @@ TODO
 
 **Examples**
 
-TODO
+```rust
+add ${ a f32; b f32 } => f32 = {
+    break a + b;
+};
+sub ${ @comp a f32; b f32 } => f32 = {
+    break a - b;
+};
+mul ${ a f32; @comp b f32 } => f32 = {
+    break a * b;
+};
+div ${ @comp a f32; @comp b f32 } => f32 = {
+    break a / b;
+};
+main ${} => ${} = {
+    @comp a f32 = 3;
+    @comp b f32 = 5;
+
+    @comp c f32 = add{a; b}; // ERROR
+    c f32 = add{a; b}; // ok
+
+    @comp c f32 = sub{a; b}; // ERROR
+    c f32 = sub{a; b}; // ok
+
+    @comp c f32 = mul{a; b}; // ERROR
+    c f32 = mul{a; b}; // ok
+
+    @comp c f32 = div{a; b}; // ok
+    c f32 = div{a; b}; // ok
+
+    break {};
+};
+```
 
 # 5. Statements {#statements}
 
