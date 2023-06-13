@@ -8,6 +8,11 @@ Other Languages
 
 ---
 
+Useful
+- https://rustc-dev-guide.rust-lang.org/part-2-intro.html
+
+---
+
 Consider
 - pointer arrays - `Types`
 - see `notes/func.rs` for new `<func_type>` ideas.
