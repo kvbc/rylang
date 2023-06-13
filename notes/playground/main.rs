@@ -1,5 +1,5 @@
 :std = {
-    @public :ast = { ... };
+    @pub :ast = { ... };
 
     @constraint is_iterable ${
         @comp Tcontainer ast:$Struct;
@@ -15,13 +15,13 @@
         break true;
     };
 
-    @public Array${ @comp T ast:$Type } => ast:$Struct = {
+    @pub Array${ @comp T ast:$Type } => ast:$Struct = {
         break ast ${
             data *T;
             len usize;
             cap usize;
 
-            @public new${ size usize } => $Array = {
+            @pub new${ size usize } => $Array = {
                 break {
                     data = std:malloc(cap * sizeof T);
                     len = 0;
@@ -29,28 +29,28 @@
                 };
             };
 
-            @public push${ arr self; val T } => ${} = {
+            @pub push${ arr self; val T } => ${} = {
                 assert arr.len < arr.cap;
                 arr.data[arr.len] = val;
                 arr.len += 1;
             };
 
-            @public iterator${ arr self } => ast:$Struct & is_iterable(T) & is_cool() = {
+            @pub iterator${ arr self } => ast:$Struct & is_iterable(T) & is_cool() = {
                 break ${
                     i usize = 0;
 
-                    @public next${ it self } => T = {
+                    @pub next${ it self } => T = {
                         assert !it:eos();
                         v T = arr.data[it.i];
                         it.i += 1;
                         break v;
                     };
 
-                    @public eos${ it self } => bool = {
+                    @pub eos${ it self } => bool = {
                         break it.i >= arr.len;
                     };
 
-                    @public cool${ it self } => bool = {
+                    @pub cool${ it self } => bool = {
                         break false;
                     };
                 };
