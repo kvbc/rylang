@@ -19,6 +19,7 @@ Consider
 - function parameters immutable - `<func_type>`
 - anon struct types - `<struct_type>` (see notes/notes4.rs)
 - Type constraints - see [playground/main.rs](playground/main.rs)
+- static
 
 ---
 
