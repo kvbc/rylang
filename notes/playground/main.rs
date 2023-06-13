@@ -21,7 +21,7 @@
             len usize;
             cap usize;
 
-            new${ size usize } => $Array = {
+            @public new${ size usize } => $Array = {
                 break {
                     data = std:malloc(cap * sizeof T);
                     len = 0;
@@ -29,28 +29,28 @@
                 };
             };
 
-            push${ arr self; val T } => ${} = {
+            @public push${ arr self; val T } => ${} = {
                 assert arr.len < arr.cap;
                 arr.data[arr.len] = val;
                 arr.len += 1;
             };
 
-            iterator${ arr self } => ast:$Struct & is_iterable(T) & is_cool() = {
+            @public iterator${ arr self } => ast:$Struct & is_iterable(T) & is_cool() = {
                 break ${
                     i usize = 0;
 
-                    next${ it self } => T = {
+                    @public next${ it self } => T = {
                         assert !it:eos();
                         v T = arr.data[it.i];
                         it.i += 1;
                         break v;
                     };
 
-                    eos${ it self } => bool = {
+                    @public eos${ it self } => bool = {
                         break it.i >= arr.len;
                     };
 
-                    cool${ it self } => bool = {
+                    @public cool${ it self } => bool = {
                         break false;
                     };
                 };
