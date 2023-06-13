@@ -39,18 +39,18 @@
                 break ${
                     i usize = 0;
 
-                    next ${ it self } => T = {
+                    next${ it self } => T = {
                         assert !it:eos();
                         v T = arr.data[it.i];
                         it.i += 1;
                         break v;
                     };
 
-                    eos ${ it self } => bool = {
+                    eos${ it self } => bool = {
                         break it.i >= arr.len;
                     };
 
-                    cool ${ it self } => bool = {
+                    cool${ it self } => bool = {
                         break false;
                     };
                 };
