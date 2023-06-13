@@ -57,7 +57,7 @@
 };
 
 main ${} => ${} = {
-    arr std:Array(i32) = std:Array(i32):new(10);
+    arr var = std:Array(i32):new(10);
     arr:push(2);
     arr:push(1);
     arr:push(3);
