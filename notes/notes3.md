@@ -2,7 +2,7 @@ Other Languages
 - [x] [zig](https://ziglang.org/documentation/master/)
 - [ ] [D](https://dlang.org/spec/spec.html)
 - [x] [odin](https://odin-lang.org/docs/overview/) - no spec
-- [ ] [rust](https://www.rust-lang.org/learn) - no spec
+- [ ] [rust](https://doc.rust-lang.org/reference/index.html)
 - [ ] [go](https://go.dev/ref/spec)
 - [ ] [nim](https://nim-lang.org/docs/manual.html)
 
