@@ -62,8 +62,7 @@ main ${} => ${} = {
     arr:push(1);
     arr:push(3);
     arr:push(7);
-    it var = arr:iterator();
-    loop{ ; !it:eos();; } {
+    loop{ it var = arr:iterator(); !it:eos();; } {
         std:print(it:next());
     }
 };
