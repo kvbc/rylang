@@ -12,7 +12,7 @@ Consider
 - see `notes/func.rs` for new `<func_type>` ideas.
 - function parameters immutable - `<func_type>`
 - anon struct types - `<struct_type>` (see notes/notes4.rs)
-- see [playground/main.rs](notes/playground/main.rs)
+- see [playground/main.rs](playground/main.rs)
 
 ---
 
