@@ -1,5 +1,6 @@
 Other Languages
 - [x] [zig](https://ziglang.org/documentation/master/)
+- [ ] [D](https://dlang.org/spec/spec.html)
 - [x] [odin](https://odin-lang.org/docs/overview/) - no spec
 - [ ] [rust](https://www.rust-lang.org/learn) - no spec
 - [ ] [go](https://go.dev/ref/spec)
