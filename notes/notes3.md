@@ -20,6 +20,7 @@ Consider
 - anon struct types - `<struct_type>` (see notes/notes4.rs)
 - Type constraints - see [playground/main.rs](playground/main.rs)
 - static
+- extern
 
 ---
 
