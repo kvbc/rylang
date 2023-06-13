@@ -1,24 +1,27 @@
 :std = {
     @public :ast = { ... };
 
-    @constraint is_iterable ${ @comp Tcontainer ast:$Struct, @comp Tvalue ast:$Struct } => bool = {
+    @constraint is_iterable ${
+        @comp Tcontainer ast:$Struct;
+        @comp Tvalue ast:$Struct
+    } => bool = {
         assert Tcontainer:has_method{ "next", ${} => Tvalue };
         assert Tcontainer:has_method{ "eos",  ${} => bool };
         break true;
     };
 
-    @constraint is_cool ${ @comp T ast:$Struct } => bool = {
+    @constraint is_cool${ @comp T ast:$Struct } => bool = {
         assert T:has_method{ "cool", ${} => bool }
         break true;
     };
 
-    @public Array ${ @comp T ast:$Type } => ast:$Struct = {
+    @public Array${ @comp T ast:$Type } => ast:$Struct = {
         break ast ${
-            @private data *T;
-            @private len usize;
-            @private cap usize;
+            data *T;
+            len usize;
+            cap usize;
 
-            new ${ size usize } => $Array = {
+            new${ size usize } => $Array = {
                 break {
                     data = std:malloc(cap * sizeof T);
                     len = 0;
@@ -26,13 +29,13 @@
                 };
             };
 
-            push ${ arr self, val T } => ${} = {
+            push${ arr self; val T } => ${} = {
                 assert arr.len < arr.cap;
                 arr.data[arr.len] = val;
                 arr.len += 1;
             };
 
-            iterator ${ arr self } => ast:$Struct & is_iterable(T) & is_cool() = {
+            iterator${ arr self } => ast:$Struct & is_iterable(T) & is_cool() = {
                 break ${
                     i usize = 0;
 
