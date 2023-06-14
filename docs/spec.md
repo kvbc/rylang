@@ -1,11 +1,15 @@
+# Language Specification
+
 Other Languages
-- [x] [zig](https://ziglang.org/documentation/master/)
+- [x] [Zig](https://ziglang.org/documentation/master/)
 - [ ] [D](https://dlang.org/spec/spec.html)
+
 - [ ] [R](https://cran.r-project.org/doc/manuals/r-release/R-lang.pdf)
-- [x] [odin](https://odin-lang.org/docs/overview/) - no spec
-- [x] [rust](https://doc.rust-lang.org/reference/index.html)
-- [ ] [go](https://go.dev/ref/spec)
-- [ ] [nim](https://nim-lang.org/docs/manual.html)
+- [x] [Odin](https://odin-lang.org/docs/overview/) - no spec
+- [x] [Rust](https://doc.rust-lang.org/reference/index.html)
+- [ ] [Go](https://go.dev/ref/spec)
+- [ ] [Nim](https://nim-lang.org/docs/manual.html)
+- [ ] [Haxe](https://haxe.org/manual/introduction.html)
 
 ---
 
@@ -20,7 +24,7 @@ Consider
 - see `notes/func.rs` for new `<func_type>` ideas.
 - function parameters immutable - `<func_type>`
 - anon struct types - `<struct_type>` (see notes/notes4.rs)
-- Type constraints - see [playground/main.rs](playground/main.rs)
+- Type constraints - see [playground/main.rs](../notes/playground/main.rs)
 - static
 - extern
 
