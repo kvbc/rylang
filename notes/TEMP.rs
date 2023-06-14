@@ -1,29 +1,22 @@
-void pure( int a, int b, int c,
-           int * ret_a, int * ret_b, int * ret_c ) {
-    *ret_a = c;
-    *ret_b = b;
-    *ret_c = a;
-}
-
-int main() {
-    int a = 1;
-    int b = 2;
-    int c = 3;
-    pure(a, b, c, &a, &b, &c);
-}
-
-// 
-
-pure ${a i32; b i32; c i32} => pure:$Ret = {
-    $Ret = ${a i32; b i32; c i32};
-    break { c; b; a };
+// runs at runtime
+add1${ a i32; b i32 } => i32 = {
+    break a + b;
 };
+
+// runs at runtime
+add2${ @comp a i32; b i32 } => i32 = {
+    break a + b;
+};
+
+// runs at comp-time, all parameters marked as @comp
+add3${ @comp a i32; @comp b i32 } => i32 = {
+    break a + b;
+};
+
+////////////////////////////////////////////////////////////////////
+
 main ${} => ${} = {
-    a i32 = 1;
-    b i32 = 2;
-    c i32 = 3;
-    ret pure:$Ret = pure{a, b, c};
-    a = ret.a;
-    b = ret.b;
-    c = ret.c;
-}
+    c1 i32 = add1{1; 2};
+    c2 i32 = add2(69; 3);
+    c3 i32 = add3(10, 20);
+};

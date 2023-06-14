@@ -1,6 +1,7 @@
 Other Languages
 - [x] [zig](https://ziglang.org/documentation/master/)
 - [ ] [D](https://dlang.org/spec/spec.html)
+- [ ] [R](https://cran.r-project.org/doc/manuals/r-release/R-lang.pdf)
 - [x] [odin](https://odin-lang.org/docs/overview/) - no spec
 - [x] [rust](https://doc.rust-lang.org/reference/index.html)
 - [ ] [go](https://go.dev/ref/spec)
@@ -9,7 +10,8 @@ Other Languages
 ---
 
 Useful
-- https://rustc-dev-guide.rust-lang.org/part-2-intro.html
+- rustc dev guide - https://rustc-dev-guide.rust-lang.org/part-2-intro.html
+- Advanced R - https://adv-r.hadley.nz/
 
 ---
 
@@ -37,7 +39,7 @@ Chapter | Syntax | Info
 &emsp; &emsp; 1.3.3. [String Literals](#string-literals)          | ✔️ 
 &emsp; &emsp; 1.3.4. [Struct Literals](#struct-literals)          | ✔️
 &emsp; 1.4. [Semicolons](#semicolons)                             | ✔️
-2. [Definitions](#definitions)                                    | ✔️ 
+2. [Definitions](#definitions)                                    | N/A 
 &emsp; 2.1. [Variables](#variables)                               | ✔️ 
 &emsp; 2.2. [Functions](#functions)                               | ✔️ 
 &emsp; 2.3. [Struct](#struct)                                     | ✔️ 
@@ -52,16 +54,16 @@ Chapter | Syntax | Info
 &emsp; 3.3. [Comparison Operators](#comparison-operators)         |
 &emsp; 3.4. [Logical Operators](#logical-operators)               |
 &emsp; 3.5. [Other Operators](#other-operators)                   |
-4. [Expressions](#expressions)                                    | ✔️ 
+4. [Expressions](#expressions)                                    | 〰️
 &emsp; 4.1. [Block](#block) (& `break`)                           | ✔️ 
 &emsp; 4.2. [Control Flow](#control-flow)                         | ✔️ 
 &emsp; &emsp; 4.2.1. [If / Elif / Else](#if-elif-else)            | ✔️ 
 &emsp; &emsp; 4.2.2. [Loop](#loop)                                | ✔️ 
 &emsp; &emsp; &emsp; 4.2.2.1. [Continue](#continue)               | ✔️
-&emsp; 4.3. [Compile-time Expressions](#compile-time-expressions) | ✔️
-5. [Statements](#statements)                                      |
+&emsp; 4.3. [Compile-time Expressions](#compile-time-expressions) | ❌
+5. [Statements](#statements)                                      | 〰️
 6. [Types](#types)                                                |
-7. [Macros](#macros)                                              |
+7. [Macros](#macros)                                              | ❌
 8. [Metadata](#metadata)                                          | ✔️
 
 ---
@@ -202,7 +204,7 @@ Tag | Syntax | Comment
 --- | ------ | -------
 \<float> | `<dec_int> . <dec_int> [<float_exp>]`
 \<float> | `<dec_int> <float_exp>`
-\<float_exp> | `e +|- <dec_int>` | Exponent
+\<float_exp> | `e|E +|- <dec_int>` | Exponent
 &emsp; \<dec_int> | See [Integer Literals](#integer-literals)
 
 **Examples**
@@ -911,6 +913,11 @@ Binary | `as` | \<as> | `<expr> as <type>`
 
 # 4. Expressions {#expressions}
 
+**Syntax**
+
+Tag | Syntax
+\<expr> | `<literal> | <block> | <if> | <loop>`
+
 ## 4.1. Block {#block}
 
 A block is a collection of statements.
@@ -1111,18 +1118,11 @@ main ${} => ${} = {
 
 # 5. Statements {#statements}
 
-[var](#variables)
-[function](#functions)
-[struct](#struct)
-[enum](#enum)
-[namespace](#namespace)
-[alias](#alias)
+**Syntax**
 
-[if / elif / else](#control-flow)
-[loop](#control-flow)
-[block](#block)
-[break](#block)
-[breakif](#block)
+Tag | Syntax
+--- | ------
+\<stmt> | `<var> | <expr> | <namespace_stmt>`
 
 # 6. Types {#types}
 
@@ -1165,12 +1165,18 @@ See [as](#as) in [Operators](#operators)
 
 Tag | Syntax
 --- | ------
-\<meta> | `@ <name>`
+\<meta> | `@ <name>` where `<name>` is one of the listed in **Parentship**
 &emsp; \<name> | See [Names](#names)
 
 **Parentship**
 
-TODO
+Metadata | Parent | Comment
+-------- | ------ | -------
+@pub        | `<namespace_stmt>` | Public access modifier
+@constraint | `<func>`           | Contstraint function
+@union      | `<struct_type>`    | Union
+@comp       |                    | Compile-time statement
+@closure    | `<func>`           | Closure
 
 **Interpretation**
 
