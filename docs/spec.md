@@ -21,14 +21,14 @@ Useful
 
 Consider
 - pointer arrays - `Types`
-- see `notes/func.rs` for new `<func_type>` ideas.
 - function parameters immutable - `<func_type>`
 - anon struct types - `<struct_type>` (see notes/notes4.rs)
-- Type constraints - see [notes/playground/main.rs](../notes/playground/main.rs)
+- type constraints - see [notes/playground/main.rs](../notes/playground/main.rs)
 - static
 - extern
 - struct-based, see [notes/all_struct.rs](../notes/all_struct.rs)
 - closures
+- variadic funtion arguments (struct fields)
 
 ---
 
@@ -45,7 +45,7 @@ Chapter | Syntax | Info
 &emsp; &emsp; 1.3.3. [String Literals](#string-literals)          | ✔️ 
 &emsp; &emsp; 1.3.4. [Struct Literals](#struct-literals)          | ✔️
 2. [Variables](#variables)                                        | ✔️
-3. [Operators](#operators)                                        |
+3. [Operators](#operators)                                        | N/A
 &emsp; 3.1. [Arithmetic Operators](#arithmetic-operators)         |
 &emsp; 3.2. [Bitwise Operators](#bitwise-operators)               |
 &emsp; 3.3. [Comparison Operators](#comparison-operators)         |
@@ -60,17 +60,11 @@ Chapter | Syntax | Info
 &emsp; 4.3. [Compile-time Expressions](#compile-time-expressions) | ❌
 5. [Statements](#statements)                                      | 〰️
 6. [Types](#types)                                                |
+&emsp; 6.1. [Primitives](#primitives)                             | 
+&emsp; 6.2. [Function Type](#function-type)                       | 
+&emsp; 6.3. [Struct Type](#struct-type)                           | 
 7. [Macros](#macros)                                              | ❌
 8. [Metadata](#metadata)                                          | ✔️
-
-&emsp; 2.2. [Struct](#struct)                                     | 
-&emsp; &emsp; 2.2.1. [Union](#union)                              | 
-&emsp; &emsp; 2.2.2. [Enum](#enum)                                | 
-
----
-
-Good info
-- TBD
 
 ---
 
@@ -641,38 +635,69 @@ Tag | Syntax
 
 # 6. Types {#types}
 
-**Primitives**
-
 Tag | Syntax
 --- | ------
-\<primitive> | below
-
-- Integers
-  - `i8`, `i16`, `i32`, `i64`, `i128`
-  - `u8`, `u16`, `u32`, `u64`, `u128`
-- Floating-point: `f32`, `f64`
-- Boolean: `bool`
-- Character: `char`
-- Size: `isize`, `usize`
+\<type> | `<primitive>`
+\<type> | `[*] [!] <type>`
 
 **Pointers**
 
-**Functions**
+**Immutability** (*const*-ness)
 
+**Type conversion** (coercion)
+
+## 6.1. Primitives {#primitives}
+
+Tag | Syntax
+--- | ------
+\<primitive> | one of the variants listed below
+
+Type | Variant(s)
+---- | ----------
+Signed Integer   | `i8`, `i16`, `i32`, `i64`, `i128`
+Unsigned Integer | `u8`, `u16`, `u32`, `u64`, `u128`
+Floating-point   | `f32`, `f64`
+Boolean          | `bool`
+Character        | `char`
+Pointer size     | `isize`, `usize`
+
+## 6.2. Function Type {#function-type}
+
+Tag | Syntax
+--- | ------
+\<func_type> | `<struct_type> => <type>`
+&emsp; \<struct_type> | See [Struct Type](#struct-type)
+&emsp; \<type>        | See [Types](#types)
 
   - Functions can take parameters, that get passed by value.
   - Functions can take variadic arguments.
   - Function parameters can take default values
 
-**Immutability** (*const*-ness)
+**Examples**
 
-##### Conversion
+```rust
+add [a i32; b i32] => i32 = a + b;
+```
 
-See [as](#as) in [Operators](#operators)
+## 6.3. Struct Type {#struct-type}
 
-`3 as f32`
+Tag | Syntax
+--- | ------
+\<struct_type> | `[ {<struct_field>} ]`
+\<struct_field> | `<name> <type> [= <comp_expr>] [;]` where the semicolon `;` can only be omitted if it's the last field
+&emsp; \<name>      | See [Names](#names)
+&emsp; \<type>      | See [Types](#types)
+&emsp; \<comp_expr> | See [Compile-time expressions](#compile-time-expressions)
+
+**Examples**
+
+```rust
+pos [x i32; y i32] = [3; 5];
+```
 
 # 7. Macros {#macros}
+
+...
 
 # 8. Metadata {#metadata}
 
