@@ -24,9 +24,10 @@ Consider
 - see `notes/func.rs` for new `<func_type>` ideas.
 - function parameters immutable - `<func_type>`
 - anon struct types - `<struct_type>` (see notes/notes4.rs)
-- Type constraints - see [playground/main.rs](../notes/playground/main.rs)
+- Type constraints - see [notes/playground/main.rs](../notes/playground/main.rs)
 - static
 - extern
+- struct-based, see [notes/all_struct.rs](../notes/all_struct.rs)
 
 ---
 
@@ -42,16 +43,14 @@ Chapter | Syntax | Info
 &emsp; &emsp; 1.3.2. [Float Literals](#float-literals)            | ✔️ 
 &emsp; &emsp; 1.3.3. [String Literals](#string-literals)          | ✔️ 
 &emsp; &emsp; 1.3.4. [Struct Literals](#struct-literals)          | ✔️
-&emsp; 1.4. [Semicolons](#semicolons)                             | ✔️
-2. [Definitions](#definitions)                                    | N/A 
-&emsp; 2.1. [Variables](#variables)                               | ✔️ 
-&emsp; 2.2. [Functions](#functions)                               | ✔️ 
-&emsp; 2.3. [Struct](#struct)                                     | ✔️ 
-&emsp; &emsp; 2.3.1. [Union](#union)                              | ✔️ 
-&emsp; 2.4. [Enum](#enum)                                         | ✔️ 
-&emsp; 2.5. [Namespace](#namespace)                               | ✔️ 
-&emsp; &emsp; 2.5.1. [Modules](#modules)                          | ✔️
-&emsp; &emsp; 2.5.2. [Use](#use)                                  | ✔️
+2. [Variables](#variables)                                        | 
+&emsp; 2.1. [Functions](#functions)                               | 
+&emsp; 2.2. [Struct](#struct)                                     | 
+&emsp; &emsp; 2.2.1. [Union](#union)                              | 
+&emsp; &emsp; 2.2.2. [Enum](#enum)                                | 
+&emsp; &emsp; 2.2.3. [Namespace](#namespace)                      | 
+&emsp; &emsp; &emsp; 2.2.3.1. [Modules](#modules)                 |
+&emsp; &emsp; &emsp; 2.2.3.2. [Use](#use)                         |
 3. [Operators](#operators)                                        |
 &emsp; 3.1. [Arithmetic Operators](#arithmetic-operators)         |
 &emsp; 3.2. [Bitwise Operators](#bitwise-operators)               |
@@ -242,7 +241,7 @@ TODO
 
 Tag | Syntax | Comment
 --- | ------ | -------
-\<struct_literal> | `{ {<struct_literal_field>} }`
+\<struct_literal> | `[ {<struct_literal_field>} ]`
 \<struct_literal_field> | `[<name> =] <expr> [;]` see **Comment** | The semicolon `;` can only be omitted if it's the last field.
 &emsp; \<name> | See [Names](#names)
 &emsp; \<expr> | See [Expressions](#expressions)
@@ -255,15 +254,11 @@ TODO
 
 TODO
 
-## 1.4. Semicolons {#semicolons}
-
-TODO
-
 # 2. Definitions {#definitions}
 
 ## 2.1. Variables {#variables}
 
-A variable is a named container for data.
+A variable is a named container for data or a type.
 
 **Syntax**
 
