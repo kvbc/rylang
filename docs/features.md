@@ -23,7 +23,7 @@ Feature | Exists
 &emsp; 3.5. [Arrays](#arrays)                                                  | ✔️
 4. [Variables](#variables)                                                     | ✔️
 &emsp; 4.1. [Functions](#functions)                                            | ✔️
-5. [Special Error Handling](#special-error-handling)                           | ❌
+5. [Language-level Error Handling](#language-level-error-handling)             | ❌
 6. [Metadata](#metadata)                                                       | ✔️
 7. [Interfaces](#interfaces)                                                   | ✔️
 8. [Modules / Imports](#modules-or-imports)                                    | ✔️
@@ -202,7 +202,7 @@ main[] => [] = {
 
 ---
 
-## 5. Special Error Handling {#special-error-handling}
+## 5. Language-level Error Handling {#language-level-error-handling}
 
 ...
 
