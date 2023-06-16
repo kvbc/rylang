@@ -176,7 +176,7 @@ Arrays are structs.
 ```rust
 main[] => [] = {
     arr [i32 * 3] = [1; 2; 3];
-    arr.0 = arr.1; // [2; 2; 3]
+    arr..0 = arr..1; // [2; 2; 3]
 }
 ```
 
