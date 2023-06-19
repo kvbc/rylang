@@ -68,7 +68,7 @@ Table of Contents
 | &emsp; 4.3. [Compile-time Expressions](#compile-time-expressions) |   ❌   |
 | 5. [Statements](#statements)                                      |   〰️   |
 | 6. [Metadata](#metadata)                                          |   ✔️   |
-| &emsp; &emsp; &emsp; &emsp; **Typing**                            |        | "Typing" the untyped AST nodes                       |
+| &emsp; &emsp; &emsp; &emsp; **Typing**                            |        | "Typing" the untyped AST nodes                 |
 | 7. [Types](#types)                                                |
 | &emsp; 7.1. [Primitives](#primitives)                             |
 | &emsp; 7.2. [Function Type](#function-type)                       |
@@ -271,6 +271,7 @@ pos [x i32; y i32] = [3; 5];
 if elif else
 loop continue break
 false true
+as
 ```
 
 ## 1.5. Operators {#lexical-operators}
@@ -376,72 +377,72 @@ Vec2 var = [ // comp-time variable, type alias
 
 ## 3.1. Arithmetic Operators {#arithmetic-operators}
 
-| Type   | Operator | Name               | Syntax            |
-| ------ | -------- | ------------------ | ----------------- |
-| Unary  | `-`      | negation           | `- <expr>`        |
-| Binary | `+`      | addition           | `<expr> + <expr>` |
-| Binary | `-`      | subtraction        | `<expr> - <expr>` |
-| Binary | `*`      | multiplication     | `<expr> * <expr>` |
-| Binary | `/`      | division           | `<expr> / <expr>` |
-| Binary | `%`      | modulo (remainder) | `<expr> % <expr>` |
+| Type   | Operator | Name               | Syntax            | Parent   |
+| ------ | -------- | ------------------ | ----------------- | -------- |
+| Unary  | `-`      | negation           | `- <expr>`        | `<expr>` |
+| Binary | `+`      | addition           | `<expr> + <expr>` | `<expr>` |
+| Binary | `-`      | subtraction        | `<expr> - <expr>` | `<expr>` |
+| Binary | `*`      | multiplication     | `<expr> * <expr>` | `<expr>` |
+| Binary | `/`      | division           | `<expr> / <expr>` | `<expr>` |
+| Binary | `%`      | modulo (remainder) | `<expr> % <expr>` | `<expr>` |
 
 Assignment
 
-| Type   | Operator | Name               | Syntax               |
-| ------ | -------- | ------------------ | -------------------- |
-| Binary | `+=`     | addition           | `<name> += <expr> ;` |
-| Binary | `-=`     | subtraction        | `<name> -= <expr> ;` |
-| Binary | `*=`     | multiplication     | `<name> *= <expr> ;` |
-| Binary | `/=`     | division           | `<name> /= <expr> ;` |
-| Binary | `%=`     | modulo (remainder) | `<name> %= <expr> ;` |
+| Type   | Operator | Name               | Syntax               | Parent   |
+| ------ | -------- | ------------------ | -------------------- | -------- |
+| Binary | `+=`     | addition           | `<name> += <expr> ;` | `<stmt>` |
+| Binary | `-=`     | subtraction        | `<name> -= <expr> ;` | `<stmt>` |
+| Binary | `*=`     | multiplication     | `<name> *= <expr> ;` | `<stmt>` |
+| Binary | `/=`     | division           | `<name> /= <expr> ;` | `<stmt>` |
+| Binary | `%=`     | modulo (remainder) | `<name> %= <expr> ;` | `<stmt>` |
 
 ## 3.2. Bitwise Operators {#bitwise-operators}
 
-| Type   | Operator | Name                | Syntax             |
-| ------ | -------- | ------------------- | ------------------ | ------- | ------- |
-| Unary  | `~`      | bitwise negation    | `~ <expr>`         |
-| Binary | `        | `                   | bitwise OR         | `<expr> | <expr>` |
-| Binary | `^`      | bitwise XOR         | `<expr> ^ <expr>`  |
-| Binary | `&`      | bitwise AND         | `<expr> & <expr>`  |
-| Binary | `<<`     | bitwise left shift  | `<expr> << <expr>` |
-| Binary | `>>`     | bitwise right shift | `<expr> >> <expr>` |
+| Type   | Operator | Name                | Syntax             | Parent   |
+| ------ | -------- | ------------------- | ------------------ | -------- |
+| Unary  | `~`      | bitwise negation    | `~ <expr>`         | `<expr>` |
+| Binary | `\|`     | bitwise OR          | `<expr> \| <expr>` | `<expr>` |
+| Binary | `^`      | bitwise XOR         | `<expr> ^ <expr>`  | `<expr>` |
+| Binary | `&`      | bitwise AND         | `<expr> & <expr>`  | `<expr>` |
+| Binary | `<<`     | bitwise left shift  | `<expr> << <expr>` | `<expr>` |
+| Binary | `>>`     | bitwise right shift | `<expr> >> <expr>` | `<expr>` |
 
 Assignment
 
-| Type   | Operator | Name                | Syntax              |
-| ------ | -------- | ------------------- | ------------------- | ------- | --------- |
-| Binary | `        | =`                  | bitwise OR          | `<name> | = <expr>` |
-| Binary | `^=`     | bitwise XOR         | `<name> ^= <expr>`  |
-| Binary | `&=`     | bitwise AND         | `<name> &= <expr>`  |
-| Binary | `<<=`    | bitwise left shift  | `<name> <<= <expr>` |
-| Binary | `>>=`    | bitwise right shift | `<name> >>= <expr>` |
+| Type   | Operator | Name                | Syntax                | Parent   |
+| ------ | -------- | ------------------- | --------------------- | -------- |
+| Binary | `\|=`    | bitwise OR          | `<name> \|= <expr> ;` | `<stmt>` |
+| Binary | `^=`     | bitwise XOR         | `<name> ^= <expr> ;`  | `<stmt>` |
+| Binary | `&=`     | bitwise AND         | `<name> &= <expr> ;`  | `<stmt>` |
+| Binary | `<<=`    | bitwise left shift  | `<name> <<= <expr> ;` | `<stmt>` |
+| Binary | `>>=`    | bitwise right shift | `<name> >>= <expr> ;` | `<stmt>` |
 
 ## 3.3. Comparison Operators {#comparison-operators}
 
-| Type   | Operator | Name             |
-| ------ | -------- | ---------------- |
-| Binary | `==`     | equals           |
-| Binary | `!=`     | not equals       |
-| Binary | `< `     | less             |
-| Binary | `<=`     | less or equal    |
-| Binary | `> `     | greater          |
-| Binary | `>=`     | greater or equal |
+| Type   | Operator | Name             | Parent   |
+| ------ | -------- | ---------------- | -------- |
+| Binary | `==`     | equals           | `<expr>` |
+| Binary | `!=`     | not equals       | `<expr>` |
+| Binary | `< `     | less             | `<expr>` |
+| Binary | `<=`     | less or equal    | `<expr>` |
+| Binary | `> `     | greater          | `<expr>` |
+| Binary | `>=`     | greater or equal | `<expr>` |
 
 ## 3.4. Logical Operators {#logical-operators}
 
-| Type   | Operator | Name        |
-| ------ | -------- | ----------- | --- | ---------- |
-| Unary  | `!`      | logical NOT |
-| Binary | `        |             | `   | logical OR |
-| Binary | `&&`     | logical AND |
+| Type   | Operator | Name        | Syntax             | Parent   |
+| ------ | -------- | ----------- | ------------------ | -------- |
+| Unary  | `!`      | logical NOT | `! <expr>`         | `<expr>` |
+| Binary | `\|`     | logical OR  | `<expr> \| <expr>` | `<expr>` |
+| Binary | `&&`     | logical AND | `<expr> && <expr>` | `<expr>` |
 
 ## 3.5. Other Operators {#other-operators}
 
 Ternary
 
-| Type    | Operator | Tag        | Syntax                                 |
-| ------- | :------: | ---------- | -------------------------------------- |
-| Ternary |   `?:`   | \<ternary> | `( <expr> ) ? ( <expr> ) : ( <expr> )` |
+| Type    | Operator | Tag        | Syntax                     |
+| ------- | :------: | ---------- | -------------------------- |
+| Ternary |   `?:`   | \<ternary> | `<expr> ? <expr> : <expr>` |
 
 Address
 
@@ -449,13 +450,30 @@ Address
 | ----- | :------: | ---------- | ---------- |
 | Unary |   `&`    | \<address> | `& <name>` |
 
-###### as
-
+as
 See [Conversion](#types-conversion) in [Types](#types)
 
 | Type   | Operator | Tag   | Syntax             |
 | ------ | :------: | ----- | ------------------ |
 | Binary |   `as`   | \<as> | `<expr> as <type>` |
+
+Struct field access
+
+| Operator | Syntax            |
+| -------- | ----------------- |
+| `.`      | `<name> . <name>` |
+
+Struct index access
+
+| Operator | Syntax             |
+| -------- | ------------------ |
+| `..`     | `<name> .. <name>` |
+
+Scope access
+
+| Operator | Syntax            |
+| -------- | ----------------- |
+| `:`      | `<name> : <name>` |
 
 **Associativity**
 **Precedence**
