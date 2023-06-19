@@ -377,24 +377,26 @@ Vec2 var = [ // comp-time variable, type alias
 
 ## 3.1. Arithmetic Operators {#arithmetic-operators}
 
-| Type   | Operator | Name               | Syntax            | Parent   |
-| ------ | -------- | ------------------ | ----------------- | -------- |
-| Unary  | `-`      | negation           | `- <expr>`        | `<expr>` |
-| Binary | `+`      | addition           | `<expr> + <expr>` | `<expr>` |
-| Binary | `-`      | subtraction        | `<expr> - <expr>` | `<expr>` |
-| Binary | `*`      | multiplication     | `<expr> * <expr>` | `<expr>` |
-| Binary | `/`      | division           | `<expr> / <expr>` | `<expr>` |
-| Binary | `%`      | modulo (remainder) | `<expr> % <expr>` | `<expr>` |
+| Type   | Operator | Name               | Syntax             | Parent   |
+| ------ | -------- | ------------------ | ------------------ | -------- |
+| Unary  | `-`      | negation           | `- <expr>`         | `<expr>` |
+| Binary | `+`      | addition           | `<expr> + <expr>`  | `<expr>` |
+| Binary | `-`      | subtraction        | `<expr> - <expr>`  | `<expr>` |
+| Binary | `*`      | multiplication     | `<expr> * <expr>`  | `<expr>` |
+| Binary | `**`     | power of           | `<expr> ** <expr>` | `<expr>` |
+| Binary | `/`      | division           | `<expr> / <expr>`  | `<expr>` |
+| Binary | `%`      | modulo (remainder) | `<expr> % <expr>`  | `<expr>` |
 
 Assignment
 
-| Type   | Operator | Name               | Syntax               | Parent   |
-| ------ | -------- | ------------------ | -------------------- | -------- |
-| Binary | `+=`     | addition           | `<name> += <expr> ;` | `<stmt>` |
-| Binary | `-=`     | subtraction        | `<name> -= <expr> ;` | `<stmt>` |
-| Binary | `*=`     | multiplication     | `<name> *= <expr> ;` | `<stmt>` |
-| Binary | `/=`     | division           | `<name> /= <expr> ;` | `<stmt>` |
-| Binary | `%=`     | modulo (remainder) | `<name> %= <expr> ;` | `<stmt>` |
+| Type   | Operator | Name               | Syntax                | Parent   |
+| ------ | -------- | ------------------ | --------------------- | -------- |
+| Binary | `+=`     | addition           | `<name> += <expr> ;`  | `<stmt>` |
+| Binary | `-=`     | subtraction        | `<name> -= <expr> ;`  | `<stmt>` |
+| Binary | `*=`     | multiplication     | `<name> *= <expr> ;`  | `<stmt>` |
+| Binary | `**=`    | power of           | `<name> **= <expr> ;` | `<stmt>` |
+| Binary | `/=`     | division           | `<name> /= <expr> ;`  | `<stmt>` |
+| Binary | `%=`     | modulo (remainder) | `<name> %= <expr> ;`  | `<stmt>` |
 
 ## 3.2. Bitwise Operators {#bitwise-operators}
 
