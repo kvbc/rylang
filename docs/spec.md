@@ -37,9 +37,9 @@ Consider
 
 Table of Contents
 
-| Chapter                                                           | Syntax | Info |
-| ----------------------------------------------------------------- | :----: | ---- |
-| 1. [Lexical Analysis](#lexical-analysis)                          |   ✔️   |
+| Chapter                                                           | Syntax | Info                                           |
+| ----------------------------------------------------------------- | :----: | :--------------------------------------------- |
+| 1. [Lexical Analysis](#lexical-analysis)                          |   ✔️   | Grouping characters into tokens                |
 | &emsp; 1.1. [Names](#names)                                       |   ✔️   |
 | &emsp; 1.2. [Comments](#comments)                                 |   ✔️   |
 | &emsp; 1.3. [Literals](#literals)                                 |   ✔️   |
@@ -47,8 +47,11 @@ Table of Contents
 | &emsp; &emsp; 1.3.2. [Float Literals](#float-literals)            |   ✔️   |
 | &emsp; &emsp; 1.3.3. [String Literals](#string-literals)          |   ✔️   |
 | &emsp; &emsp; 1.3.4. [Struct Literals](#struct-literals)          |   ✔️   |
-| &emsp; 1.4. [Keywords](#keywords)                                 |
-| &emsp; 1.5. [Tokens](#keywords)                                   |
+| &emsp; 1.4. [Keywords](#keywords)                                 |   ✔️   |
+| &emsp; 1.5. [Operators](#lexical-operators)                       |   ✔️   |
+| &emsp; 1.6. [Tokens](#tokens)                                     |   ✔️   |
+| &emsp; &emsp; &emsp; &nbsp;**Parsing and**                        |        | Grouping tokens into untyped AST nodes         |
+| &emsp; &emsp; **Semantic Analysis**                               |        | Analyzing untyped AST nodes                    |
 | 2. [Variables](#variables)                                        |   ✔️   |
 | 3. [Operators](#operators)                                        |  N/A   |
 | &emsp; 3.1. [Arithmetic Operators](#arithmetic-operators)         |
@@ -64,12 +67,15 @@ Table of Contents
 | &emsp; &emsp; &emsp; 4.2.2.1. [Continue](#continue)               |   ✔️   |
 | &emsp; 4.3. [Compile-time Expressions](#compile-time-expressions) |   ❌   |
 | 5. [Statements](#statements)                                      |   〰️   |
-| 6. [Types](#types)                                                |
-| &emsp; 6.1. [Primitives](#primitives)                             |
-| &emsp; 6.2. [Function Type](#function-type)                       |
-| &emsp; 6.3. [Struct Type](#struct-type)                           |
-| 7. [Macros](#macros)                                              |   ❌   |
-| 8. [Metadata](#metadata)                                          |   ✔️   |
+| 6. [Metadata](#metadata)                                          |   ✔️   |
+| &emsp; &emsp; &emsp; &emsp; **Typing**                            |        | "Typing" the untyped AST nodes                       |
+| 7. [Types](#types)                                                |
+| &emsp; 7.1. [Primitives](#primitives)                             |
+| &emsp; 7.2. [Function Type](#function-type)                       |
+| &emsp; 7.3. [Struct Type](#struct-type)                           |
+| &emsp; &emsp; &emsp; &emsp; **Transpilation**                     |        | Transpiling typed AST nodes into C source code |
+| &ensp; &ensp; &nbsp; **Compile-time Evaluation**                  |        | JIT compile-time expression evaluation         |
+| 8. [Macros](#macros)                                              |   ❌   |
 
 ---
 
@@ -256,11 +262,31 @@ pos [x i32; y i32] = [3; 5];
 
 ## 1.4. Keywords {#keywords}
 
+| Tag                 | Syntax                        |
+| ------------------- | ----------------------------- |
+| \<keyword>          | `<primitive>` or below        |
+| &emsp; \<primitive> | See [Primitives](#primitives) |
+
 ```
-if elif else break continue loop
+if elif else
+loop continue break
+false true
 ```
 
-## 1.5. Tokens {#tokens}
+## 1.5. Operators {#lexical-operators}
+
+| Tag         | Syntax                      |
+| ----------- | --------------------------- |
+| \<operator> | See [Operators](#operators) |
+
+## 1.6. Tokens {#tokens}
+
+Tokens represent:
+
+-   [Keywords](#keywords)
+-   [Operators](#operators)
+-   [Literals](#literals)
+-   Characters
 
 # 2. Variables {#variables}
 
@@ -648,73 +674,7 @@ main ${} => ${} = {
 | ------- | ------ | ------ | ----------------- |
 | \<stmt> | `<var> | <expr> | <namespace_stmt>` |
 
-# 6. Types {#types}
-
-| Tag     | Syntax           |
-| ------- | ---------------- |
-| \<type> | `<primitive>`    |
-| \<type> | `[*] [!] <type>` |
-
-**Pointers**
-
-**Immutability** (_const_-ness)
-
-**Type conversion** (coercion)
-
-## 6.1. Primitives {#primitives}
-
-| Tag          | Syntax                           |
-| ------------ | -------------------------------- |
-| \<primitive> | one of the variants listed below |
-
-| Type             | Variant(s)                        |
-| ---------------- | --------------------------------- |
-| Signed Integer   | `i8`, `i16`, `i32`, `i64`, `i128` |
-| Unsigned Integer | `u8`, `u16`, `u32`, `u64`, `u128` |
-| Floating-point   | `f32`, `f64`                      |
-| Boolean          | `bool`                            |
-| Character        | `char`                            |
-| Pointer size     | `isize`, `usize`                  |
-
-## 6.2. Function Type {#function-type}
-
-| Tag                   | Syntax                          |
-| --------------------- | ------------------------------- |
-| \<func_type>          | `<struct_type> => <type>`       |
-| &emsp; \<struct_type> | See [Struct Type](#struct-type) |
-| &emsp; \<type>        | See [Types](#types)             |
-
--   Functions can take parameters, that get passed by value.
--   Functions can take variadic arguments.
--   Function parameters can take default values
-
-**Examples**
-
-```rust
-add [a i32; b i32] => i32 = a + b;
-```
-
-## 6.3. Struct Type {#struct-type}
-
-| Tag                 | Syntax                                                                                                 |
-| ------------------- | ------------------------------------------------------------------------------------------------------ |
-| \<struct_type>      | `[ {<struct_field>} ]`                                                                                 |
-| \<struct_field>     | `<name> <type> [= <comp_expr>] [;]` where the semicolon `;` can only be omitted if it's the last field |
-| &emsp; \<name>      | See [Names](#names)                                                                                    |
-| &emsp; \<type>      | See [Types](#types)                                                                                    |
-| &emsp; \<comp_expr> | See [Compile-time expressions](#compile-time-expressions)                                              |
-
-**Examples**
-
-```rust
-pos [x i32; y i32] = [3; 5];
-```
-
-# 7. Macros {#macros}
-
-...
-
-# 8. Metadata {#metadata}
+## 6. Metadata {#metadata}
 
 **Syntax**
 
@@ -740,6 +700,72 @@ TODO
 **Examples**
 
 TODO
+
+# 7. Types {#types}
+
+| Tag     | Syntax           |
+| ------- | ---------------- |
+| \<type> | `<primitive>`    |
+| \<type> | `[*] [!] <type>` |
+
+**Pointers**
+
+**Immutability** (_const_-ness)
+
+**Type conversion** (coercion)
+
+## 7.1. Primitives {#primitives}
+
+| Tag          | Syntax                           |
+| ------------ | -------------------------------- |
+| \<primitive> | one of the variants listed below |
+
+| Type             | Variant(s)                        |
+| ---------------- | --------------------------------- |
+| Signed Integer   | `i8`, `i16`, `i32`, `i64`, `i128` |
+| Unsigned Integer | `u8`, `u16`, `u32`, `u64`, `u128` |
+| Floating-point   | `f32`, `f64`                      |
+| Boolean          | `bool`                            |
+| Character        | `char`                            |
+| Pointer size     | `isize`, `usize`                  |
+
+## 7.2. Function Type {#function-type}
+
+| Tag                   | Syntax                          |
+| --------------------- | ------------------------------- |
+| \<func_type>          | `<struct_type> => <type>`       |
+| &emsp; \<struct_type> | See [Struct Type](#struct-type) |
+| &emsp; \<type>        | See [Types](#types)             |
+
+-   Functions can take parameters, that get passed by value.
+-   Functions can take variadic arguments.
+-   Function parameters can take default values
+
+**Examples**
+
+```rust
+add [a i32; b i32] => i32 = a + b;
+```
+
+## 7.3. Struct Type {#struct-type}
+
+| Tag                 | Syntax                                                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------------------------ |
+| \<struct_type>      | `[ {<struct_field>} ]`                                                                                 |
+| \<struct_field>     | `<name> <type> [= <comp_expr>] [;]` where the semicolon `;` can only be omitted if it's the last field |
+| &emsp; \<name>      | See [Names](#names)                                                                                    |
+| &emsp; \<type>      | See [Types](#types)                                                                                    |
+| &emsp; \<comp_expr> | See [Compile-time expressions](#compile-time-expressions)                                              |
+
+**Examples**
+
+```rust
+pos [x i32; y i32] = [3; 5];
+```
+
+# 8. Macros {#macros}
+
+...
 
 ---
 

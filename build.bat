@@ -1,1 +1,1 @@
-gcc -O2 -s -o ry.exe src/ry.c -Wpedantic -Wall
+gcc -O2 -s -o ry.exe src/ry.c -Wpedantic -Wall -Wno-format

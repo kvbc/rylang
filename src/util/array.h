@@ -1,17 +1,17 @@
 #ifndef RY_ARRAY_H
 #define RY_ARRAY_H
 
-#include "core.h"
+#include "../core.h"
 #include <stdint.h>
 
 struct ry_Array {
-    RY_SIZE_T len; // items
-    RY_SIZE_T cap; // items
+    size_t len; // items
+    size_t cap; // items
     void * data;
-    RY_SIZE_T itemsz; // bytes
+    size_t itemsz; // bytes
 };
 
-void ry_Array_init (struct ry_Array * arr, RY_SIZE_T itemsz) {
+void ry_Array_init (struct ry_Array * arr, size_t itemsz) {
     arr->len = 0;
     arr->cap = 0;
     arr->data = NULL;
@@ -38,7 +38,7 @@ void ry_Array_push (struct ry_Array * arr, const void * data) {
     arr->len++;
 }
 
-void * ry_Array_get (struct ry_Array * arr, RY_SIZE_T idx) {
+void * ry_Array_get (struct ry_Array * arr, size_t idx) {
     RY_ASSERT(idx < arr->len);
     return (uint8_t*)arr->data + (idx * arr->itemsz);
 }

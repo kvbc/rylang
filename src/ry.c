@@ -1,6 +1,6 @@
 #include "core.h"
 #include "lexer.h"
-#include "array.h"
+#include "util/array.h"
 
 #include <stdio.h>
 
@@ -18,7 +18,7 @@ int main (void) {
     ry_Lexer_init(&lex, &id, &src);
 
     ry_Lexer_run(&lex);
-    for( RY_SIZE_T i = 0; i < lex.tokens.len; i++ ) {
+    for( size_t i = 0; i < lex.tokens.len; i++ ) {
         struct ry_LexerToken * token = (struct ry_LexerToken *)ry_Array_get(&lex.tokens, i);
         ry_LexerToken_print(token);
         printf("\n");

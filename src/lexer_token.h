@@ -1,9 +1,9 @@
 #ifndef RY_LEXER_TOKEN_H
 #define RY_LEXER_TOKEN_H
 
-#include "cstr.h"
+#include "util/cstr.h"
 #include "core.h"
-#include "str.h"
+#include "util/str.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -12,7 +12,7 @@ enum ry_LexerTokenCode {
     TK_NONE,
 
     TK_NAME, // name
-    TK_META, // @
+    TK_HASH, // 3
     TK_SEMI, // ;
     TK_STRING, // "string"
     TK_NUMBER, // 123
@@ -30,22 +30,15 @@ enum ry_LexerTokenCode {
 
     TK__KW_FIRST,
 
-    TK_KW_STRUCT,
-    TK_KW_EXTEND,
-    TK_KW_RETURN,
-    TK_KW_CASE,
-    TK_KW_SWITCH,
-    TK_KW_FOR,
-    TK_KW_DO,
-    TK_KW_WHILE,
+    TK_KW_LOOP,
     TK_KW_BREAK,
     TK_KW_CONTINUE,
     TK_KW_ELSE,
+    TK_KW_ELIF,
     TK_KW_IF,
     TK_KW_FALSE,
     TK_KW_TRUE,
 
-    TK_KW_VOID,
     TK_KW_BOOL,
     TK_KW_I8,
     TK_KW_I16,
@@ -127,22 +120,15 @@ struct ry_LexerToken {
 static const char * kwcode_to_str (enum ry_LexerTokenCode code) {
     RY_ASSERT(IS_KWCODE(code));
     switch( code ) {
-        case TK_KW_STRUCT:   return "struct";
-        case TK_KW_EXTEND:   return "extend";
-        case TK_KW_RETURN:   return "return";
-        case TK_KW_CASE:     return "case";
-        case TK_KW_SWITCH:   return "switch";
-        case TK_KW_FOR:      return "for";
-        case TK_KW_DO:       return "do";
-        case TK_KW_WHILE:    return "while";
+        case TK_KW_LOOP:     return "loop";
         case TK_KW_BREAK:    return "break";
         case TK_KW_CONTINUE: return "continue";
         case TK_KW_ELSE:     return "else";
+        case TK_KW_ELIF:     return "elif";
         case TK_KW_IF:       return "if";
         case TK_KW_FALSE:    return "false";
         case TK_KW_TRUE:     return "true";
 
-        case TK_KW_VOID: return "void";
         case TK_KW_BOOL: return "bool";
         case TK_KW_I8:   return "i8";
         case TK_KW_I16:  return "i16";
@@ -163,7 +149,7 @@ static const char * kwcode_to_str (enum ry_LexerTokenCode code) {
 static unsigned long kwcode_to_strhash (enum ry_LexerTokenCode code) {
     RY_ASSERT(IS_KWCODE(code));
     static unsigned long code_hashes[KW_COUNT] = {0};
-    const RY_SIZE_T idx = code - (TK__KW_FIRST + 1);
+    const size_t idx = code - (TK__KW_FIRST + 1);
     if( code_hashes[idx] == 0 ) {
         const char * kwstr = kwcode_to_str(code);
         code_hashes[idx] = ry_cstr_hash(kwstr, strlen(kwstr));
@@ -177,13 +163,12 @@ static unsigned long kwcode_to_strhash (enum ry_LexerTokenCode code) {
 
 void ry_LexerToken_free( struct ry_LexerToken * tk ) {
     if((tk->code == TK_NAME) ||
-       (tk->code == TK_META) ||
        (tk->code == TK_STRING)
     )
         ry_String_free(&(tk->value.str));
 }
 
-enum ry_LexerTokenCode ry_LexerToken_string_to_keyword (const char * str, RY_SIZE_T len) {
+enum ry_LexerTokenCode ry_LexerToken_string_to_keyword (const char * str, size_t len) {
     unsigned long strhash = ry_cstr_hash(str, len);
     for( enum ry_LexerTokenCode kwcode = TK__KW_FIRST + 1; kwcode < TK__KW_LAST; kwcode++ ) {
         unsigned long kwhash = kwcode_to_strhash(kwcode);
@@ -202,7 +187,7 @@ void ry_LexerToken_print (struct ry_LexerToken * token) {
         case TK_NONE: printf("none"); break;  
         
         case TK_NAME: printf("name \"%.*s\" (len: %u)", token->value.str.len, token->value.str.buf, token->value.str.len); break;
-        case TK_META: printf("@"); break;
+        case TK_HASH: printf("#"); break;
         case TK_SEMI: printf(";"); break;
         case TK_STRING: printf("\"%.*s\" (len: %u)", token->value.str.len, token->value.str.buf, token->value.str.len); break;
         case TK_NUMBER: printf("number: %d", token->value.num); break;

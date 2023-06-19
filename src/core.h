@@ -5,11 +5,7 @@
 #include <assert.h>
 #include <stdint.h>
 #include <string.h>
-
-#define RY_SIZE_T size_t
-#define RY_BOOL int
-#define RY_TRUE (1)
-#define RY_FALSE (0)
+#include <stdbool.h>
 
 #define RY_MEMCPY(dest, src, sz) (memcpy(dest, src, sz))
 #define RY_MALLOC(sz) (malloc(sz))
@@ -21,7 +17,7 @@
 typedef uint8_t ry_char_t;
 typedef int64_t ry_numlit_t; // number literal type
 
-#define RY_CHAR_MIN (0)
+#define RY_CHAR_MIN (1)
 #define RY_CHAR_MAX (255)
 
 #endif // RY_CORE_H

@@ -1,10 +1,10 @@
 #ifndef RY_STR_VIEW_H
 #define RY_STR_VIEW_H
 
-#include "core.h"
+#include "../core.h"
 
 struct ry_StringView {
-    RY_SIZE_T len;
+    size_t len;
     const char * buf;
 };
 
@@ -12,7 +12,7 @@ struct ry_StringView {
 // 
 // 
 
-struct ry_StringView ry_StringView_new( const char * buf, RY_SIZE_T len ) {
+struct ry_StringView ry_StringView_new( const char * buf, size_t len ) {
     return (struct ry_StringView) {
         .len = len,
         .buf = buf
