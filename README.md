@@ -1,5 +1,7 @@
 # rylang
 
+A programming language in progress, which this repository will host the compiler of.
+
 See [docs/spec.md](docs/spec.md)
 
 For ease of reading the Markdown files, I recommend opening them up in VSCode
