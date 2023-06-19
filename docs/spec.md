@@ -1,70 +1,75 @@
 # Language Specification
 
 Other Languages
-- [x] [Zig](https://ziglang.org/documentation/master/)
-- [ ] [D](https://dlang.org/spec/spec.html)
 
-- [ ] [R](https://cran.r-project.org/doc/manuals/r-release/R-lang.pdf)
-- [x] [Odin](https://odin-lang.org/docs/overview/) - no spec
-- [x] [Rust](https://doc.rust-lang.org/reference/index.html)
-- [ ] [Go](https://go.dev/ref/spec)
-- [ ] [Nim](https://nim-lang.org/docs/manual.html)
-- [ ] [Haxe](https://haxe.org/manual/introduction.html)
+-   [x] [Zig](https://ziglang.org/documentation/master/)
+-   [ ] [D](https://dlang.org/spec/spec.html)
+
+-   [ ] [R](https://cran.r-project.org/doc/manuals/r-release/R-lang.pdf)
+-   [x] [Odin](https://odin-lang.org/docs/overview/) - no spec
+-   [x] [Rust](https://doc.rust-lang.org/reference/index.html)
+-   [ ] [Go](https://go.dev/ref/spec)
+-   [ ] [Nim](https://nim-lang.org/docs/manual.html)
+-   [ ] [Haxe](https://haxe.org/manual/introduction.html)
 
 ---
 
 Useful
-- rustc dev guide - https://rustc-dev-guide.rust-lang.org/part-2-intro.html
-- Advanced R - https://adv-r.hadley.nz/
+
+-   rustc dev guide - https://rustc-dev-guide.rust-lang.org/part-2-intro.html
+-   Advanced R - https://adv-r.hadley.nz/
 
 ---
 
 Consider
-- pointer arrays - `Types`
-- function parameters immutable - `<func_type>`
-- anon struct types - `<struct_type>` (see notes/notes4.rs)
-- type constraints - see [notes/playground/main.rs](../notes/playground/main.rs)
-- static
-- extern
-- struct-based, see [notes/all_struct.rs](../notes/all_struct.rs)
-- closures
-- variadic funtion arguments (struct fields)
+
+-   pointer arrays - `Types`
+-   function parameters immutable - `<func_type>`
+-   anon struct types - `<struct_type>` (see notes/notes4.rs)
+-   type constraints - see [notes/playground/main.rs](../notes/playground/main.rs)
+-   static
+-   extern
+-   struct-based, see [notes/all_struct.rs](../notes/all_struct.rs)
+-   closures
+-   variadic funtion arguments (struct fields)
 
 ---
 
 Table of Contents
 
-Chapter | Syntax | Info
-------- | :----: | ---- 
-1. [Lexical Analysis](#lexical-analysis)                          | ✔️
-&emsp; 1.1. [Names](#names)                                       | ✔️
-&emsp; 1.2. [Comments](#comments)                                 | ✔️
-&emsp; 1.3. [Literals](#literals)                                 | ✔️
-&emsp; &emsp; 1.3.1. [Integer Literals](#integer-literals)        | ✔️ 
-&emsp; &emsp; 1.3.2. [Float Literals](#float-literals)            | ✔️ 
-&emsp; &emsp; 1.3.3. [String Literals](#string-literals)          | ✔️ 
-&emsp; &emsp; 1.3.4. [Struct Literals](#struct-literals)          | ✔️
-2. [Variables](#variables)                                        | ✔️
-3. [Operators](#operators)                                        | N/A
-&emsp; 3.1. [Arithmetic Operators](#arithmetic-operators)         |
-&emsp; 3.2. [Bitwise Operators](#bitwise-operators)               |
-&emsp; 3.3. [Comparison Operators](#comparison-operators)         |
-&emsp; 3.4. [Logical Operators](#logical-operators)               |
-&emsp; 3.5. [Other Operators](#other-operators)                   |
-4. [Expressions](#expressions)                                    | 〰️
-&emsp; 4.1. [Block](#block) (& `break`)                           | ✔️ 
-&emsp; 4.2. [Control Flow](#control-flow)                         | ✔️ 
-&emsp; &emsp; 4.2.1. [If / Elif / Else](#if-elif-else)            | ✔️ 
-&emsp; &emsp; 4.2.2. [Loop](#loop)                                | ✔️ 
-&emsp; &emsp; &emsp; 4.2.2.1. [Continue](#continue)               | ✔️
-&emsp; 4.3. [Compile-time Expressions](#compile-time-expressions) | ❌
-5. [Statements](#statements)                                      | 〰️
-6. [Types](#types)                                                |
-&emsp; 6.1. [Primitives](#primitives)                             | 
-&emsp; 6.2. [Function Type](#function-type)                       | 
-&emsp; 6.3. [Struct Type](#struct-type)                           | 
-7. [Macros](#macros)                                              | ❌
-8. [Metadata](#metadata)                                          | ✔️
+| Chapter                                                           | Syntax | Info |
+| ----------------------------------------------------------------- | :----: | ---- |
+| 1. [Lexical Analysis](#lexical-analysis)                          |   ✔️   |
+| &emsp; 1.1. [Names](#names)                                       |   ✔️   |
+| &emsp; 1.2. [Comments](#comments)                                 |   ✔️   |
+| &emsp; 1.3. [Literals](#literals)                                 |   ✔️   |
+| &emsp; &emsp; 1.3.1. [Integer Literals](#integer-literals)        |   ✔️   |
+| &emsp; &emsp; 1.3.2. [Float Literals](#float-literals)            |   ✔️   |
+| &emsp; &emsp; 1.3.3. [String Literals](#string-literals)          |   ✔️   |
+| &emsp; &emsp; 1.3.4. [Struct Literals](#struct-literals)          |   ✔️   |
+| &emsp; 1.4. [Keywords](#keywords)                                 |
+| &emsp; 1.5. [Tokens](#keywords)                                   |
+| 2. [Variables](#variables)                                        |   ✔️   |
+| 3. [Operators](#operators)                                        |  N/A   |
+| &emsp; 3.1. [Arithmetic Operators](#arithmetic-operators)         |
+| &emsp; 3.2. [Bitwise Operators](#bitwise-operators)               |
+| &emsp; 3.3. [Comparison Operators](#comparison-operators)         |
+| &emsp; 3.4. [Logical Operators](#logical-operators)               |
+| &emsp; 3.5. [Other Operators](#other-operators)                   |
+| 4. [Expressions](#expressions)                                    |   〰️   |
+| &emsp; 4.1. [Block](#block) (& `break`)                           |   ✔️   |
+| &emsp; 4.2. [Control Flow](#control-flow)                         |   ✔️   |
+| &emsp; &emsp; 4.2.1. [If / Elif / Else](#if-elif-else)            |   ✔️   |
+| &emsp; &emsp; 4.2.2. [Loop](#loop)                                |   ✔️   |
+| &emsp; &emsp; &emsp; 4.2.2.1. [Continue](#continue)               |   ✔️   |
+| &emsp; 4.3. [Compile-time Expressions](#compile-time-expressions) |   ❌   |
+| 5. [Statements](#statements)                                      |   〰️   |
+| 6. [Types](#types)                                                |
+| &emsp; 6.1. [Primitives](#primitives)                             |
+| &emsp; 6.2. [Function Type](#function-type)                       |
+| &emsp; 6.3. [Struct Type](#struct-type)                           |
+| 7. [Macros](#macros)                                              |   ❌   |
+| 8. [Metadata](#metadata)                                          |   ✔️   |
 
 ---
 
@@ -72,36 +77,36 @@ Chapter | Syntax | Info
 
 **Syntax**
 
-Tag | Syntax
---- | ------
-\<new_line> | `\n | \r | \r\n` or `LF | CR | CRLF`
-\<src_char> | Any valid [UTF-8](https://en.wikipedia.org/wiki/UTF-8) character (0 - 255)
+| Tag         | Syntax                                                                     |
+| ----------- | -------------------------------------------------------------------------- | --- | ---------- | --- | ----- |
+| \<new_line> | `\n                                                                        | \r  | \r\n`or`LF | CR  | CRLF` |
+| \<src_char> | Any valid [UTF-8](https://en.wikipedia.org/wiki/UTF-8) character (0 - 255) |
 
 **Interpretation**
 
-- The only valid line encodings are:
-  - LF
-  - CR
-  - CRLF
-- The source code is written in the UTF-8 encoding.
+-   The only valid line encodings are:
+    -   LF
+    -   CR
+    -   CRLF
+-   The source code is written in the UTF-8 encoding.
 
 ## 1.1. Names {#names}
 
 **Syntax**
 
-Tag | Syntax
---- | ------
-\<name>            | `<name_start_char> {<name_char>}`
-\<name_start_char> | `_ | a-z | A-Z`
-\<name_char>       | `<name_start_char> | 0-9`
+| Tag                | Syntax                            |
+| ------------------ | --------------------------------- | ---- | ---- |
+| \<name>            | `<name_start_char> {<name_char>}` |
+| \<name_start_char> | `\_                               | a-z  | A-Z` |
+| \<name_char>       | `<name_start_char>                | 0-9` |
 
 **Interpretation**
 
-- A name cannot start with a digit.
-- Names (identifiers) can only consist of:
-  - underscores `_`,
-  - lowercase and uppercase letters from `aA` to `zZ`,
-  - digits from `0` to `9`
+-   A name cannot start with a digit.
+-   Names (identifiers) can only consist of:
+    -   underscores `_`,
+    -   lowercase and uppercase letters from `aA` to `zZ`,
+    -   digits from `0` to `9`
 
 **Examples**
 
@@ -121,21 +126,22 @@ __Big_Word__
 
 **Syntax**
 
-Tag | Syntax | Comment
---- | ------ | -------
-\<comment> | `// {<src_char>} [<new_line>]` where `<src_char>` is not `<new_line>` | Single-line comment
-\<comment> | `/* {<src_char>} */` | Multi-line comment
-&emsp; \<src_char>, <br> \<new_line> | See [Lexical Analysis](#lexical-analysis)
+| Tag                                  | Syntax                                                                | Comment             |
+| ------------------------------------ | --------------------------------------------------------------------- | ------------------- |
+| \<comment>                           | `// {<src_char>} [<new_line>]` where `<src_char>` is not `<new_line>` | Single-line comment |
+| \<comment>                           | `/* {<src_char>} */`                                                  | Multi-line comment  |
+| &emsp; \<src_char>, <br> \<new_line> | See [Lexical Analysis](#lexical-analysis)                             |
 
 **Context**
 
-- Multiple multi-line comments can be nested inside of each other.
+-   Multiple multi-line comments can be nested inside of each other.
 
 **Examples**
 
 ```rust
 // single-line comment
 ```
+
 ```rust
 /*
 multi
@@ -152,13 +158,13 @@ comment
 
 **Syntax**
 
-Tag(s) | Syntax | Comment
------- | ------ | -------
-\<dec_int>, <br> \<integer> | `0-9 {[_]0-9}` | Decimal integer literal
-\<integer> | `0b 0|1 {[_]0|1}` | Binary integer literal
-\<integer> | `0x <hex_digit> {[_]<hex_digit>}` | Hexadecimal integer literal
-&emsp; \<hex_digit> | `(0 - 9) | (a - z) | (A - Z)` | Hexadecimal digit
-\<integer> | `0o 0-7 {[_]0-7}` | Octal integer literal
+| Tag(s)                      | Syntax                            | Comment                     |
+| --------------------------- | --------------------------------- | --------------------------- | -------- | ---------------------- |
+| \<dec_int>, <br> \<integer> | `0-9 {[_]0-9}`                    | Decimal integer literal     |
+| \<integer>                  | `0b 0                             | 1 {[_]0                     | 1}`      | Binary integer literal |
+| \<integer>                  | `0x <hex_digit> {[_]<hex_digit>}` | Hexadecimal integer literal |
+| &emsp; \<hex_digit>         | `(0 - 9)                          | (a - z)                     | (A - Z)` | Hexadecimal digit      |
+| \<integer>                  | `0o 0-7 {[_]0-7}`                 | Octal integer literal       |
 
 **Examples**
 
@@ -195,12 +201,12 @@ _1_    // INVALID
 
 **Syntax**
 
-Tag | Syntax | Comment
---- | ------ | -------
-\<float> | `<dec_int> . <dec_int> [<float_exp>]`
-\<float> | `<dec_int> <float_exp>`
-\<float_exp> | `e|E +|- <dec_int>` | Exponent
-&emsp; \<dec_int> | See [Integer Literals](#integer-literals)
+| Tag               | Syntax                                    | Comment |
+| ----------------- | ----------------------------------------- | ------- | ------------ | -------- |
+| \<float>          | `<dec_int> . <dec_int> [<float_exp>]`     |
+| \<float>          | `<dec_int> <float_exp>`                   |
+| \<float_exp>      | `e                                        | E +     | - <dec_int>` | Exponent |
+| &emsp; \<dec_int> | See [Integer Literals](#integer-literals) |
 
 **Examples**
 
@@ -210,14 +216,14 @@ TODO
 
 **Syntax**
 
-Tag | Syntax | Comment
---- | ------ | -------
-\<string> | `" {<src_char>} "` | Raw string literal
-\<string> | `` ` {<src_char> | \<string_esc_seq>} ` `` where `<src_char>` is not `\` | Escapable string literal
-\<string_esc_seq> | <code>a \| b \| e \| f \| n \| r \| t \| v \| ` \| \ </code>
-\<string_esc_seq> | `<integer>`
-&emsp; \<src_char> | See [Lexical Analysis](#lexical-analysis)
-&emsp; \<integer>  | See [Integer Literals](#integer-literals)
+| Tag                | Syntax                                                       | Comment                                             |
+| ------------------ | ------------------------------------------------------------ | --------------------------------------------------- | ------------------------ |
+| \<string>          | `" {<src_char>} "`                                           | Raw string literal                                  |
+| \<string>          | `` ` {<src_char>                                             | \<string_esc_seq>} ` `` where `<src_char>`is not`\` | Escapable string literal |
+| \<string_esc_seq>  | <code>a \| b \| e \| f \| n \| r \| t \| v \| ` \| \ </code> |
+| \<string_esc_seq>  | `<integer>`                                                  |
+| &emsp; \<src_char> | See [Lexical Analysis](#lexical-analysis)                    |
+| &emsp; \<integer>  | See [Integer Literals](#integer-literals)                    |
 
 **Interpretation**
 
@@ -231,12 +237,12 @@ TODO
 
 **Syntax**
 
-Tag | Syntax | Comment
---- | ------ | -------
-\<struct_literal> | `[ {<struct_literal_field>} ]`
-\<struct_literal_field> | `[<name> =] <expr> [;]` see **Comment** | The semicolon `;` can only be omitted if it's the last field.
-&emsp; \<name> | See [Names](#names)
-&emsp; \<expr> | See [Expressions](#expressions)
+| Tag                     | Syntax                                  | Comment                                                       |
+| ----------------------- | --------------------------------------- | ------------------------------------------------------------- |
+| \<struct_literal>       | `[ {<struct_literal_field>} ]`          |
+| \<struct_literal_field> | `[<name> =] <expr> [;]` see **Comment** | The semicolon `;` can only be omitted if it's the last field. |
+| &emsp; \<name>          | See [Names](#names)                     |
+| &emsp; \<expr>          | See [Expressions](#expressions)         |
 
 **Interpretation**
 
@@ -248,26 +254,34 @@ TODO
 pos [x i32; y i32] = [3; 5];
 ```
 
+## 1.4. Keywords {#keywords}
+
+```
+if elif else break continue loop
+```
+
+## 1.5. Tokens {#tokens}
+
 # 2. Variables {#variables}
 
 **Syntax**
 
-Tag | Syntax
---- | ------
-\<var>          | `<name> <type> = <expr> ;` where `<expr>` coerces into `<type>` | Non-struct variable
-&emsp; \<name>  | See [Names](#names)
-&emsp; \<expr>  | See [Expressions](#expressions)
-&emsp; \<type>  | See [Types](#types)
+| Tag            | Syntax                                                          |
+| -------------- | --------------------------------------------------------------- | ------------------- |
+| \<var>         | `<name> <type> = <expr> ;` where `<expr>` coerces into `<type>` | Non-struct variable |
+| &emsp; \<name> | See [Names](#names)                                             |
+| &emsp; \<expr> | See [Expressions](#expressions)                                 |
+| &emsp; \<type> | See [Types](#types)                                             |
 
-- See `<name>` in [Names](#names) for the rules behind a valid variable name (identifier).
-- See `<expr>` in [Expressions](#expressions) for what a variable can be assigned.
-- The variable's value must be able to coerce into the variable's type.
-    - See [Type Coercion](#type-coercion)
-- All variables must be initialized.
-- Variables of type `<type>` being `<func_type>` are knows as functions.
-    - See `<func_type>` in [Types](#types)
-- Variables of type `<type>` being `<struct_type>` are known as structs.
-    - See `<struct_type>` in [Types](#types)
+-   See `<name>` in [Names](#names) for the rules behind a valid variable name (identifier).
+-   See `<expr>` in [Expressions](#expressions) for what a variable can be assigned.
+-   The variable's value must be able to coerce into the variable's type.
+    -   See [Type Coercion](#type-coercion)
+-   All variables must be initialized.
+-   Variables of type `<type>` being `<func_type>` are knows as functions.
+    -   See `<func_type>` in [Types](#types)
+-   Variables of type `<type>` being `<struct_type>` are known as structs.
+    -   See `<struct_type>` in [Types](#types)
 
 **Examples**
 
@@ -325,97 +339,97 @@ Vec2 var = [ // comp-time variable, type alias
 
 **Context**
 
-Tag | Parent
---- | ------
-\<var> | `<block>`
-&emsp; \<block> | See [Blocks](#blocks)
+| Tag             | Parent                |
+| --------------- | --------------------- |
+| \<var>          | `<block>`             |
+| &emsp; \<block> | See [Blocks](#blocks) |
 
-- Variables can only exist inside of blocks.
+-   Variables can only exist inside of blocks.
 
 # 3. Operators {#operators}
 
 ## 3.1. Arithmetic Operators {#arithmetic-operators}
 
-Type | Operator | Name | Syntax
----- | -------- | ---- | ------
-Unary  | `-`   | negation           | `- <expr>`
-Binary | `+`   | addition           | `<expr> + <expr>`
-Binary | `-`   | subtraction        | `<expr> - <expr>`
-Binary | `*`   | multiplication     | `<expr> * <expr>`
-Binary | `/`   | division           | `<expr> / <expr>`
-Binary | `%`   | modulo (remainder) | `<expr> % <expr>`
+| Type   | Operator | Name               | Syntax            |
+| ------ | -------- | ------------------ | ----------------- |
+| Unary  | `-`      | negation           | `- <expr>`        |
+| Binary | `+`      | addition           | `<expr> + <expr>` |
+| Binary | `-`      | subtraction        | `<expr> - <expr>` |
+| Binary | `*`      | multiplication     | `<expr> * <expr>` |
+| Binary | `/`      | division           | `<expr> / <expr>` |
+| Binary | `%`      | modulo (remainder) | `<expr> % <expr>` |
 
 Assignment
 
-Type | Operator | Name | Syntax
----- | -------- | ---- | ------
-Binary | `+=`   | addition           | `<name> += <expr> ;`
-Binary | `-=`   | subtraction        | `<name> -= <expr> ;`
-Binary | `*=`   | multiplication     | `<name> *= <expr> ;`
-Binary | `/=`   | division           | `<name> /= <expr> ;`
-Binary | `%=`   | modulo (remainder) | `<name> %= <expr> ;`
+| Type   | Operator | Name               | Syntax               |
+| ------ | -------- | ------------------ | -------------------- |
+| Binary | `+=`     | addition           | `<name> += <expr> ;` |
+| Binary | `-=`     | subtraction        | `<name> -= <expr> ;` |
+| Binary | `*=`     | multiplication     | `<name> *= <expr> ;` |
+| Binary | `/=`     | division           | `<name> /= <expr> ;` |
+| Binary | `%=`     | modulo (remainder) | `<name> %= <expr> ;` |
 
 ## 3.2. Bitwise Operators {#bitwise-operators}
 
-Type | Operator | Name | Syntax
----- | -------- | ---- | ------
-Unary  | `~`  | bitwise negation    | `~ <expr>`
-Binary | `|`  | bitwise OR          | `<expr> | <expr>`
-Binary | `^`  | bitwise XOR         | `<expr> ^ <expr>`
-Binary | `&`  | bitwise AND         | `<expr> & <expr>`
-Binary | `<<` | bitwise left shift  | `<expr> << <expr>`
-Binary | `>>` | bitwise right shift | `<expr> >> <expr>`
+| Type   | Operator | Name                | Syntax             |
+| ------ | -------- | ------------------- | ------------------ | ------- | ------- |
+| Unary  | `~`      | bitwise negation    | `~ <expr>`         |
+| Binary | `        | `                   | bitwise OR         | `<expr> | <expr>` |
+| Binary | `^`      | bitwise XOR         | `<expr> ^ <expr>`  |
+| Binary | `&`      | bitwise AND         | `<expr> & <expr>`  |
+| Binary | `<<`     | bitwise left shift  | `<expr> << <expr>` |
+| Binary | `>>`     | bitwise right shift | `<expr> >> <expr>` |
 
 Assignment
 
-Type | Operator | Name | Syntax
----- | -------- | ---- | ------
-Binary | `|=`  | bitwise OR          | `<name> |= <expr>`
-Binary | `^=`  | bitwise XOR         | `<name> ^= <expr>`
-Binary | `&=`  | bitwise AND         | `<name> &= <expr>`
-Binary | `<<=` | bitwise left shift  | `<name> <<= <expr>`
-Binary | `>>=` | bitwise right shift | `<name> >>= <expr>`
+| Type   | Operator | Name                | Syntax              |
+| ------ | -------- | ------------------- | ------------------- | ------- | --------- |
+| Binary | `        | =`                  | bitwise OR          | `<name> | = <expr>` |
+| Binary | `^=`     | bitwise XOR         | `<name> ^= <expr>`  |
+| Binary | `&=`     | bitwise AND         | `<name> &= <expr>`  |
+| Binary | `<<=`    | bitwise left shift  | `<name> <<= <expr>` |
+| Binary | `>>=`    | bitwise right shift | `<name> >>= <expr>` |
 
 ## 3.3. Comparison Operators {#comparison-operators}
 
-Type | Operator | Name
----- | -------- | ----
-Binary | `==` | equals
-Binary | `!=` | not equals
-Binary | `< ` | less
-Binary | `<=` | less or equal
-Binary | `> ` | greater
-Binary | `>=` | greater or equal
+| Type   | Operator | Name             |
+| ------ | -------- | ---------------- |
+| Binary | `==`     | equals           |
+| Binary | `!=`     | not equals       |
+| Binary | `< `     | less             |
+| Binary | `<=`     | less or equal    |
+| Binary | `> `     | greater          |
+| Binary | `>=`     | greater or equal |
 
 ## 3.4. Logical Operators {#logical-operators}
 
-Type | Operator | Name
----- | -------- | ----
-Unary  | `!`  | logical NOT
-Binary | `||` | logical OR
-Binary | `&&` | logical AND
+| Type   | Operator | Name        |
+| ------ | -------- | ----------- | --- | ---------- |
+| Unary  | `!`      | logical NOT |
+| Binary | `        |             | `   | logical OR |
+| Binary | `&&`     | logical AND |
 
 ## 3.5. Other Operators {#other-operators}
 
 Ternary
 
-Type | Operator | Tag | Syntax
----- | :------: | --- | ------
-Ternary | `?:` | \<ternary> | `( <expr> ) ? ( <expr> ) : ( <expr> )`
+| Type    | Operator | Tag        | Syntax                                 |
+| ------- | :------: | ---------- | -------------------------------------- |
+| Ternary |   `?:`   | \<ternary> | `( <expr> ) ? ( <expr> ) : ( <expr> )` |
 
 Address
 
-Type | Operator | Tag | Syntax
----- | :------: | --- | ------
-Unary | `&` | \<address> | `& <name>`
+| Type  | Operator | Tag        | Syntax     |
+| ----- | :------: | ---------- | ---------- |
+| Unary |   `&`    | \<address> | `& <name>` |
 
 ###### as
 
 See [Conversion](#types-conversion) in [Types](#types)
 
-Type | Operator | Tag | Syntax
----- | :------: | --- | ------
-Binary | `as` | \<as> | `<expr> as <type>`
+| Type   | Operator | Tag   | Syntax             |
+| ------ | :------: | ----- | ------------------ |
+| Binary |   `as`   | \<as> | `<expr> as <type>` |
 
 **Associativity**
 **Precedence**
@@ -430,19 +444,20 @@ Tag | Syntax
 ## 4.1. Block {#block}
 
 A block is a collection of statements.
-- See `<stmt>` in [Statements](#statements) for the definition of a *statement*.
+
+-   See `<stmt>` in [Statements](#statements) for the definition of a _statement_.
 
 A block can be "broke from" using the `break` statement.
 
 **Syntax**
 
-Tag | Syntax
---- | ------
-\<block> | `[<string>] { <stmt> {<stmt>} }`
-\<break> | `break [<string>] [<expr>] ;`
-&emsp; \<string> | See [Literals](#literals)
-&emsp; \<stmt> | See [Statements](#statements)
-&emsp; \<expr> | See [Expressions](#expressions)
+| Tag              | Syntax                           |
+| ---------------- | -------------------------------- |
+| \<block>         | `[<string>] { <stmt> {<stmt>} }` |
+| \<break>         | `break [<string>] [<expr>] ;`    |
+| &emsp; \<string> | See [Literals](#literals)        |
+| &emsp; \<stmt>   | See [Statements](#statements)    |
+| &emsp; \<expr>   | See [Expressions](#expressions)  |
 
 **Context**
 
@@ -450,21 +465,21 @@ TODO
 
 **Interpretation**
 
-- All blocks can be labeled with a preceding string literal.
-- Break statements can be optionally provided the block label to break from (as a string literal) and an expression to return from a block
-	```rust
-    max usize = 10;
-    x isize = "x" {
-        for( a usize = max;; a > 0; a -= 1 ) {
-            for( b usize = max;; b > 0; b -= 1 ) {
-                if( a + b == a * b ) {
-                    break "x" (a + b);
-                }
-            }
-        }
-        break -1;
-    }
-	```
+-   All blocks can be labeled with a preceding string literal.
+-   Break statements can be optionally provided the block label to break from (as a string literal) and an expression to return from a block
+    ```rust
+      max usize = 10;
+      x isize = "x" {
+          for( a usize = max;; a > 0; a -= 1 ) {
+              for( b usize = max;; b > 0; b -= 1 ) {
+                  if( a + b == a * b ) {
+                      break "x" (a + b);
+                  }
+              }
+          }
+          break -1;
+      }
+    ```
 
 **Examples**
 
@@ -484,19 +499,19 @@ for( x usize = 0;; x < 10; x += 1 ) "x" {
 
 **Syntax**
 
-Tag | Syntax
---- | ------
-\<if>   | `if ( <expr> ) <block> {<elif>} [<else>]`
-\<elif> | `elif ( <expr> ) <block>`
-\<else> | `else <block>` 
-&emsp; \<expr>  | See [Expressions](#expressions)
-&emsp; \<block> | See [Block](#6-block)
+| Tag             | Syntax                                    |
+| --------------- | ----------------------------------------- |
+| \<if>           | `if ( <expr> ) <block> {<elif>} [<else>]` |
+| \<elif>         | `elif ( <expr> ) <block>`                 |
+| \<else>         | `else <block>`                            |
+| &emsp; \<expr>  | See [Expressions](#expressions)           |
+| &emsp; \<block> | See [Block](#6-block)                     |
 
 **Parentship**
 
-Tag | Parent | Comment
---- | ------ | -------
-\<if> | \<expr> | See **Interpretation** & [Expressions](#expressions)
+| Tag   | Parent  | Comment                                              |
+| ----- | ------- | ---------------------------------------------------- |
+| \<if> | \<expr> | See **Interpretation** & [Expressions](#expressions) |
 
 **Context**
 
@@ -523,18 +538,18 @@ b i32 = if( a == 1 ) {
 
 **Syntax**
 
-Tag | Syntax | Comment
---- | ------ | -------
-\<loop> | `loop ( <stmt> ; <expr> ; <expr> ; <stmt> )` where both `<expr>` result in `bool` | start statement `;` start break condition `;` end break condition `;` end statement
-&emsp; \<stmt> | See [Statements](#statements)
-&emsp; \<expr> | See [Expressions](#expressions)
-&emsp; `bool`  | See `<primitive>` in [Types](#types)
+| Tag            | Syntax                                                                            | Comment                                                                             |
+| -------------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| \<loop>        | `loop ( <stmt> ; <expr> ; <expr> ; <stmt> )` where both `<expr>` result in `bool` | start statement `;` start break condition `;` end break condition `;` end statement |
+| &emsp; \<stmt> | See [Statements](#statements)                                                     |
+| &emsp; \<expr> | See [Expressions](#expressions)                                                   |
+| &emsp; `bool`  | See `<primitive>` in [Types](#types)                                              |
 
 **Parentship**
 
-Tag | Parent | Comment
---- | ------ | -------
-\<loop> | \<expr> | See **Interpretation** & [Expressions](#expressions)
+| Tag     | Parent  | Comment                                              |
+| ------- | ------- | ---------------------------------------------------- |
+| \<loop> | \<expr> | See **Interpretation** & [Expressions](#expressions) |
 
 **Context**
 
@@ -557,9 +572,9 @@ loop( u32 i = 0; i < 10; i < 10; i++ ) {}
 
 **Syntax**
 
-Tag | Syntax
---- | ------
-\<continue> | `continue ;`
+| Tag         | Syntax       |
+| ----------- | ------------ |
+| \<continue> | `continue ;` |
 
 **Context**
 
@@ -577,14 +592,14 @@ TODO
 
 **Syntax**
 
-Tag | Syntax
---- | ------
-\<comp_expr> | `comp ( <expr> )`
-\<comp_expr> | `comp <block>`
+| Tag          | Syntax            |
+| ------------ | ----------------- |
+| \<comp_expr> | `comp ( <expr> )` |
+| \<comp_expr> | `comp <block>`    |
 
 **Context**
 
-- Metadata `@comp` can be used to mark [struct](#struct) fields and [variables](#variables) as being compile-time known.
+-   Metadata `@comp` can be used to mark [struct](#struct) fields and [variables](#variables) as being compile-time known.
 
 **Interpretation**
 
@@ -629,49 +644,49 @@ main ${} => ${} = {
 
 **Syntax**
 
-Tag | Syntax
---- | ------
-\<stmt> | `<var> | <expr> | <namespace_stmt>`
+| Tag     | Syntax |
+| ------- | ------ | ------ | ----------------- |
+| \<stmt> | `<var> | <expr> | <namespace_stmt>` |
 
 # 6. Types {#types}
 
-Tag | Syntax
---- | ------
-\<type> | `<primitive>`
-\<type> | `[*] [!] <type>`
+| Tag     | Syntax           |
+| ------- | ---------------- |
+| \<type> | `<primitive>`    |
+| \<type> | `[*] [!] <type>` |
 
 **Pointers**
 
-**Immutability** (*const*-ness)
+**Immutability** (_const_-ness)
 
 **Type conversion** (coercion)
 
 ## 6.1. Primitives {#primitives}
 
-Tag | Syntax
---- | ------
-\<primitive> | one of the variants listed below
+| Tag          | Syntax                           |
+| ------------ | -------------------------------- |
+| \<primitive> | one of the variants listed below |
 
-Type | Variant(s)
----- | ----------
-Signed Integer   | `i8`, `i16`, `i32`, `i64`, `i128`
-Unsigned Integer | `u8`, `u16`, `u32`, `u64`, `u128`
-Floating-point   | `f32`, `f64`
-Boolean          | `bool`
-Character        | `char`
-Pointer size     | `isize`, `usize`
+| Type             | Variant(s)                        |
+| ---------------- | --------------------------------- |
+| Signed Integer   | `i8`, `i16`, `i32`, `i64`, `i128` |
+| Unsigned Integer | `u8`, `u16`, `u32`, `u64`, `u128` |
+| Floating-point   | `f32`, `f64`                      |
+| Boolean          | `bool`                            |
+| Character        | `char`                            |
+| Pointer size     | `isize`, `usize`                  |
 
 ## 6.2. Function Type {#function-type}
 
-Tag | Syntax
---- | ------
-\<func_type> | `<struct_type> => <type>`
-&emsp; \<struct_type> | See [Struct Type](#struct-type)
-&emsp; \<type>        | See [Types](#types)
+| Tag                   | Syntax                          |
+| --------------------- | ------------------------------- |
+| \<func_type>          | `<struct_type> => <type>`       |
+| &emsp; \<struct_type> | See [Struct Type](#struct-type) |
+| &emsp; \<type>        | See [Types](#types)             |
 
-  - Functions can take parameters, that get passed by value.
-  - Functions can take variadic arguments.
-  - Function parameters can take default values
+-   Functions can take parameters, that get passed by value.
+-   Functions can take variadic arguments.
+-   Function parameters can take default values
 
 **Examples**
 
@@ -681,13 +696,13 @@ add [a i32; b i32] => i32 = a + b;
 
 ## 6.3. Struct Type {#struct-type}
 
-Tag | Syntax
---- | ------
-\<struct_type> | `[ {<struct_field>} ]`
-\<struct_field> | `<name> <type> [= <comp_expr>] [;]` where the semicolon `;` can only be omitted if it's the last field
-&emsp; \<name>      | See [Names](#names)
-&emsp; \<type>      | See [Types](#types)
-&emsp; \<comp_expr> | See [Compile-time expressions](#compile-time-expressions)
+| Tag                 | Syntax                                                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------------------------ |
+| \<struct_type>      | `[ {<struct_field>} ]`                                                                                 |
+| \<struct_field>     | `<name> <type> [= <comp_expr>] [;]` where the semicolon `;` can only be omitted if it's the last field |
+| &emsp; \<name>      | See [Names](#names)                                                                                    |
+| &emsp; \<type>      | See [Types](#types)                                                                                    |
+| &emsp; \<comp_expr> | See [Compile-time expressions](#compile-time-expressions)                                              |
 
 **Examples**
 
@@ -703,20 +718,20 @@ pos [x i32; y i32] = [3; 5];
 
 **Syntax**
 
-Tag | Syntax
---- | ------
-\<meta> | `@ <name>` where `<name>` is one of the listed in **Parentship**
-&emsp; \<name> | See [Names](#names)
+| Tag            | Syntax                                                           |
+| -------------- | ---------------------------------------------------------------- |
+| \<meta>        | `@ <name>` where `<name>` is one of the listed in **Parentship** |
+| &emsp; \<name> | See [Names](#names)                                              |
 
 **Parentship**
 
-Metadata | Parent | Comment
--------- | ------ | -------
-@pub        | `<namespace_stmt>` | Public access modifier
-@constraint | `<func>`           | Contstraint function
-@union      | `<struct_type>`    | Union
-@comp       |                    | Compile-time statement
-@closure    | `<func>`           | Closure
+| Metadata    | Parent             | Comment                |
+| ----------- | ------------------ | ---------------------- |
+| @pub        | `<namespace_stmt>` | Public access modifier |
+| @constraint | `<func>`           | Contstraint function   |
+| @union      | `<struct_type>`    | Union                  |
+| @comp       |                    | Compile-time statement |
+| @closure    | `<func>`           | Closure                |
 
 **Interpretation**
 
@@ -727,47 +742,63 @@ TODO
 TODO
 
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
 
 ## 2.3. Struct {#struct}
 
-A *struct* (Structure) is a collection of variables (fields).
+A _struct_ (Structure) is a collection of variables (fields).
 
 **Syntax**
 
-Tag | Syntax | Comment
---- | ------ | -------
-\<struct>        | `$ <name> = <struct_block> ;`
-\<struct_block>  | `{ <struct_stmt> {<struct_stmt>} }`
-\<struct_stmt>   | `<struct_field> | <namespace_stmt>`
-\<struct_field>  | `<name> <type> [= <compexpr>] ;` where `<type>` isn't the defined struct itself | <li>The semicolon `;` might be omitted if it's the last field in a struct.</li> <li>Struct fields follow the same rules as regular [variables](#1-variables)</li>
-&emsp; \<name>           | See [Names](#names)
-&emsp; \<var>            | See [Variables](#variables)
-&emsp; \<var_type>       | See [Types](#types)
-&emsp; \<namespace_stmt> | See [Namespace](#namespace)
-&emsp; \<compexpr>       | See [Expressions](#expressions)
-&emsp; \<struct_literal> | See [Literals](#literals)
+| Tag                      | Syntax                                                                          | Comment                                                                                                                                                           |
+| ------------------------ | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| \<struct>                | `$ <name> = <struct_block> ;`                                                   |
+| \<struct_block>          | `{ <struct_stmt> {<struct_stmt>} }`                                             |
+| \<struct_stmt>           | `<struct_field>                                                                 | <namespace_stmt>`                                                                                                                                                 |
+| \<struct_field>          | `<name> <type> [= <compexpr>] ;` where `<type>` isn't the defined struct itself | <li>The semicolon `;` might be omitted if it's the last field in a struct.</li> <li>Struct fields follow the same rules as regular [variables](#1-variables)</li> |
+| &emsp; \<name>           | See [Names](#names)                                                             |
+| &emsp; \<var>            | See [Variables](#variables)                                                     |
+| &emsp; \<var_type>       | See [Types](#types)                                                             |
+| &emsp; \<namespace_stmt> | See [Namespace](#namespace)                                                     |
+| &emsp; \<compexpr>       | See [Expressions](#expressions)                                                 |
+| &emsp; \<struct_literal> | See [Literals](#literals)                                                       |
 
 **Parentship**
 
-Tag | Parent | Comment
---- | ------ | ------
-\<struct> | \<namespace> | See [Namespace](#namespace)
+| Tag       | Parent       | Comment                     |
+| --------- | ------------ | --------------------------- |
+| \<struct> | \<namespace> | See [Namespace](#namespace) |
 
 **Context**
 
@@ -775,91 +806,94 @@ TODO
 
 **Interpretation**
 
-- A *struct* is also a namespace.
-  - See [Namespace](#namespace).
-  ```rust
-    $Vector2 = {
-      ^int = i32;
-      x ^int;
-      y ^int;
+-   A _struct_ is also a namespace.
+    -   See [Namespace](#namespace).
+    ```rust
+      $Vector2 = {
+        ^int = i32;
+        x ^int;
+        y ^int;
+      };
+    ```
+-   Structs can only be defined inside of namespaces.
+    -   See [Namespace](#namespace).
+-   A _struct_ cannot be empty.
+    ```rust
+    $Vector2 = {} // ERROR
+    ```
+-   See `<struct_type>` in [Types](#types) for anonymous structs.
+-   A _struct_ field cannot be of the same type as the defined struct.
+    ```rust
+    $A = {
+      a $A; // ERROR
     };
-  ```
-- Structs can only be defined inside of namespaces.
-  - See [Namespace](#namespace).
-- A *struct* cannot be empty.
-  ```rust
-  $Vector2 = {} // ERROR
-  ```
-- See `<struct_type>` in [Types](#types) for anonymous structs.
-- A *struct* field cannot be of the same type as the defined struct.
-  ```rust
-  $A = {
-    a $A; // ERROR
-  };
-  ```
-- *Struct* fields follow the same rules as regular variables.
-  - See [Variables](#variables).
-- *Struct* fields can be assigned default values.
-  ```rust
-  $Vector2 = {
-    x i32 = 0;
-    y i32 = 0;
-  };
-  ```
-- *Struct* fields can be accessed using the dot `.` operator.
-  - See [Operators](#operators) for the *struct* field access operator
-  ```rust
-  pos $Vector2;
-  pos.x = 0;
-  pos.y = 0;
-  x i32 = pos.x;
-  ```
-- Functions declared inside of a *struct*, with their first parameter being of the defined *struct* type, are called *methods*. \
-  You can call them on a struct instance using the colon `:` operator.
-  - See [Operators](#operators) for the *struct* *method* access operator.
+    ```
+-   _Struct_ fields follow the same rules as regular variables.
+    -   See [Variables](#variables).
+-   _Struct_ fields can be assigned default values.
+    ```rust
+    $Vector2 = {
+      x i32 = 0;
+      y i32 = 0;
+    };
+    ```
+-   _Struct_ fields can be accessed using the dot `.` operator.
+    -   See [Operators](#operators) for the _struct_ field access operator
+    ```rust
+    pos $Vector2;
+    pos.x = 0;
+    pos.y = 0;
+    x i32 = pos.x;
+    ```
+-   Functions declared inside of a _struct_, with their first parameter being of the defined _struct_ type, are called _methods_. \
+    You can call them on a struct instance using the colon `:` operator.
 
-  The first "self" argument is excluded from a *method* call. \
-  This *struct* *method* syntax is nothing but syntactic sugar for plain-old *namespace* access.
-  ```rust
-  $Vector2 = {
-      x i32;
-      y i32;
-  
-      add( self !*$Vector2, other !*!$Vector2 ) !*$Vector2 = {
-          self.x += other.x;
-          self.y += other.y;
-          break self;
-      }
-  };
-  
-  main() void {
-      a $Vector2 = { .x = 1; .y = 1; };
-      b $Vector2 = { .x = 2; .y = 2; };
-  
-      a:add(b);
-  
-      // is the same as
-  
-      $Vector2:add(&a, b);
-  }
-  ```
-- Examples:
-  ```rust
-  $Vector2 = {
-      x i32;
-      y i32;
-      new (x i32, y i32) $Vector2 = {
-          v $Vector2 = {
-            .x = x,
-            .y = y
-          };
-          break v; 
-      }
-  };
-  main ()void = {
-    pos $Vector2 = $Vector2:new(0, 0);
-  }
-  ```
+    -   See [Operators](#operators) for the _struct_ _method_ access operator.
+
+    The first "self" argument is excluded from a _method_ call. \
+    This _struct_ _method_ syntax is nothing but syntactic sugar for plain-old _namespace_ access.
+
+    ```rust
+    $Vector2 = {
+        x i32;
+        y i32;
+
+        add( self !*$Vector2, other !*!$Vector2 ) !*$Vector2 = {
+            self.x += other.x;
+            self.y += other.y;
+            break self;
+        }
+    };
+
+    main() void {
+        a $Vector2 = { .x = 1; .y = 1; };
+        b $Vector2 = { .x = 2; .y = 2; };
+
+        a:add(b);
+
+        // is the same as
+
+        $Vector2:add(&a, b);
+    }
+    ```
+
+-   Examples:
+    ```rust
+    $Vector2 = {
+        x i32;
+        y i32;
+        new (x i32, y i32) $Vector2 = {
+            v $Vector2 = {
+              .x = x,
+              .y = y
+            };
+            break v;
+        }
+    };
+    main ()void = {
+      pos $Vector2 = $Vector2:new(0, 0);
+    }
+    ```
 
 ## 2.3.1. Union {#union}
 
@@ -895,74 +929,74 @@ An Enum (Enumeration) is a collection of scoped, named & unique integer values (
 
 **Syntax**
 
-Tag | Syntax
---- | ------
-\<enum>        | `# <name> = <enum_block> ;`
-\<enum_block>  | `{ <enum_stmt> {<enum_stmt>} }`
-\<enum_stmt>   | `<enum_field> | <namespace_stmt>`
-\<enum_field>  | `<name> [= <compexpr>] ;` where `<compexpr>` results in type `i32`
-\<enum_access> | `<enum_type> : <name>`
-&emsp; \<name>           | See [Names](#names)
-&emsp; \<namespace_stmt> | See [Namespace](#namespace)
-&emsp; \<number>         | See [Literals](#literals)
-&emsp; \<compexpr>       | See [Expressions](#expressions)
+| Tag                      | Syntax                                                             |
+| ------------------------ | ------------------------------------------------------------------ | ----------------- |
+| \<enum>                  | `# <name> = <enum_block> ;`                                        |
+| \<enum_block>            | `{ <enum_stmt> {<enum_stmt>} }`                                    |
+| \<enum_stmt>             | `<enum_field>                                                      | <namespace_stmt>` |
+| \<enum_field>            | `<name> [= <compexpr>] ;` where `<compexpr>` results in type `i32` |
+| \<enum_access>           | `<enum_type> : <name>`                                             |
+| &emsp; \<name>           | See [Names](#names)                                                |
+| &emsp; \<namespace_stmt> | See [Namespace](#namespace)                                        |
+| &emsp; \<number>         | See [Literals](#literals)                                          |
+| &emsp; \<compexpr>       | See [Expressions](#expressions)                                    |
 
 **Parentship**
 
-Tag | Parent | Comment
---- | ------ | ------
-\<enum> | \<namespace> | See [Namespace](#namespace)
+| Tag     | Parent       | Comment                     |
+| ------- | ------------ | --------------------------- |
+| \<enum> | \<namespace> | See [Namespace](#namespace) |
 
 **Context**
 
 TODO
 
-- The first enum field, if not explicitely set, is equal to 0.
-- Each next enum field, if not explicitely set, is 1 higher than the previous value. 
+-   The first enum field, if not explicitely set, is equal to 0.
+-   Each next enum field, if not explicitely set, is 1 higher than the previous value.
 
 **Interpretation**
 
-- Enum fields are of type `i32`
-  - See `<primitive>` in [Types](#types) for the type of `i32`.
-- Enums can only be defined inside of namespaces.
-  - See [Namespace](#namespace)
- Enums are also namespaces.
-  - See [Namespace](#namespace).
-- Enum fields can be accessed using the colon `:` operator
-  - See [Operators](#operators) for the *enum field access* operator.
-  ```rust
-  var #Enum = #Enum:FIELD;
-  ```
-- *Enum* fields can be explicitely set.
-  - The set value must be a *compile-time* expression resulting in a value of type `i32`.
-    - See [Expressions](#expressions) for the definition of a *compile-time* expression `compexpr`.
+-   Enum fields are of type `i32`
+    -   See `<primitive>` in [Types](#types) for the type of `i32`.
+-   Enums can only be defined inside of namespaces.
+    -   See [Namespace](#namespace)
+        Enums are also namespaces.
+    -   See [Namespace](#namespace).
+-   Enum fields can be accessed using the colon `:` operator
+    -   See [Operators](#operators) for the _enum field access_ operator.
     ```rust
-    x i32 = 10;
-    #Color = {
-        RED = x, // ERROR
-        GREEN = 0.5, // ERROR
-    };
+    var #Enum = #Enum:FIELD;
     ```
-  - The set value must be higher than the previous values.
-    ```rust
-    #Color = {
-        RED, // 0
-        GREEN, // 1
-        BLUE = 1 // ERROR
-    }
-    ```
-  - The fields can be set even multiple times
-    ```rust
-    #Animal = {
-        DOG, // 0
-        CAT = 10,
-        WOLF, // 11
-        LION, // 12
-        SQUID = 100, 
-        HORSE // 101
-    }
-    ```
-    
+-   _Enum_ fields can be explicitely set.
+    -   The set value must be a _compile-time_ expression resulting in a value of type `i32`.
+        -   See [Expressions](#expressions) for the definition of a _compile-time_ expression `compexpr`.
+        ```rust
+        x i32 = 10;
+        #Color = {
+            RED = x, // ERROR
+            GREEN = 0.5, // ERROR
+        };
+        ```
+    -   The set value must be higher than the previous values.
+        ```rust
+        #Color = {
+            RED, // 0
+            GREEN, // 1
+            BLUE = 1 // ERROR
+        }
+        ```
+    -   The fields can be set even multiple times
+        ```rust
+        #Animal = {
+            DOG, // 0
+            CAT = 10,
+            WOLF, // 11
+            LION, // 12
+            SQUID = 100,
+            HORSE // 101
+        }
+        ```
+
 **Examples**
 
 ```rust
@@ -977,50 +1011,51 @@ c #Color = #Color:RED;
 ## 2.5. Namespace {#namespace}
 
 A namespace is a scoped collection of:
-  - [Functions](#functions),
-  - [Structs](#struct),
-  - [Enums](#enum),
-  - [Aliases](#alias), and
-  - Other namespaces
+
+-   [Functions](#functions),
+-   [Structs](#struct),
+-   [Enums](#enum),
+-   [Aliases](#alias), and
+-   Other namespaces
 
 **Syntax**
 
-Tag | Syntax | Comment
---- | ------ | -------
-\<namespace>        | `: <name> = <namespace_block> ;`
-\<namespace>        | `: <name> = <string> ;` | Module import
-\<namespace_block>  | `{ <namespace_stmt> {<namespace_stmt>} }`
-\<namespace_stmt>   | `<func> | <struct> | <enum> | <namespace>`
-\<namespace_entity> | `<struct_type> | <enum_type> | <name> | <name>()` | Struct / Enum / Namespace / Function
-\<namespace_access> | `<namespace_entity> : <namespace_entity> {: <namespace_entity>}`
-&emsp; \<name>   | See [Names](#names)
-&emsp; \<string> | See [Literals](#literals)
-&emsp; \<func>   | See [Functions](#functions)
-&emsp; \<struct> | See [Struct](#struct)
-&emsp; \<enum>   | See [Enum](#enum)
-&emsp; \<alias>  | See [Alias](#alias)
+| Tag                 | Syntax                                                           | Comment       |
+| ------------------- | ---------------------------------------------------------------- | ------------- | ------ | ------------ | ------------------------------------ |
+| \<namespace>        | `: <name> = <namespace_block> ;`                                 |
+| \<namespace>        | `: <name> = <string> ;`                                          | Module import |
+| \<namespace_block>  | `{ <namespace_stmt> {<namespace_stmt>} }`                        |
+| \<namespace_stmt>   | `<func>                                                          | <struct>      | <enum> | <namespace>` |
+| \<namespace_entity> | `<struct_type>                                                   | <enum_type>   | <name> | <name>()`    | Struct / Enum / Namespace / Function |
+| \<namespace_access> | `<namespace_entity> : <namespace_entity> {: <namespace_entity>}` |
+| &emsp; \<name>      | See [Names](#names)                                              |
+| &emsp; \<string>    | See [Literals](#literals)                                        |
+| &emsp; \<func>      | See [Functions](#functions)                                      |
+| &emsp; \<struct>    | See [Struct](#struct)                                            |
+| &emsp; \<enum>      | See [Enum](#enum)                                                |
+| &emsp; \<alias>     | See [Alias](#alias)                                              |
 
 **Parentship**
 
-Tag | Parent | Comment
---- | ------ | -------
-\<namespace> | \<namespace> | See **Context**
+| Tag          | Parent       | Comment         |
+| ------------ | ------------ | --------------- |
+| \<namespace> | \<namespace> | See **Context** |
 
 **Context**
 
-- The global scope is also considered a namespace.
+-   The global scope is also considered a namespace.
 
 **Interpretation**
 
-- Namespaces can be imported from other files. This concept forms the basis of [Modules](#modules).
-- [Functions](#functions), [Structs](#struct) and [Enums](#enum) are all namespaces.
-- To access a namespace member, you can use the colon `:` operator
-  - ```rust
-    :math = {
-        $Vector2 = { x i32; y i32; };
-    };
-    pos :math:$Vector2;
-    ```
+-   Namespaces can be imported from other files. This concept forms the basis of [Modules](#modules).
+-   [Functions](#functions), [Structs](#struct) and [Enums](#enum) are all namespaces.
+-   To access a namespace member, you can use the colon `:` operator
+    -   ```rust
+        :math = {
+            $Vector2 = { x i32; y i32; };
+        };
+        pos :math:$Vector2;
+        ```
 
 **Examples**
 
@@ -1058,10 +1093,10 @@ main ()void = {
 
 **Syntax**
 
-Tag | Syntax
---- | ------
-\<use> | `use (<namespace_entity> | <namespace_access>) ;`
-&emsp; \<namespace_entity>, <br> \<namespace_access> | See [Namespace](#namespace)
+| Tag                                                  | Syntax                      |
+| ---------------------------------------------------- | --------------------------- | ---------------------- |
+| \<use>                                               | `use (<namespace_entity>    | <namespace_access>) ;` |
+| &emsp; \<namespace_entity>, <br> \<namespace_access> | See [Namespace](#namespace) |
 
 **Interpretation**
 
