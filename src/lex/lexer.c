@@ -1,22 +1,4 @@
-#ifndef RY_LEXER_H
-#define RY_LEXER_H
-
-#include "lexer_token.h"
-
-#include "util/str.h"
-#include "util/array.h"
-
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdarg.h>
-
-// 
-// 
-// 
-
-#define CHAR_EOF (-1)
-#define CHAR_NUMLIT_SEP ('_')
+#include "lexer.h"
 
 // 
 // 
@@ -24,16 +6,12 @@
 // 
 // 
 
-struct ry_LexerPos {
-    size_t ln;
-    size_t col;
-};
-static void ry_LexerPos_init (struct ry_LexerPos * pos) {
+static void ry__LexerPos_init (struct ry__LexerPos * pos) {
     pos->col = 1;
     pos->ln = 1;
 }
-static void ry_LexerPos_clear (struct ry_LexerPos * pos) {
-    ry_LexerPos_init(pos);
+static void ry__LexerPos_clear (struct ry__LexerPos * pos) {
+    ry__LexerPos_init(pos);
 }
 
 // 
@@ -42,7 +20,7 @@ static void ry_LexerPos_clear (struct ry_LexerPos * pos) {
 // 
 // 
 
-enum ry_LexerInfoCode {
+enum ry__LexerInfoCode {
     LEX_INFO_UNTERMINATED_STRING,
     LEX_INFO_UNFINISHED_STRING,
     LEX_INFO_UNDEFINED_ESC_SEQ,
@@ -51,17 +29,17 @@ enum ry_LexerInfoCode {
     LEX_INFO_TRAILING_NUMBER_SEPARATOR,
     LEX_INFO_MALFORMED_NUMBER_LITERAL
 };
-struct ry_LexerInfo {
-    enum ry_LexerInfoCode code;
-    struct ry_LexerPos pos;
+struct ry__LexerInfo {
+    enum ry__LexerInfoCode code;
+    struct ry__LexerPos pos;
     const char * msg;
     bool msg_allocd;
 };
-static void ry_LexerInfo_free( struct ry_LexerInfo * info ) {
+static void ry__LexerInfo_free( struct ry__LexerInfo * info ) {
     if( info->msg_allocd )
-        free( (void*) info->msg);
+        free((void*)info->msg);
 }
-static void ry_LexerInfo_init( struct ry_LexerInfo * info, enum ry_LexerInfoCode code, struct ry_LexerPos pos, ... ) {
+static void ry__LexerInfo_init( struct ry__LexerInfo * info, enum ry__LexerInfoCode code, struct ry__LexerPos pos, ... ) {
     info->code = code;
     info->pos = pos;
     info->msg = "[???]";
@@ -74,14 +52,14 @@ static void ry_LexerInfo_init( struct ry_LexerInfo * info, enum ry_LexerInfoCode
         case LEX_INFO_ESC_SEQ_OVERFLOW: {
             va_list args;
             va_start(args, pos);
-            ry_numlit_t num = va_arg(args, ry_numlit_t);
+            ry_lex_numlit_t num = va_arg(args, ry_lex_numlit_t);
             va_end(args);
 
             const char * fmt = "escape sequence is out of bounds: \\\\(%u / 0x%X / 0%o) is not in range (%d, %d / 0x%X / 0%o)";
-            int msglen = snprintf(NULL, 0, fmt, num, num, num, RY_CHAR_MIN, RY_CHAR_MAX, RY_CHAR_MAX, RY_CHAR_MAX);
+            int msglen = snprintf(NULL, 0, fmt, num, num, num, RY_LEX_CHAR_MIN, RY_LEX_CHAR_MAX, RY_LEX_CHAR_MAX, RY_LEX_CHAR_MAX);
             RY_ASSERT(msglen > 0);
             char * msg = RY_MALLOC(msglen + 1);
-            snprintf(msg, msglen + 1, fmt, num, num, num, RY_CHAR_MIN, RY_CHAR_MAX, RY_CHAR_MAX, RY_CHAR_MAX);
+            snprintf(msg, msglen + 1, fmt, num, num, num, RY_LEX_CHAR_MIN, RY_LEX_CHAR_MAX, RY_LEX_CHAR_MAX, RY_LEX_CHAR_MAX);
             info->msg = msg;
             info->msg_allocd = true;
 
@@ -97,17 +75,6 @@ static void ry_LexerInfo_init( struct ry_LexerInfo * info, enum ry_LexerInfoCode
 // 
 // 
 // 
-
-struct ry_Lexer {
-    struct ry_String id;
-    const struct ry_StringView * src;
-
-    size_t src_idx;
-    struct ry_LexerPos pos;
-    
-    struct ry_Array tokens; // ry_LexerToken[]
-    struct ry_Array infos; // ry_LexerInfo[]
-};
 
 static void lex_clear_tokens( struct ry_Lexer * lex ) {
     for( size_t i = 0; i < lex->tokens.len; i++ ) {
@@ -204,7 +171,7 @@ static const char * lex_srcptr( struct ry_Lexer * lex ) {
 static char lex_readofs( struct ry_Lexer * lex, int offset ) {
     const char * src = lex_srcptrofs(lex, offset);
     if( src == NULL )
-        return CHAR_EOF;
+        return RY_LEX_CHAR_EOF;
     return *src;
 }
 static char lex_read( struct ry_Lexer * lex ) {
@@ -275,21 +242,21 @@ static struct ry_LexerToken lex_name( struct ry_Lexer * lex ) {
     return tk;
 }
 
-static ry_numlit_t lex_number__base(
+static ry_lex_numlit_t lex_number__base(
     struct ry_Lexer * lex,
     size_t base,
     bool (* is_valid_char) (char c),
     uint8_t (* char_to_value) (char c)
 ) {
     char c = lex_read(lex);
-    ry_numlit_t num = 0;
+    ry_lex_numlit_t num = 0;
 
     for( bool first = true ;; first = false ) {
-        if( c == CHAR_NUMLIT_SEP ) {
+        if( c == RY_LEX_CHAR_NUMLIT_SEP ) {
             lex_next(lex);
             if( lex_is_eof(lex) ) {
-                struct ry_LexerInfo info;
-                ry_LexerInfo_init(&info, LEX_INFO_TRAILING_NUMBER_SEPARATOR, lex->pos);
+                struct ry__LexerInfo info;
+                ry__LexerInfo_init(&info, LEX_INFO_TRAILING_NUMBER_SEPARATOR, lex->pos);
                 ry_Array_push(&lex->infos, &info);
                 break;
             }
@@ -312,12 +279,12 @@ static ry_numlit_t lex_number__base(
 
     return num;
 }
-static ry_numlit_t lex_number( struct ry_Lexer * lex ) {
+static ry_lex_numlit_t lex_number( struct ry_Lexer * lex ) {
     char c1 = lex_read(lex);
 
-    if( c1 == CHAR_NUMLIT_SEP ) {
-        struct ry_LexerInfo info;
-        ry_LexerInfo_init(&info, LEX_INFO_TRAILING_NUMBER_SEPARATOR, lex->pos);
+    if( c1 == RY_LEX_CHAR_NUMLIT_SEP ) {
+        struct ry__LexerInfo info;
+        ry__LexerInfo_init(&info, LEX_INFO_TRAILING_NUMBER_SEPARATOR, lex->pos);
         ry_Array_push(&lex->infos, &info);
     }
     else RY_ASSERT(is_char_decimal_digit(c1));
@@ -331,8 +298,8 @@ static ry_numlit_t lex_number( struct ry_Lexer * lex ) {
         if( (c2 == 'x') || (c2 == 'b') || (c2 == 'o') ) {
             lex_next(lex);
             if( lex_is_eof(lex) ) {
-                struct ry_LexerInfo info;
-                ry_LexerInfo_init(&info, LEX_INFO_MALFORMED_NUMBER_LITERAL, lex->pos);
+                struct ry__LexerInfo info;
+                ry__LexerInfo_init(&info, LEX_INFO_MALFORMED_NUMBER_LITERAL, lex->pos);
                 ry_Array_push(&lex->infos, &info);
                 return -1;
             }
@@ -364,8 +331,8 @@ static struct ry_LexerToken lex_string( struct ry_Lexer * lex ) {
         char c = lex_read(lex);
     
         if( is_nl_char(c) ) {
-            struct ry_LexerInfo info;
-            ry_LexerInfo_init(&info, LEX_INFO_UNFINISHED_STRING, lex->pos);
+            struct ry__LexerInfo info;
+            ry__LexerInfo_init(&info, LEX_INFO_UNFINISHED_STRING, lex->pos);
             ry_Array_push(&lex->infos, &info);
         }
         else if( c == '\\' ) {
@@ -374,7 +341,7 @@ static struct ry_LexerToken lex_string( struct ry_Lexer * lex ) {
             lex_next(lex);
             char nc = lex_read(lex);
 
-            char esc = CHAR_EOF;
+            char esc = RY_LEX_CHAR_EOF;
             switch( nc ) {
                 case 'a': esc = '\a'; break;
                 case 'b': esc = '\b'; break;
@@ -387,23 +354,23 @@ static struct ry_LexerToken lex_string( struct ry_Lexer * lex ) {
                 case '\\': esc = '\\'; break;
                 default:
                     if( is_char_decimal_digit(nc) ) {
-                        ry_numlit_t num = lex_number(lex);
-                        if( (num < RY_CHAR_MIN) || (num > RY_CHAR_MAX) ) {
-                            struct ry_LexerInfo info;
-                            ry_LexerInfo_init(&info, LEX_INFO_ESC_SEQ_OVERFLOW, lex->pos, num);
+                        ry_lex_numlit_t num = lex_number(lex);
+                        if( (num < RY_LEX_CHAR_MIN) || (num > RY_LEX_CHAR_MIN) ) {
+                            struct ry__LexerInfo info;
+                            ry__LexerInfo_init(&info, LEX_INFO_ESC_SEQ_OVERFLOW, lex->pos, num);
                             ry_Array_push(&lex->infos, &info);
                             break;
                         }
                         esc = num;
                     } else {
-                        struct ry_LexerInfo info;
-                        ry_LexerInfo_init(&info, LEX_INFO_UNDEFINED_ESC_SEQ, lex->pos);
+                        struct ry__LexerInfo info;
+                        ry__LexerInfo_init(&info, LEX_INFO_UNDEFINED_ESC_SEQ, lex->pos);
                         ry_Array_push(&lex->infos, &info);
                     }
                     break;
             }
 
-            if( esc != CHAR_EOF )
+            if( esc != RY_LEX_CHAR_EOF )
                 ry_Array_push(&chars, &esc);
         }
         else if( c == '"' ) {
@@ -416,8 +383,8 @@ static struct ry_LexerToken lex_string( struct ry_Lexer * lex ) {
     next:
 
         if( lex_is_eofnext(lex) ) {
-            struct ry_LexerInfo info;
-            ry_LexerInfo_init(&info, LEX_INFO_UNTERMINATED_STRING, lex->pos);
+            struct ry__LexerInfo info;
+            ry__LexerInfo_init(&info, LEX_INFO_UNTERMINATED_STRING, lex->pos);
             ry_Array_push(&lex->infos, &info);
             break;
         }
@@ -449,15 +416,15 @@ void ry_Lexer_init (
     ry_String_fromview(&lex->id, id);
     lex->src = src;
     lex->src_idx = 0;
-    ry_Array_init(&lex->infos, sizeof(struct ry_LexerInfo));
+    ry_Array_init(&lex->infos, sizeof(struct ry__LexerInfo));
     ry_Array_init(&lex->tokens, sizeof(struct ry_LexerToken));
-    ry_LexerPos_init(&lex->pos);
+    ry__LexerPos_init(&lex->pos);
 }
 
 void ry_Lexer_free (struct ry_Lexer * lex) {
     for( size_t i = 0; i < lex->infos.len; i++ ) {
         struct ry_LexerInfo * info = ry_Array_get(&lex->infos, i);
-        ry_LexerInfo_free(info);
+        ry__LexerInfo_free(info);
     }
     lex_clear_tokens(lex);
     ry_Array_free(&lex->infos);
@@ -467,7 +434,7 @@ void ry_Lexer_free (struct ry_Lexer * lex) {
 
 void ry_Lexer_print_infos( struct ry_Lexer * lex ) {
     for( size_t i = 0; i < lex->infos.len; i++ ) {
-        const struct ry_LexerInfo * info = ry_Array_get(&lex->infos, i);
+        const struct ry__LexerInfo * info = ry_Array_get(&lex->infos, i);
         printf("[%.*s:%u:%u] %s\n",
             lex->id.len, lex->id.buf,
             info->pos.ln,
@@ -480,7 +447,7 @@ void ry_Lexer_print_infos( struct ry_Lexer * lex ) {
 void ry_Lexer_run (struct ry_Lexer * lex) {
     ry_Array_clear(&lex->infos);
     lex_clear_tokens(lex);
-    ry_LexerPos_clear(&lex->pos);
+    ry__LexerPos_clear(&lex->pos);
     lex->src_idx = 0;
 
     for( ;; ) {
@@ -603,5 +570,3 @@ void ry_Lexer_run (struct ry_Lexer * lex) {
             break;
     }
 }
-
-#endif // RY_LEXER_H

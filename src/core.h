@@ -7,17 +7,28 @@
 #include <string.h>
 #include <stdbool.h>
 
+// #define RY_DEBUG
+
 #define RY_MEMCPY(dest, src, sz) (memcpy(dest, src, sz))
-#define RY_MALLOC(sz) (malloc(sz))
-#define RY_FREE(ptr) (free(ptr))
-#define RY_REALLOC(ptr, sz) (realloc(ptr, sz))
+#define RY_MALLOC(sz)            (malloc(sz))
+#define RY_FREE(ptr)             (free(ptr))
+#define RY_REALLOC(ptr, sz)      (realloc(ptr, sz))
 
 #define RY_ASSERT(cond) (assert(cond))
 
-typedef uint8_t ry_char_t;
-typedef int64_t ry_numlit_t; // number literal type
-
-#define RY_CHAR_MIN (1)
-#define RY_CHAR_MAX (255)
+typedef int8_t  i8;
+typedef int16_t i16;
+typedef int32_t i32;
+typedef int64_t i64;
+typedef i64     isize;
+// 
+typedef uint8_t  u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+typedef size_t   usize;
+// 
+typedef float  f32;
+typedef double f64;
 
 #endif // RY_CORE_H

@@ -37,45 +37,46 @@ Consider
 
 Table of Contents
 
-| Chapter                                                           | Syntax | Info                                           |
-| ----------------------------------------------------------------- | :----: | :--------------------------------------------- |
-| 1. [Lexical Analysis](#lexical-analysis)                          |   ✔️   | Grouping characters into tokens                |
-| &emsp; 1.1. [Names](#names)                                       |   ✔️   |
-| &emsp; 1.2. [Comments](#comments)                                 |   ✔️   |
-| &emsp; 1.3. [Literals](#literals)                                 |   ✔️   |
-| &emsp; &emsp; 1.3.1. [Integer Literals](#integer-literals)        |   ✔️   |
-| &emsp; &emsp; 1.3.2. [Float Literals](#float-literals)            |   ✔️   |
-| &emsp; &emsp; 1.3.3. [String Literals](#string-literals)          |   ✔️   |
-| &emsp; &emsp; 1.3.4. [Struct Literals](#struct-literals)          |   ✔️   |
-| &emsp; 1.4. [Keywords](#keywords)                                 |   ✔️   |
-| &emsp; 1.5. [Operators](#lexical-operators)                       |   ✔️   |
-| &emsp; 1.6. [Tokens](#tokens)                                     |   ✔️   |
-| &emsp; &emsp; &emsp; &nbsp;**Parsing and**                        |        | Grouping tokens into untyped AST nodes         |
-| &emsp; &emsp; **Semantic Analysis**                               |        | Analyzing untyped AST nodes                    |
-| 2. [Variables](#variables)                                        |   ✔️   |
-| 3. [Operators](#operators)                                        |  N/A   |
-| &emsp; 3.1. [Arithmetic Operators](#arithmetic-operators)         |
-| &emsp; 3.2. [Bitwise Operators](#bitwise-operators)               |
-| &emsp; 3.3. [Comparison Operators](#comparison-operators)         |
-| &emsp; 3.4. [Logical Operators](#logical-operators)               |
-| &emsp; 3.5. [Other Operators](#other-operators)                   |
-| 4. [Expressions](#expressions)                                    |   〰️   |
-| &emsp; 4.1. [Block](#block) (& `break`)                           |   ✔️   |
-| &emsp; 4.2. [Control Flow](#control-flow)                         |   ✔️   |
-| &emsp; &emsp; 4.2.1. [If / Elif / Else](#if-elif-else)            |   ✔️   |
-| &emsp; &emsp; 4.2.2. [Loop](#loop)                                |   ✔️   |
-| &emsp; &emsp; &emsp; 4.2.2.1. [Continue](#continue)               |   ✔️   |
-| &emsp; 4.3. [Compile-time Expressions](#compile-time-expressions) |   ❌   |
-| 5. [Statements](#statements)                                      |   〰️   |
-| 6. [Metadata](#metadata)                                          |   ✔️   |
-| &emsp; &emsp; &emsp; &emsp; **Typing**                            |        | "Typing" the untyped AST nodes                 |
-| 7. [Types](#types)                                                |
-| &emsp; 7.1. [Primitives](#primitives)                             |
-| &emsp; 7.2. [Function Type](#function-type)                       |
-| &emsp; 7.3. [Struct Type](#struct-type)                           |
-| &emsp; &emsp; &emsp; &emsp; **Transpilation**                     |        | Transpiling typed AST nodes into C source code |
-| &ensp; &ensp; &nbsp; **Compile-time Evaluation**                  |        | JIT compile-time expression evaluation         |
-| 8. [Macros](#macros)                                              |   ❌   |
+| Chapter                                                           | Syntax | Implemented | Description                                    |
+| ----------------------------------------------------------------- | :----: | :---------: | ---------------------------------------------- |
+| 1. [Lexical Analysis](#lexical-analysis)                          |   ✔️   |     N/A     | Grouping characters into tokens                |
+| &emsp; 1.1. [Names](#names)                                       |   ✔️   |     ✔️      |
+| &emsp; 1.2. [Comments](#comments)                                 |   ✔️   |     ❌      |
+| &emsp; 1.3. [Literals](#literals)                                 |   ✔️   |     N/A     |
+| &emsp; &emsp; 1.3.1. [Integer Literals](#integer-literals)        |   ✔️   |     ✔️      |
+| &emsp; &emsp; 1.3.2. [Float Literals](#float-literals)            |   ✔️   |     ❌      |
+| &emsp; &emsp; 1.3.3. [String Literals](#string-literals)          |   ✔️   |     ❌      |
+| &emsp; &emsp; 1.3.4. [Struct Literals](#lexical-struct-literals)  |  N/A   |     N/A     |
+| &emsp; 1.4. [Keywords](#keywords)                                 |   ✔️   |     ❌      |
+| &emsp; 1.5. [Operators](#lexical-operators)                       |  N/A   |     ❌      |
+| &emsp; 1.6. [Tokens](#tokens)                                     |  N/A   |     N/A     |
+| &emsp; &emsp; &emsp; &nbsp;**Parsing and**                        |        |     ❌      | Grouping tokens into untyped AST nodes         |
+| &emsp; &emsp; **Semantic Analysis**                               |        |     ❌      | Analyzing untyped AST nodes                    |
+| 1.9. [Struct Literals](#parsing-struct-literals)                  |   ✔️   |     ❌      |
+| 2. [Variables](#variables)                                        |   ✔️   |     ❌      |
+| 3. [Operators](#operators)                                        |   ✔️   |     ❌      |
+| &emsp; 3.1. [Arithmetic Operators](#arithmetic-operators)         |   ✔️   |     ❌      |
+| &emsp; 3.2. [Bitwise Operators](#bitwise-operators)               |   ✔️   |     ❌      |
+| &emsp; 3.3. [Comparison Operators](#comparison-operators)         |   ✔️   |     ❌      |
+| &emsp; 3.4. [Logical Operators](#logical-operators)               |   ✔️   |     ❌      |
+| &emsp; 3.5. [Other Operators](#other-operators)                   |   ✔️   |     ❌      |
+| 4. [Expressions](#expressions)                                    |   〰️   |     ❌      |
+| &emsp; 4.1. [Block](#block) (& `break`)                           |   ✔️   |     ❌      |
+| &emsp; 4.2. [Control Flow](#control-flow)                         |   ✔️   |     ❌      |
+| &emsp; &emsp; 4.2.1. [If / Elif / Else](#if-elif-else)            |   ✔️   |     ❌      |
+| &emsp; &emsp; 4.2.2. [Loop](#loop)                                |   ✔️   |     ❌      |
+| &emsp; &emsp; &emsp; 4.2.2.1. [Continue](#continue)               |   ✔️   |     ❌      |
+| &emsp; 4.3. [Compile-time Expressions](#compile-time-expressions) |   ❌   |     ❌      |
+| 5. [Statements](#statements)                                      |   〰️   |     ❌      |
+| 6. [Metadata](#metadata)                                          |   ✔️   |     ❌      |
+| &emsp; &emsp; &emsp; &emsp; **Typing**                            |        |     ❌      | "Typing" the untyped AST nodes                 |
+| 7. [Types](#types)                                                |        |     ❌      |
+| &emsp; 7.1. [Primitives](#primitives)                             |        |     ❌      |
+| &emsp; 7.2. [Function Type](#function-type)                       |        |     ❌      |
+| &emsp; 7.3. [Struct Type](#struct-type)                           |        |     ❌      |
+| &emsp; &emsp; &emsp; &emsp; **Transpilation**                     |        |     ❌      | Transpiling typed AST nodes into C source code |
+| &ensp; &ensp; &nbsp; **Compile-time Evaluation**                  |        |     ❌      | JIT compile-time expression evaluation         |
+| 8. [Macros](#macros)                                              |   ❌   |     ❌      |
 
 ---
 
@@ -83,10 +84,10 @@ Table of Contents
 
 **Syntax**
 
-| Tag         | Syntax                                                                     |
-| ----------- | -------------------------------------------------------------------------- | --- | ---------- | --- | ----- |
-| \<new_line> | `\n                                                                        | \r  | \r\n`or`LF | CR  | CRLF` |
-| \<src_char> | Any valid [UTF-8](https://en.wikipedia.org/wiki/UTF-8) character (0 - 255) |
+| Tag         | Syntax                                                                                |
+| ----------- | ------------------------------------------------------------------------------------- | --- | ---------- | --- | ----- |
+| \<new_line> | `\n                                                                                   | \r  | \r\n`or`LF | CR  | CRLF` |
+| \<src_char> | Any valid [UTF-8](https://en.wikipedia.org/wiki/UTF-8) character in range of (1, 255) |
 
 **Interpretation**
 
@@ -222,10 +223,10 @@ TODO
 
 **Syntax**
 
-| Tag                | Syntax                                                       | Comment                                             |
-| ------------------ | ------------------------------------------------------------ | --------------------------------------------------- | ------------------------ |
-| \<string>          | `" {<src_char>} "`                                           | Raw string literal                                  |
-| \<string>          | `` ` {<src_char>                                             | \<string_esc_seq>} ` `` where `<src_char>`is not`\` | Escapable string literal |
+| Tag                | Syntax                                                       | Comment                                         |
+| ------------------ | ------------------------------------------------------------ | ----------------------------------------------- | ------------------------ |
+| \<string>          | `` ` {<src_char>} ` ``                                       | Raw string literal                              |
+| \<string>          | `" {<src_char>                                               | \<string_esc_seq>} "`where`<src_char>`is not`\` | Escapable string literal |
 | \<string_esc_seq>  | <code>a \| b \| e \| f \| n \| r \| t \| v \| ` \| \ </code> |
 | \<string_esc_seq>  | `<integer>`                                                  |
 | &emsp; \<src_char> | See [Lexical Analysis](#lexical-analysis)                    |
@@ -239,26 +240,10 @@ TODO
 
 TODO
 
-### 1.3.4. Struct Literals {#struct-literals}
+### 1.3.4. Struct Literals {#lexical-struct-literals}
 
-**Syntax**
-
-| Tag                     | Syntax                                  | Comment                                                       |
-| ----------------------- | --------------------------------------- | ------------------------------------------------------------- |
-| \<struct_literal>       | `[ {<struct_literal_field>} ]`          |
-| \<struct_literal_field> | `[<name> =] <expr> [;]` see **Comment** | The semicolon `;` can only be omitted if it's the last field. |
-| &emsp; \<name>          | See [Names](#names)                     |
-| &emsp; \<expr>          | See [Expressions](#expressions)         |
-
-**Interpretation**
-
-TODO
-
-**Examples**
-
-```rust
-pos [x i32; y i32] = [3; 5];
-```
+Struct Literals are not recognized during the lexing phase.
+See [Struct Literals](#parsing-struct-literals) in **Parsing**.
 
 ## 1.4. Keywords {#keywords}
 
@@ -286,6 +271,27 @@ Tokens represent:
 -   [Operators](#operators)
 -   [Literals](#literals)
 -   Characters
+
+# 1.9. Struct Literals {#parsing-struct-literals}
+
+**Syntax**
+
+| Tag                     | Syntax                                  | Comment                                                       |
+| ----------------------- | --------------------------------------- | ------------------------------------------------------------- |
+| \<struct_literal>       | `[ {<struct_literal_field>} ]`          |
+| \<struct_literal_field> | `[<name> =] <expr> [;]` see **Comment** | The semicolon `;` can only be omitted if it's the last field. |
+| &emsp; \<name>          | See [Names](#names)                     |
+| &emsp; \<expr>          | See [Expressions](#expressions)         |
+
+**Interpretation**
+
+TODO
+
+**Examples**
+
+```rust
+pos [x i32; y i32] = [3; 5];
+```
 
 # 2. Variables {#variables}
 
@@ -383,6 +389,7 @@ Vec2 var = [ // comp-time variable, type alias
 |         | Binary | `*`      | multiplication     | `<expr> * <expr>`  | `<expr>` |
 |   ⭐    | Binary | `**`     | power of           | `<expr> ** <expr>` | `<expr>` |
 |         | Binary | `/`      | division           | `<expr> / <expr>`  | `<expr>` |
+|   ⭐    | Binary | `//`     | floor division     | `<expr> // <expr>` | `<expr>` |
 |         | Binary | `%`      | modulo (remainder) | `<expr> % <expr>`  | `<expr>` |
 
 Assignment
@@ -394,6 +401,7 @@ Assignment
 |   ⭐    | Binary | `*=`     | multiplication     | `<name> *= <expr> ;`  | `<stmt>` |
 |   ⭐    | Binary | `**=`    | power of           | `<name> **= <expr> ;` | `<stmt>` |
 |   ⭐    | Binary | `/=`     | division           | `<name> /= <expr> ;`  | `<stmt>` |
+|   ⭐    | Binary | `//=`    | floor division     | `<name> //= <expr> ;` | `<stmt>` |
 |   ⭐    | Binary | `%=`     | modulo (remainder) | `<name> %= <expr> ;`  | `<stmt>` |
 
 ## 3.2. Bitwise Operators {#bitwise-operators}
@@ -419,67 +427,36 @@ Assignment
 
 ## 3.3. Comparison Operators {#comparison-operators}
 
-| Type   | Operator | Name             | Parent   |
-| ------ | -------- | ---------------- | -------- |
-| Binary | `==`     | equals           | `<expr>` |
-| Binary | `!=`     | not equals       | `<expr>` |
-| Binary | `< `     | less             | `<expr>` |
-| Binary | `<=`     | less or equal    | `<expr>` |
-| Binary | `> `     | greater          | `<expr>` |
-| Binary | `>=`     | greater or equal | `<expr>` |
+| Special | Type   | Operator | Name             | Syntax             | Parent   |
+| ------- | ------ | -------- | ---------------- | ------------------ | -------- |
+| ⭐      | Binary | `==`     | equals           | `<expr> == <expr>` | `<expr>` |
+| ⭐      | Binary | `!=`     | not equals       | `<expr> != <expr>` | `<expr>` |
+|         | Binary | `< `     | less             | `<expr> < <expr>`  | `<expr>` |
+| ⭐      | Binary | `<=`     | less or equal    | `<expr> <= <expr>` | `<expr>` |
+|         | Binary | `> `     | greater          | `<expr> > <expr>`  | `<expr>` |
+| ⭐      | Binary | `>=`     | greater or equal | `<expr> >= <expr>` | `<expr>` |
 
 ## 3.4. Logical Operators {#logical-operators}
 
-| Type   | Operator | Name        | Syntax             | Parent   |
-| ------ | -------- | ----------- | ------------------ | -------- |
-| Unary  | `!`      | logical NOT | `! <expr>`         | `<expr>` |
-| Binary | `\|`     | logical OR  | `<expr> \| <expr>` | `<expr>` |
-| Binary | `&&`     | logical AND | `<expr> && <expr>` | `<expr>` |
+| Special | Type   | Operator | Name        | Syntax               | Parent   |
+| ------- | ------ | -------- | ----------- | -------------------- | -------- |
+|         | Unary  | `!`      | logical NOT | `! <expr>`           | `<expr>` |
+| ⭐      | Binary | `\|\|`   | logical OR  | `<expr> \|\| <expr>` | `<expr>` |
+| ⭐      | Binary | `&&`     | logical AND | `<expr> && <expr>`   | `<expr>` |
 
 ## 3.5. Other Operators {#other-operators}
 
 Ternary
 
-| Type    | Operator | Syntax                                                                                 |
-| ------- | :------: | -------------------------------------------------------------------------------------- |
-| Ternary |   `?:`   | `<expr> ? <expr> : <expr>` where the first `<expr>` coerces into primitive type `bool` |
-
-Address
-
-| Type  | Operator | Name       | Syntax     |
-| ----- | :------: | ---------- | ---------- |
-| Unary |   `&`    | address of | `& <name>` |
-
-as
-See [Conversion](#types-conversion) in [Types](#types)
-
-| Type   | Operator | Syntax             |
-| ------ | :------: | ------------------ |
-| Binary |   `as`   | `<expr> as <type>` |
-
-Struct field access
-
-| Operator | Syntax            |
-| -------- | ----------------- |
-| `.`      | `<name> . <name>` |
-
-Struct index access
-
-| Operator | Syntax             |
-| -------- | ------------------ |
-| `..`     | `<name> .. <name>` |
-
-Scope access
-
-| Operator | Syntax            |
-| -------- | ----------------- |
-| `:`      | `<name> : <name>` |
-
-Assignment
-
-| Operator | Syntax            |
-| -------- | ----------------- |
-| `=`      | `<name> = <expr>` |
+| Special | Type    | Operator | Name                      | Syntax                                                                                 | Description                                            | Parent   |
+| ------- | ------- | :------: | ------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------ | -------- |
+|         | Ternary |   `?:`   | Ternary                   | `<expr> ? <expr> : <expr>` where the first `<expr>` coerces into primitive type `bool` |                                                        | `<expr>` |
+|         | Unary   |   `&`    | address of                | `& <name>`                                                                             |                                                        | `<expr>` |
+| ⭐      | Binary  |   `as`   | as                        | `<expr> as <type>`                                                                     | See [Conversion](#types-conversion) in [Types](#types) | `<expr>` |
+|         | Binary  |   `.`    | Struct field access       | `<name> . <name>`                                                                      |                                                        | `<expr>` |
+| ⭐      | Binary  |   `..`   | Struct field index access | `<name> .. <name>`                                                                     |                                                        | `<expr>` |
+|         | Binary  |   `:`    | Scope access              | `<name> : <name>`                                                                      |                                                        | `<expr>` |
+|         | Binary  |   `=`    | Assignment                | `<name> = <expr>`                                                                      |                                                        | `<stmt>` |
 
 **Associativity**
 **Precedence**
@@ -488,8 +465,9 @@ Assignment
 
 **Syntax**
 
-Tag | Syntax
-\<expr> | `<literal> | <block> | <if> | <loop>`
+| Tag     | Syntax     |
+| ------- | ---------- | ------- | ---- | ------- |
+| \<expr> | `<literal> | <block> | <if> | <loop>` |
 
 ## 4.1. Block {#block}
 
