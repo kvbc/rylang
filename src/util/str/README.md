@@ -6,35 +6,41 @@
 | dyn_str   | `DynStr`   | Either an `AllocStr` or `DynStr`                |
 
 ```mermaid
-graph LR
+graph TD
     cstr --> AllocStr & StrView
     AllocStr & StrView <--> DynStr
     subgraph " "
-        AllocStr <--conversion--> StrView
+        AllocStr <---> |conversion| StrView
     end
 ```
 
-# AllocStr
+---
+
+**AllocStr**
+[alloc_str.h](alloc_str.h)
 
 ```mermaid
 ---
 title: Initializing an AllocStr
 ---
 graph LR
-    cstr -- init_movebuf    ----> A[AllocStr]
-    cstr -- init_movebuflen ----> A[AllocStr]
-    cstr -- init_copybuflen ----> A[AllocStr]
-    cstr -- init_copybuf    ----> A[AllocStr]
+    cstr -- init_movebuf / init_movebuflen ----> A[AllocStr]
+    cstr -- init_copybuf / init_copybuflen ----> A[AllocStr]
 
     B[AllocStr] -- init_movealloc ----> C[AllocStr]
     B[AllocStr] -- init_copyalloc ----> C[AllocStr]
 
     StrView -- init_copyview ----> D[AllocStr]
+    StrView x--x |CAN'T MOVE| D[AllocStr]
 
     DynStr -- init_copydyn ----> AllocStr
+    DynStr x--x |CAN'T MOVE| AllocStr
 ```
 
-# StrView
+---
+
+**StrView**
+[str_view.h](str_view.h)
 
 As this is a "view", all `init` functions move the data and do not copy it.
 
@@ -43,8 +49,7 @@ As this is a "view", all `init` functions move the data and do not copy it.
 title: Initializing a StrView
 ---
 graph LR
-    cstr -- init_buflen ----> A[StrView]
-    cstr -- init_buf    ----> A[StrView]
+    cstr -- init_buf / init_buflen ----> A[StrView]
 
     B[StrView] ----> |init_view| C[StrView]
 
