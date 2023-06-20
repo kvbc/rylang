@@ -13,20 +13,29 @@ struct ryUSTR_AllocStr {
     u8 * _buf;
 };
 
-// init : move
-void ryUSTR_AllocStr_init_movebuflen( struct ryUSTR_AllocStr * out_str, u8 * buf, usize len );
-void ryUSTR_AllocStr_init_movebuf   ( struct ryUSTR_AllocStr * out_str, u8 * buf );
-void ryUSTR_AllocStr_init_movealloc ( struct ryUSTR_AllocStr * out_str, struct ryUSTR_AllocStr * str );
-// init : copy
-void ryUSTR_AllocStr_init_copybuflen( struct ryUSTR_AllocStr * out_str, u8 * buf, usize len );
-void ryUSTR_AllocStr_init_copybuf   ( struct ryUSTR_AllocStr * out_str, u8 * buf );
-void ryUSTR_AllocStr_init_copyview  ( struct ryUSTR_AllocStr * out_str, const struct ryUSTR_StringView * view );
-void ryUSTR_AllocStr_init_copyalloc ( struct ryUSTR_AllocStr * out_str, const struct ryUSTR_AllocStr * str );
-void ryUSTR_AllocStr_init_copydyn   ( struct ryUSTR_AllocStr * out_str, const struct ryUSTR_DynStr * str );
-
+void ryUSTR_AllocStr_init( struct ryUSTR_AllocStr * out_str );
 void ryUSTR_AllocStr_free( struct ryUSTR_AllocStr * str );
 
+// 
+// Conversions into
+// 
+
+// move into
+void ryUSTR_AllocStr_move_buflen( struct ryUSTR_AllocStr * out_str, u8 * buf, usize len );
+void ryUSTR_AllocStr_move_buf   ( struct ryUSTR_AllocStr * out_str, u8 * buf );
+void ryUSTR_AllocStr_move_alloc ( struct ryUSTR_AllocStr * out_str, struct ryUSTR_AllocStr * str );
+// [!] can't move StrView and DynStr
+// copy into
+void ryUSTR_AllocStr_copy_buflen( struct ryUSTR_AllocStr * out_str, u8 * buf, usize len );
+void ryUSTR_AllocStr_copy_buf   ( struct ryUSTR_AllocStr * out_str, u8 * buf );
+void ryUSTR_AllocStr_copy_view  ( struct ryUSTR_AllocStr * out_str, const struct ryUSTR_StringView * view );
+void ryUSTR_AllocStr_copy_alloc ( struct ryUSTR_AllocStr * out_str, const struct ryUSTR_AllocStr * str );
+void ryUSTR_AllocStr_copy_dyn   ( struct ryUSTR_AllocStr * out_str, const struct ryUSTR_DynStr * str );
+
+// 
 // Getters
+// 
+
 usize            ryUSTR_AllocStr_getlen( const struct ryUSTR_AllocStr * str );
 const u8 * const ryUSTR_AllocStr_getbuf( const struct ryUSTR_AllocStr * str );
 

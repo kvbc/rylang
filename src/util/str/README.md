@@ -1,5 +1,6 @@
 | Module    | Struct     | Description                                     |
 | --------- | ---------- | ----------------------------------------------- |
+| str       | -          | Global utility functions all strings            |
 | cstr      | -          | Utility functions for C-style strings (buffers) |
 | str_view  | `StrView`  | String View                                     |
 | alloc_str | `AllocStr` | Allocated String                                |
@@ -21,19 +22,19 @@ graph TD
 
 ```mermaid
 ---
-title: Initializing an AllocStr
+title: Conversions into an AllocStr
 ---
 graph LR
-    cstr -- init_movebuf / init_movebuflen ----> A[AllocStr]
-    cstr -- init_copybuf / init_copybuflen ----> A[AllocStr]
+    cstr -- move_buf / move_buflen ----> A[AllocStr]
+    cstr -- copy_buf / copy_buflen ----> A[AllocStr]
 
-    B[AllocStr] -- init_movealloc ----> C[AllocStr]
-    B[AllocStr] -- init_copyalloc ----> C[AllocStr]
+    B[AllocStr] -- move_alloc ----> C[AllocStr]
+    B[AllocStr] -- copy_alloc ----> C[AllocStr]
 
-    StrView -- init_copyview ----> D[AllocStr]
+    StrView -- copy_view ----> D[AllocStr]
     StrView x--x |CAN'T MOVE| D[AllocStr]
 
-    DynStr -- init_copydyn ----> AllocStr
+    DynStr -- copy_dyn ----> AllocStr
     DynStr x--x |CAN'T MOVE| AllocStr
 ```
 
@@ -41,8 +42,6 @@ graph LR
 
 **StrView** \
 [str_view.h](str_view.h)
-
-As this is a "view", all `init` functions move the data and do not copy it.
 
 ```mermaid
 ---

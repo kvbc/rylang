@@ -1,5 +1,5 @@
-#ifndef RY_LEXER_H
-#define RY_LEXER_H
+#ifndef RYL_LEXER_H
+#define RYL_LEXER_H
 
 #include "token.h"
 
@@ -13,33 +13,33 @@
 #include <stdarg.h>
 
 // 
-// Private
+// [Private]
 // 
 
-struct ry__LexerPos {
+struct ryL_Lexer__Pos {
     usize ln;
     usize col;
 };
 
 //
-// Public
+// [Public]
 // 
 
-struct ry_Lexer {
-    struct ryUSTR_StringView id;
-    const struct ryUSTR_StringView * src;
+struct ryL_Lexer {
+    struct ryUSTR_DynStr id;
+    struct ryUSTR_DynStr src;
 
     usize src_idx;
-    struct ry__LexerPos pos;
+    struct ryL_Lexer__Pos pos;
     
     struct ryU_Array tokens; // ry_LexerToken[]
     struct ryU_Array infos; // ry_LexerInfo[]
 };
 
-void ry_lex (struct ry_Lexer * lex);
+void ryL_lex( struct ryL_Lexer * lex );
 
 // 
 // 
 // 
 
-#endif // RY_LEXER_H
+#endif // RYL_LEXER_H

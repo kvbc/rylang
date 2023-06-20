@@ -2,58 +2,73 @@
 #include "dyn_str.h"
 
 // 
-// [Public] 
+// [Static]
 // 
 
-void ryUSTR_AllocStr_free( struct ryUSTR_AllocStr * str ) {
-    free(str->_buf);
+static void clear( struct ryUSTR_AllocStr * out_str ) {
+    out_str->_buf = NULL;
+    out_str->_len = 0;
 }
 
 // 
-// [Public] init : move
+// 
 // 
 
-void ryUSTR_AllocStr_init_movebuflen( struct ryUSTR_AllocStr * out_str, u8 * buf, usize len ) {
+void ryUSTR_AllocStr_init( struct ryUSTR_AllocStr * out_str ) {
+    clear(out_str);
+}
+
+void ryUSTR_AllocStr_free( struct ryUSTR_AllocStr * str ) {
+    RY_FREE(str->_buf);
+    clear(str);
+}
+
+// 
+// move
+// 
+
+void ryUSTR_AllocStr_move_buflen( struct ryUSTR_AllocStr * out_str, u8 * buf, usize len ) {
+    ryUSTR_AllocStr_free(out_str);
     out_str->_buf = buf;
     out_str->_len = len;
 }
 
-void ryUSTR_AllocStr_init_movebuf( struct ryUSTR_AllocStr * out_str, u8 * buf ) {
+void ryUSTR_AllocStr_move_buf( struct ryUSTR_AllocStr * out_str, u8 * buf ) {
     ryUSTR_AllocStr_init_movebuflen(out_str, buf, strlen(buf));
 }
-void ryUSTR_AllocStr_init_movealloc( struct ryUSTR_AllocStr * out_str, struct ryUSTR_AllocStr * str ) {
+void ryUSTR_AllocStr_move_alloc( struct ryUSTR_AllocStr * out_str, struct ryUSTR_AllocStr * str ) {
     ryUSTR_AllocStr_init_movebuflen(out_str, str->_buf, str->_len);
-    ryUSTR_AllocStr_init_movebuflen(str, NULL, 0);
+    clear(str);
 }
 
 // 
-// [Public] init : copy
+// copy
 // 
 
-void ryUSTR_AllocStr_init_copybuflen( struct ryUSTR_AllocStr * out_str, u8 * buf, usize len ) {
+void ryUSTR_AllocStr_copy_buflen( struct ryUSTR_AllocStr * out_str, u8 * buf, usize len ) {
     u8 * buf_cpy = RY_MALLOC(len);
     RY_ASSERT(buf_cpy != NULL);
     RY_MEMCPY(buf_cpy, buf, len);
-    ryUSTR_AllocStr_init_movebuflen(out_str, buf_cpy, len);
+    ryUSTR_AllocStr_move_buflen(out_str, buf_cpy, len);
 }
 
-void ryUSTR_AllocStr_init_copybuf( struct ryUSTR_AllocStr * out_str, u8 * buf ) {
+void ryUSTR_AllocStr_copy_buf( struct ryUSTR_AllocStr * out_str, u8 * buf ) {
     ryUSTR_AllocStr_init_copybuflen(out_str, buf, strlen(buf));
 }
 
-void ryUSTR_AllocStr_init_copyview( struct ryUSTR_AllocStr * out_str, const struct ryUSTR_StringView * view ) {
+void ryUSTR_AllocStr_copy_view( struct ryUSTR_AllocStr * out_str, const struct ryUSTR_StringView * view ) {
     const usize viewlen = ryUSTR_StringView_getlen(view);
     const u8 * const viewbuf = ryUSTR_StringView_getbuf(view);
     ryUSTR_AllocStr_init_copybuflen(out_str, viewbuf, viewlen);
 
 }
-void ryUSTR_AllocStr_init_copyalloc( struct ryUSTR_AllocStr * out_str, const struct ryUSTR_AllocStr * str ) {
+void ryUSTR_AllocStr_copy_alloc( struct ryUSTR_AllocStr * out_str, const struct ryUSTR_AllocStr * str ) {
     const u8 * buf = ryUSTR_AllocStr_getbuf(str);
     usize len = ryUSTR_AllocStr_getlen(str);
     ryUSTR_AllocStr_init_copybuflen(out_str, buf, len);
 }
 
-void ryUSTR_AllocStr_init_copydyn( struct ryUSTR_AllocStr * out_str, const struct ryUSTR_DynStr * str ) {
+void ryUSTR_AllocStr_copy_dyn( struct ryUSTR_AllocStr * out_str, const struct ryUSTR_DynStr * str ) {
     if( ryUSTR_DynStr_is_alloc(str) )
         ryUSTR_AllocStr_init_copyalloc(out_str, ryUSTR_DynStr_get_alloc(str));
     else
@@ -61,7 +76,7 @@ void ryUSTR_AllocStr_init_copydyn( struct ryUSTR_AllocStr * out_str, const struc
 }
 
 // 
-// [Public] Getters
+// getters
 // 
 
 usize ryUSTR_AllocStr_getlen( const struct ryUSTR_AllocStr * str ) {

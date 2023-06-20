@@ -43,7 +43,7 @@ static const char * kwcode_to_str (enum ryL_TokenCode code) {
     }
 }
 
-static unsigned long kwcode_to_strhash (enum ry_LexerTokenCode code) {
+static unsigned long kwcode_to_strhash (enum ryL_TokenCode code) {
     RY_ASSERT(IS_KWCODE(code));
     static unsigned long code_hashes[RYL_TOKEN_CODE_KW_COUNT] = {0};
     const size_t idx = code - (TK__KW_FIRST + 1);
@@ -58,14 +58,14 @@ static unsigned long kwcode_to_strhash (enum ry_LexerTokenCode code) {
 // [Public]
 // 
 
-void ry_LexerToken_free( struct ryL_Token * tk ) {
-    if( tk->value_type == TKVAL_STRING )
-        ry_String_free(&(tk->value.str));
+void ryL_Token_free( struct ryL_Token * tk ) {
+    if( tk->_value_type == TKVAL_STRING )
+        ryUSTR_DynStr_free(&(tk->_value.str));
 }
 
-enum ry_LexerTokenCode ry_LexerToken_string_to_keyword (const char * str, size_t len) {
+enum ryL_TokenCode ryL_Token_string_to_keyword (const char * str, size_t len) {
     unsigned long strhash = ry_cstr_hash(str, len);
-    for( enum ry_LexerTokenCode kwcode = TK__KW_FIRST + 1; kwcode < TK__KW_LAST; kwcode++ ) {
+    for( enum ryL_TokenCode kwcode = TK__KW_FIRST + 1; kwcode < TK__KW_LAST; kwcode++ ) {
         unsigned long kwhash = kwcode_to_strhash(kwcode);
         if( strhash == kwhash )
             return kwcode;
@@ -73,22 +73,51 @@ enum ry_LexerTokenCode ry_LexerToken_string_to_keyword (const char * str, size_t
     return TK_NONE;
 }
 
-void ry_LexerToken_to_string( struct ry_LexerToken * tk, struct ry_String * outStr ) {
-    
-}
-
-// 
-// [Debug]
-// 
-
 void ryL_Token_to_string( struct ryL_Token * tk, struct ryUSTR_DynStr * out_str ) {
-    switch( tk->code ) {
-        case TK_NONE: return "NONE";
+    return "ERR";
+    // switch( tk->code ) {
+    //     case TK_NONE: return "NONE";
 
-        case TK_NAME: return ""
-    }
+    //     case TK_NAME: return ""
+    // }
 }
 
+// 
+// Getters
+// 
+
+enum ryL_TokenCode ryL_Token_get_code( const struct ryL_Token * tk ) {
+    return tk->_code;
+}
+
+enum ryL_TokenValueType ryL_Token_get_value_type( const struct ryL_Token * tk ) {
+    return tk->_value_type;
+}
+
+// value
+
+const struct ryUSTR_DynStr * ryL_Token_get_string( const struct ryL_Token * tk ) {
+    RY_ASSERT(tk->_value_type == TKVAL_STRING);
+    return &(tk->_value.str);
+}
+ryL_int_t ryL_Token_get_int( const struct ryL_Token * tk ) {
+    RY_ASSERT(tk->_value_type == TKVAL_INT);
+    return tk->_value.intv;
+}
+ryL_float_t ryL_Token_get_float( const struct ryL_Token * tk ) {
+    RY_ASSERT(tk->_value_type == TKVAL_FLOAT);
+    return tk->_value.floatv;
+}
+ryL_char_t ryL_Token_get_char( const struct ryL_Token * tk ) {
+    RY_ASSERT(tk->_value_type == TKVAL_CHAR);
+    return tk->_value.charv;
+}
+
+// 
+// 
+// 
+
+/*
 void ry_LexerToken_print( struct ryL_Token * token ) {
     switch( token->code ) {
         case TK_NONE: printf("none"); break;  
@@ -162,3 +191,4 @@ void ry_LexerToken_print( struct ryL_Token * token ) {
             else printf("[???]");
     }
 }
+*/

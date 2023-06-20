@@ -6,12 +6,12 @@
 // 
 // 
 
-static void ry__LexerPos_init (struct ry__LexerPos * pos) {
+static void LexerPos_init (struct ryL_Lexer__Pos * pos) {
     pos->col = 1;
     pos->ln = 1;
 }
-static void ry__LexerPos_clear (struct ry__LexerPos * pos) {
-    ry__LexerPos_init(pos);
+static void LexerPos_clear (struct ryL_Lexer__Pos * pos) {
+    LexerPos_init(pos);
 }
 
 // 
@@ -20,7 +20,7 @@ static void ry__LexerPos_clear (struct ry__LexerPos * pos) {
 // 
 // 
 
-enum ry__LexerInfoCode {
+enum LexerInfoCode {
     LEX_INFO_UNTERMINATED_STRING,
     LEX_INFO_UNFINISHED_STRING,
     LEX_INFO_UNDEFINED_ESC_SEQ,
@@ -29,17 +29,17 @@ enum ry__LexerInfoCode {
     LEX_INFO_TRAILING_NUMBER_SEPARATOR,
     LEX_INFO_MALFORMED_NUMBER_LITERAL
 };
-struct ry__LexerInfo {
-    enum ry__LexerInfoCode code;
-    struct ry__LexerPos pos;
+struct LexerInfo {
+    enum LexerInfoCode code;
+    struct ryL_Lexer__Pos pos;
     const char * msg;
     bool msg_allocd;
 };
-static void ry__LexerInfo_free( struct ry__LexerInfo * info ) {
+static void LexerInfo_free( struct LexerInfo * info ) {
     if( info->msg_allocd )
         free((void*)info->msg);
 }
-static void ry__LexerInfo_init( struct ry__LexerInfo * info, enum ry__LexerInfoCode code, struct ry__LexerPos pos, ... ) {
+static void LexerInfo_init( struct LexerInfo * info, enum LexerInfoCode code, struct ryL_Lexer__Pos pos, ... ) {
     info->code = code;
     info->pos = pos;
     info->msg = "[???]";
@@ -52,14 +52,14 @@ static void ry__LexerInfo_init( struct ry__LexerInfo * info, enum ry__LexerInfoC
         case LEX_INFO_ESC_SEQ_OVERFLOW: {
             va_list args;
             va_start(args, pos);
-            ry_lex_numlit_t num = va_arg(args, ry_lex_numlit_t);
+            ryL_int_t num = va_arg(args, ryL_int_t);
             va_end(args);
 
             const char * fmt = "escape sequence is out of bounds: \\\\(%u / 0x%X / 0%o) is not in range (%d, %d / 0x%X / 0%o)";
-            int msglen = snprintf(NULL, 0, fmt, num, num, num, RY_LEX_CHAR_MIN, RY_LEX_CHAR_MAX, RY_LEX_CHAR_MAX, RY_LEX_CHAR_MAX);
+            int msglen = snprintf(NULL, 0, fmt, num, num, num, RYL_CHAR_MIN, RYL_CHAR_MAX, RYL_CHAR_MAX, RYL_CHAR_MAX);
             RY_ASSERT(msglen > 0);
             char * msg = RY_MALLOC(msglen + 1);
-            snprintf(msg, msglen + 1, fmt, num, num, num, RY_LEX_CHAR_MIN, RY_LEX_CHAR_MAX, RY_LEX_CHAR_MAX, RY_LEX_CHAR_MAX);
+            snprintf(msg, msglen + 1, fmt, num, num, num, RYL_CHAR_MIN, RYL_CHAR_MAX, RYL_CHAR_MAX, RYL_CHAR_MAX);
             info->msg = msg;
             info->msg_allocd = true;
 
@@ -76,8 +76,9 @@ static void ry__LexerInfo_init( struct ry__LexerInfo * info, enum ry__LexerInfoC
 // 
 // 
 
-static void lex_clear_tokens( struct ry_Lexer * lex ) {
-    for( size_t i = 0; i < lex->tokens.len; i++ ) {
+static void lex_clear_tokens( struct ryL_Lexer * lex ) {
+    usize len = ryU_Array_getlen(&lex->tokens);
+    for( size_t i = 0; i < len; i++ ) {
         struct ry_LexerToken * tk = ry_Array_get(&lex->tokens, i);
         ry_LexerToken_free(tk);
     }
@@ -141,11 +142,11 @@ static bool is_nl_char( char c ) {
 // EOF
 // 
 
-static bool lex_is_eofofs( struct ry_Lexer * lex, int offset ) {
+static bool lex_is_eofofs( struct ryL_Lexer * lex, int offset ) {
     size_t idx = lex->src_idx + offset;
     return (
         ( idx < 0 ) ||
-        ( idx >= lex->src->len )
+        ( idx >= ryUSTR_DynStr_get_len(&lex->src) )
     );
 }
 static bool lex_is_eof( struct ry_Lexer * lex ) {
@@ -159,10 +160,10 @@ static bool lex_is_eofnext( struct ry_Lexer * lex ) {
 // Read
 // 
 
-static const char * lex_srcptrofs( struct ry_Lexer * lex, int offset ) {
+static const char * lex_srcptrofs( struct ryL_Lexer * lex, int offset ) {
     if( lex_is_eofofs(lex, offset) )
         return NULL;
-    return lex->src->buf + lex->src_idx + offset;
+    return ryUSTR_DynStr_get_buf(&lex->src) + lex->src_idx + offset;
 }
 static const char * lex_srcptr( struct ry_Lexer * lex ) {
     return lex_srcptrofs(lex, 0);
@@ -171,7 +172,7 @@ static const char * lex_srcptr( struct ry_Lexer * lex ) {
 static char lex_readofs( struct ry_Lexer * lex, int offset ) {
     const char * src = lex_srcptrofs(lex, offset);
     if( src == NULL )
-        return RY_LEX_CHAR_EOF;
+        return RYL_CHAR_EOF;
     return *src;
 }
 static char lex_read( struct ry_Lexer * lex ) {
@@ -188,7 +189,7 @@ static char lex_read_prev( struct ry_Lexer * lex ) {
 // Next
 // 
 
-static void lex_next( struct ry_Lexer * lex ) {
+static void lex_next( struct ryL_Lexer * lex ) {
     lex->src_idx++;
 
     char c = lex_read(lex);
@@ -213,7 +214,7 @@ static void lex_next( struct ry_Lexer * lex ) {
 // 
 // 
 
-static struct ry_LexerToken lex_name( struct ry_Lexer * lex ) {
+static struct ryL_Token lex_name( struct ryL_Lexer * lex ) {
     char c = lex_read(lex);
     RY_ASSERT(is_name_start_char(c)); // starts on name
 
@@ -230,7 +231,7 @@ static struct ry_LexerToken lex_name( struct ry_Lexer * lex ) {
 
     size_t namelen = lex_srcptr(lex) - name + 1;
 
-    struct ry_LexerToken tk;
+    struct ryL_Token tk;
     enum ry_LexerTokenCode kwcode = ry_LexerToken_string_to_keyword(name, namelen);
     if( kwcode == TK_NONE ) {
         tk.code = TK_NAME;
