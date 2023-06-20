@@ -16,7 +16,7 @@ graph TD
 
 ---
 
-**AllocStr**
+**AllocStr** \
 [alloc_str.h](alloc_str.h)
 
 ```mermaid
@@ -39,7 +39,7 @@ graph LR
 
 ---
 
-**StrView**
+**StrView** \
 [str_view.h](str_view.h)
 
 As this is a "view", all `init` functions move the data and do not copy it.
