@@ -102,11 +102,11 @@ Table of Contents
 
 **Syntax**
 
-| Tag                | Syntax                            |
-| ------------------ | --------------------------------- | ---- | ---- |
-| \<name>            | `<name_start_char> {<name_char>}` |
-| \<name_start_char> | `\_                               | a-z  | A-Z` |
-| \<name_char>       | `<name_start_char>                | 0-9` |
+| Tag                | Syntax                                 |
+| ------------------ | -------------------------------------- |
+| \<name>            | `<name_start_char> {<name_char>}`      |
+| \<name_start_char> | <code>\_ \| a-z \| A-Z</code>          |
+| \<name_char>       | <code>\<name_start_char> \| 0-9</code> |
 
 **Interpretation**
 
@@ -224,22 +224,39 @@ TODO
 
 **Syntax**
 
-| Tag                | Syntax                                                       | Comment                                         |
-| ------------------ | ------------------------------------------------------------ | ----------------------------------------------- | ------------------------ |
-| \<string>          | `` ` {<src_char>} ` ``                                       | Raw string literal                              |
-| \<string>          | `" {<src_char>                                               | \<string_esc_seq>} "`where`<src_char>`is not`\` | Escapable string literal |
-| \<string_esc_seq>  | <code>a \| b \| e \| f \| n \| r \| t \| v \| ` \| \ </code> |
-| \<string_esc_seq>  | `<integer>`                                                  |
-| &emsp; \<src_char> | See [Lexical Analysis](#lexical-analysis)                    |
-| &emsp; \<integer>  | See [Integer Literals](#integer-literals)                    |
+| Tag                | Syntax                                                                     | Comment                                         |
+| ------------------ | -------------------------------------------------------------------------- | ----------------------------------------------- | ------------------------ |
+| \<string>          | `` ` {<src_char>} ` ``                                                     | Raw string literal                              |
+| \<string>          | `" {<src_char>                                                             | \<string_esc_seq>} "`where`<src_char>`is not`\` | Escapable string literal |
+| \<string_esc_seq>  | <code>a \| b \| e \| f \| n \| r \| t \| v \| ` \| \ \| <new_line> </code> |
+| \<string_esc_seq>  | `<integer>`                                                                |
+| &emsp; \<src_char> | See [Lexical Analysis](#lexical-analysis)                                  |
+| &emsp; \<integer>  | See [Integer Literals](#integer-literals)                                  |
 
 **Interpretation**
 
-TODO
-
 **Examples**
 
-TODO
+```rust
+"one line string"
+"multi \n line \n string"
+"
+    multi
+    multi
+    line
+    string
+"
+`
+    multi
+    raw
+    string
+`
+"
+    one \
+    line \
+    multi \
+" == "onelinemulti"
+```
 
 ### 1.3.4. Struct Literals {#lexical-struct-literals}
 
