@@ -1,6 +1,6 @@
 | Module    | Struct     | Description                                     |
 | --------- | ---------- | ----------------------------------------------- |
-| str       | -          | Global utility functions all strings            |
+| str       | -          | Global utility functions for all strings        |
 | cstr      | -          | Utility functions for C-style strings (buffers) |
 | str_view  | `StrView`  | String View                                     |
 | alloc_str | `AllocStr` | Allocated String                                |
