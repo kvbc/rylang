@@ -36,14 +36,11 @@ static const u8 * kwcode_to_str( enum ryL_TokenCode code ) {
         CASE(TK_KW_I32,   "i32");
         CASE(TK_KW_I64,   "i64");
         CASE(TK_KW_I128,  "i128");
-        CASE(TK_KW_ISIZE, "isize");
         CASE(TK_KW_U8,    "u8");
         CASE(TK_KW_U16,   "u16");
         CASE(TK_KW_U32,   "u32");
         CASE(TK_KW_U64,   "u64");
         CASE(TK_KW_U128,  "u128");
-        CASE(TK_KW_USIZE, "usize");
-        CASE(TK_KW_CHAR,  "char");
         CASE(TK_KW_F32,   "f32");
         CASE(TK_KW_F64,   "f64");
 

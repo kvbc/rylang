@@ -739,8 +739,6 @@ TODO
 | Unsigned Integer | `u8`, `u16`, `u32`, `u64`, `u128` |
 | Floating-point   | `f32`, `f64`                      |
 | Boolean          | `bool`                            |
-| Character        | `char`                            |
-| Pointer size     | `isize`, `usize`                  |
 
 ## 7.2. Function Type {#function-type}
 
