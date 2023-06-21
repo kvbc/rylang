@@ -4,11 +4,15 @@
 #include "lex.h"
 
 enum ryL_TokenCode {
-    TK_NONE = RYL_CHAR_MAX + 1,
+    TK__FIRST = RYL_CHAR_MAX + 1,
+
+    TK_NONE,
 
     TK_NAME, // name
     TK_STRING, // "string"
-    TK_NUMBER, // 123
+    TK_INT, // 123
+    TK_FLOAT, // 123.123
+    TK_CHAR,
 
     // 
     // Keywords
@@ -73,7 +77,7 @@ enum ryL_TokenCode {
 
     // Comparison
     TK_OP_EQ,
-    TK_OP_UNEQ,
+    TK_OP_NE,
     TK_OP_LE,
     TK_OP_GE,
 
@@ -88,5 +92,6 @@ enum ryL_TokenCode {
 #define RYL_TOKEN_CODE_KW_COUNT (TK__KW_LAST - TK__KW_FIRST - 1)
 
 bool ryL_TokenCode_is_keyword( enum ryL_TokenCode code );
+enum ryL_TokenCode ryL_TokenCode_from_char( u8 c );
 
 #endif // RYL_TOKEN_CODE_H

@@ -1,1 +1,0 @@
-gcc -O2 -s -o ry.exe src/ry.c src/lexer.c src/util/str.c src/util/str_view.c src/util/cstr.c src/util/array.c src/lexer_token.c -Wpedantic -Wall -Wno-format

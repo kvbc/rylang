@@ -1,6 +1,6 @@
 #ifndef RYL_H
 
-#include "../core.h"
+#include "../ry.h"
 
 typedef u8  ryL_char_t;
 typedef i64 ryL_int_t; // integer literal

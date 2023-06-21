@@ -1,11 +1,12 @@
 #ifndef RYL_TOKEN_H
 #define RYL_TOKEN_H
 
-#include "util/str/cstr.h"
-#include "core.h"
-#include "util/str/dyn_str.h"
+#include "../util/str/cstr.h"
+#include "../ry.h"
+#include "../util/str/dyn_str.h"
 #include "lexer.h"
 #include "lex.h"
+#include "token_code.h"
 
 // 
 // [Public]
@@ -30,12 +31,16 @@ struct ryL_Token {
     enum ryL_TokenValueType _value_type;
 };
 
-
-
+void ryL_Token_init( struct ryL_Token * tk );
 void ryL_Token_free( struct ryL_Token * tk );
 
-enum ryL_TokenCode ryL_Token_string_to_keyword( const char * str, size_t len );
+void ryL_Token_set      ( struct ryL_Token * tk, enum ryL_TokenCode code );
+struct ryUSTR_DynStr * ryL_Token_set_string( struct ryL_Token * tk, enum ryL_TokenCode code );
+void ryL_Token_set_int  ( struct ryL_Token * tk, enum ryL_TokenCode code, ryL_int_t intv );
+void ryL_Token_set_float( struct ryL_Token * tk, enum ryL_TokenCode code, ryL_float_t floatv );
+void ryL_Token_set_char ( struct ryL_Token * tk, enum ryL_TokenCode code, ryL_char_t charv );
 
+enum ryL_TokenCode ryL_Token_string_to_keyword( const u8 * str, usize len );
 void ryL_Token_to_string( struct ryL_Token * tk, struct ryUSTR_DynStr * out_str );
 
 // 
