@@ -16,7 +16,7 @@ TODO: finish the lexer - match with the spec
 
 ```mermaid
 graph TD
-    Lexer --> |tokens| Parser
+    Lexer --> |Tokens| Parser
     Parser --> |Untyped AST| Analyzer
     Analyzer --> |Untyped AST| Typer
     Typer --> |Typed AST| CTEE[Compile-time expression evaluator - CTEE]
