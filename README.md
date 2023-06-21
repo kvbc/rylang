@@ -12,6 +12,37 @@ TODO: clean up `lexer.c`, `lexer.h` and `ry.c` \
 TODO: add character literals to the spec \
 TODO: finish the lexer - match with the spec
 
+# Compiler
+
+```mermaid
+graph TD
+    Lexer --> |tokens| Parser
+    Parser --> |AST| Analyzer
+    Analyzer --> |AST| Typer
+    Typer --> |Typed AST| CTEE[Compile-time expression evaluator - CTEE]
+    subgraph Frontend
+        Lexer & Parser & Analyzer & Typer
+    end
+
+    CTEE --> |Modified AST| Transpiler
+    Transpiler --> C[C code]
+    C --> CComp[C Compiler]
+
+    C .-> JIT
+    CTEE <.-> |Values| JIT[C JIT]
+
+    subgraph Backend
+        CTEE & Transpiler
+    end
+
+    subgraph Third-party
+        JIT
+        CComp
+    end
+
+    CComp --> EXE[Final Executable]
+```
+
 # Overview
 
 TODO
