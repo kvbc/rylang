@@ -48,11 +48,11 @@ Table of Contents
 | &emsp; &emsp; 1.3.3. [String Literals](#string-literals)          |   ✔️   |     ❌      |
 | &emsp; &emsp; 1.3.4. [Struct Literals](#lexical-struct-literals)  |  N/A   |     N/A     |
 | &emsp; &emsp; 1.3.5. [Character Literals](#character-literals)    |   ✔️   |     ❌      |
-| &emsp; 1.4. [Keywords](#keywords)                                 |   ✔️   |     ❌      |
-| &emsp; 1.5. [Operators](#lexical-operators)                       |  N/A   |     ❌      |
+| &emsp; 1.4. [Keywords](#keywords)                                 |   ✔️   |     ✔️      |
+| &emsp; 1.5. [Operators](#lexical-operators)                       |  N/A   |     ✔️      |
 | &emsp; 1.6. [Tokens](#tokens)                                     |  N/A   |     N/A     |
-| &emsp; &emsp; &emsp; &nbsp;**Parsing and**                        |        |     ❌      | Grouping tokens into untyped AST nodes         |
-| &emsp; &emsp; **Semantic Analysis**                               |        |     ❌      | Analyzing untyped AST nodes                    |
+| &emsp; &emsp; &emsp; &nbsp;**Parsing and**                        |        |             | Grouping tokens into untyped AST nodes         |
+| &emsp; &emsp; **Semantic Analysis**                               |        |             | Analyzing untyped AST nodes                    |
 | 1.9. [Struct Literals](#parsing-struct-literals)                  |   ✔️   |     ❌      |
 | 2. [Variables](#variables)                                        |   ✔️   |     ❌      |
 | 3. [Operators](#operators)                                        |   ✔️   |     ❌      |
@@ -70,13 +70,13 @@ Table of Contents
 | &emsp; 4.3. [Compile-time Expressions](#compile-time-expressions) |   ❌   |     ❌      |
 | 5. [Statements](#statements)                                      |   〰️   |     ❌      |
 | 6. [Metadata](#metadata)                                          |   ✔️   |     ❌      |
-| &emsp; &emsp; &emsp; &emsp; **Typing**                            |        |     ❌      | "Typing" the untyped AST nodes                 |
+| &emsp; &emsp; &emsp; &emsp; **Typing**                            |        |             | "Typing" the untyped AST nodes                 |
 | 7. [Types](#types)                                                |        |     ❌      |
 | &emsp; 7.1. [Primitives](#primitives)                             |        |     ❌      |
 | &emsp; 7.2. [Function Type](#function-type)                       |        |     ❌      |
 | &emsp; 7.3. [Struct Type](#struct-type)                           |        |     ❌      |
-| &emsp; &emsp; &emsp; &emsp; **Transpilation**                     |        |     ❌      | Transpiling typed AST nodes into C source code |
-| &ensp; &ensp; &nbsp; **Compile-time Evaluation**                  |        |     ❌      | JIT compile-time expression evaluation         |
+| &emsp; &emsp; &emsp; &emsp; **Transpilation**                     |        |             | Transpiling typed AST nodes into C source code |
+| &ensp; &ensp; &nbsp; **Compile-time Evaluation**                  |        |             | JIT compile-time expression evaluation         |
 | 8. [Macros](#macros)                                              |   ❌   |     ❌      |
 
 ---
