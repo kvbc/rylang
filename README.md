@@ -24,7 +24,7 @@ graph TD
         Lexer & Parser & Analyzer & Typer
     end
 
-    CTEE --> |Unmodified Typed AST| Transpiler
+    CTEE ---> |Unmodified Typed AST| Transpiler
     CTEE .-> |Modified Typed AST| Transpiler
     Transpiler --> C[C code]
     C --> CComp[C Compiler]
