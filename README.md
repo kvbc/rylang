@@ -19,18 +19,18 @@ graph TD
     Lexer --> |tokens| Parser
     Parser --> |AST| Analyzer
     Analyzer --> |AST| Typer
-    Typer --> |Typed AST| Transpiler
-    Typer .-> |Typed AST| CTEE[Compile-time expression evaluator - CTEE]
+    Typer --> |Typed AST| CTEE[Compile-time expression evaluator - CTEE]
     subgraph Frontend
         Lexer & Parser & Analyzer & Typer
     end
 
+    CTEE ---> |Typed AST| Transpiler
+    CTEE ..-> |Modified AST| Transpiler
     Transpiler --> C[C code]
     C --> CComp[C Compiler]
 
     C .-> JIT[C JIT]
     JIT .-> |evaluations| CTEE
-    CTEE .-> |Modified AST| Transpiler
     CTEE <.-> |?| Macro[Macro Processor ?]
 
     subgraph Third-party
