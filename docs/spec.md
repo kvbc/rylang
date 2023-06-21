@@ -47,6 +47,7 @@ Table of Contents
 | &emsp; &emsp; 1.3.2. [Float Literals](#float-literals)            |   ✔️   |     ❌      |
 | &emsp; &emsp; 1.3.3. [String Literals](#string-literals)          |   ✔️   |     ❌      |
 | &emsp; &emsp; 1.3.4. [Struct Literals](#lexical-struct-literals)  |  N/A   |     N/A     |
+| &emsp; &emsp; 1.3.5. [Character Literals](#character-literals)    |   ✔️   |     ❌      |
 | &emsp; 1.4. [Keywords](#keywords)                                 |   ✔️   |     ❌      |
 | &emsp; 1.5. [Operators](#lexical-operators)                       |  N/A   |     ❌      |
 | &emsp; 1.6. [Tokens](#tokens)                                     |  N/A   |     N/A     |
@@ -244,6 +245,16 @@ TODO
 
 Struct Literals are not recognized during the lexing phase.
 See [Struct Literals](#parsing-struct-literals) in **Parsing**.
+
+### 1.3.5. Character Literals {#character-literals}
+
+Character literals are of type `u8`
+
+**Syntax**
+
+| Tag     | Syntax           |
+| ------- | ---------------- |
+| \<char> | `' <src_char> '` |
 
 ## 1.4. Keywords {#keywords}
 
