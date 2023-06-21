@@ -25,10 +25,12 @@ int main (void) {
     ryUSTR_DynStr_init_viewptr(&iddyn, &idview);
 
     struct ryL_Lexer lex;
-    ryL_Lexer_init(&lex, RYL_LEXFLAG_NONE, &iddyn, &srcdyn);
+    ryL_Lexer_init(&lex, &iddyn, &srcdyn);
 
     ryL_Lexer_lex(&lex);
+#ifdef RY_DEBUG
     ryL_Lexer_print_tokens(&lex);
+#endif
     puts("------------");
     ryL_Lexer_print_infos(&lex);
 

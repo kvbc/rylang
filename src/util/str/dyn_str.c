@@ -11,6 +11,7 @@ struct ryUSTR_AllocStr * ryUSTR_DynStr_init_alloc( struct ryUSTR_DynStr * out_st
     ryUSTR_AllocStr_init(alloc_str);
     return alloc_str;
 }
+
 struct ryUSTR_StrView * ryUSTR_DynStr_init_view( struct ryUSTR_DynStr * out_str ) {
     out_str->_is_alloc = false;
     out_str->_is_ptr = false;
@@ -18,11 +19,13 @@ struct ryUSTR_StrView * ryUSTR_DynStr_init_view( struct ryUSTR_DynStr * out_str 
     ryUSTR_StrView_init(view);
     return view;
 }
+
 void ryUSTR_DynStr_init_allocptr( struct ryUSTR_DynStr * out_str, struct ryUSTR_AllocStr * alloc_str ) {
     out_str->_is_alloc = true;
     out_str->_is_ptr = true;
     out_str->_variant.alloc_ptr = alloc_str;
 }
+
 void ryUSTR_DynStr_init_viewptr( struct ryUSTR_DynStr * out_str, struct ryUSTR_StrView * view ) {
     out_str->_is_alloc = false;
     out_str->_is_ptr = true;

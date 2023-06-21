@@ -8,10 +8,11 @@
 #include <limits.h>
 
 // 
-// [Static]
+// Static
 // 
+#pragma region
 
-static const u8 * kwcode_to_str (enum ryL_TokenCode code) {
+static const u8 * kwcode_to_str( enum ryL_TokenCode code ) {
     RY_ASSERT(ryL_TokenCode_is_keyword(code));
 
     const char * str = NULL;
@@ -46,7 +47,9 @@ static const u8 * kwcode_to_str (enum ryL_TokenCode code) {
         CASE(TK_KW_F32,   "f32");
         CASE(TK_KW_F64,   "f64");
 
-        default: return NULL;
+        default:
+            RY_ASSERT(false);
+            return NULL;
 
         #undef CASE
     }
@@ -54,9 +57,9 @@ static const u8 * kwcode_to_str (enum ryL_TokenCode code) {
     return (const u8 *)str;
 }
 
-static unsigned long kwcode_to_strhash (enum ryL_TokenCode code) {
+static usize kwcode_to_strhash (enum ryL_TokenCode code) {
     RY_ASSERT(ryL_TokenCode_is_keyword(code));
-    static unsigned long code_hashes[RYL_TOKEN_CODE_KW_COUNT] = {0};
+    static usize code_hashes[RYL_TOKEN_CODE_KW_COUNT] = {0};
     const size_t idx = code - (TK__KW_FIRST + 1);
     if( code_hashes[idx] == 0 ) {
         const u8 * kwstr = kwcode_to_str(code);
@@ -66,13 +69,14 @@ static unsigned long kwcode_to_strhash (enum ryL_TokenCode code) {
 }
 
 static struct ryUSTR_DynStr * Token_get_string( struct ryL_Token * tk ) {
-    RY_ASSERT(tk->_value_type == TKVAL_STRING);
-    return &(tk->_value.str);
+    return (struct ryUSTR_DynStr *)ryL_Token_get_string((const struct ryL_Token *)tk);
 }
 
+#pragma endregion
 // 
-// [Public]
+// Public
 // 
+#pragma region public
 
 void ryL_Token_init( struct ryL_Token * tk ) {
     tk->_code = TK_NONE;
@@ -85,6 +89,7 @@ void ryL_Token_free( struct ryL_Token * tk ) {
 }
 
 // set
+#pragma region set
 
 void ryL_Token_set( struct ryL_Token * tk, enum ryL_TokenCode code ) {
     ryL_Token_free(tk);
@@ -116,6 +121,7 @@ void ryL_Token_set_char( struct ryL_Token * tk, enum ryL_TokenCode code, ryL_cha
     tk->_value.charv = charv;
 }
 
+#pragma endregion set
 // 
 
 enum ryL_TokenCode ryL_Token_string_to_keyword (const u8 * str, usize len) {
@@ -131,6 +137,12 @@ enum ryL_TokenCode ryL_Token_string_to_keyword (const u8 * str, usize len) {
     }
     return TK_NONE;
 }
+
+#pragma endregion
+// 
+// Debug
+// 
+#ifdef RY_DEBUG
 
 void ryL_Token_to_string( struct ryL_Token * tk, struct ryUSTR_DynStr * out_str ) {
     const u8 * cstr = NULL;
@@ -202,7 +214,7 @@ void ryL_Token_to_string( struct ryL_Token * tk, struct ryUSTR_DynStr * out_str 
                 struct ryUSTR_AllocStr * alloc_str = ryUSTR_DynStr_init_alloc(out_str);
                 ryUSTR_format(alloc_str, ryUSTR_cstr("keyword \"%s\" (hash: %ul)"), (const char *)kwstr, kwhash);
             }
-            else if( tk->_code < TK__FIRST ) {
+            else if( ryL_TokenCode_is_char(tk->_code) ) {
                 struct ryUSTR_AllocStr * alloc_str = ryUSTR_DynStr_init_alloc(out_str);
                 ryUSTR_format(alloc_str, ryUSTR_cstr("'%c'"), (char)tk->_code);
             }
@@ -215,9 +227,11 @@ void ryL_Token_to_string( struct ryL_Token * tk, struct ryUSTR_DynStr * out_str 
     }
 }
 
+#endif
 // 
 // Getters
 // 
+#pragma region
 
 enum ryL_TokenCode ryL_Token_get_code( const struct ryL_Token * tk ) {
     return tk->_code;
@@ -246,82 +260,7 @@ ryL_char_t ryL_Token_get_char( const struct ryL_Token * tk ) {
     return tk->_value.charv;
 }
 
+#pragma endregion
 // 
 // 
 // 
-
-/*
-void ry_LexerToken_print( struct ryL_Token * token ) {
-    switch( token->code ) {
-        case TK_NONE: printf("none"); break;  
-        
-        case TK_NAME: printf("name \"%.*s\" (len: %u)", token->value.str.len, token->value.str.buf, token->value.str.len); break;
-        case TK_HASH: printf("#"); break;
-        case TK_SEMI: printf(";"); break;
-        case TK_STRING: printf("\"%.*s\" (len: %u)", token->value.str.len, token->value.str.buf, token->value.str.len); break;
-        case TK_NUMBER: printf("number: %d", token->value.num); break;
-        case TK_OP_RND_BRACK: printf("("); break;
-        case TK_CL_RND_BRACK: printf(")"); break;
-        case TK_OP_CRL_BRACK: printf("{"); break;
-        case TK_CL_CRL_BRACK: printf("}"); break;
-        case TK_OP_SQ_BRACK: printf("["); break;
-        case TK_CL_SQ_BRACK: printf("]"); break;
-        case TK_EXMARK: printf("!"); break;
-
-        // 
-        // Arithmetic Operators
-        // 
-
-        case TK_ADD:  printf("+"); break;
-        case TK_SUB:  printf("-"); break;
-        case TK_DIV:  printf("/"); break;
-        case TK_MUL:  printf("*"); break;
-        case TK_MOD:  printf("%"); break;
-        case TK_BXOR: printf("^"); break;
-        case TK_BAND: printf("&"); break;
-        case TK_BOR:  printf("|"); break;
-        case TK_BNOT: printf("~"); break;
-        case TK_BLS:  printf("<<"); break;
-        case TK_BRS:  printf(">>"); break;
-
-        case TK_SET:       printf("="); break;
-        case TK_SET_ADD:   printf("+="); break;
-        case TK_SET_SUB:   printf("-="); break;
-        case TK_SET_DIV:   printf("/="); break;
-        case TK_SET_MUL:   printf("*="); break;
-        case TK_SET_MOD:   printf("%="); break;
-        case TK_SET_BXOR:  printf("^="); break;
-        case TK_SET_BAND:  printf("&="); break;
-        case TK_SET_BOR:   printf("|="); break;
-        case TK_SET_BLS:   printf("<<="); break;
-        case TK_SET_BRS:   printf(">>="); break;
-
-        case TK_INC: printf("++"); break;
-        case TK_DEC: printf("--"); break;
-
-        // 
-        // Logical Operators
-        // 
-
-        case TK_EQ:    printf("=="); break;
-        case TK_EQ_GR: printf(">="); break;
-        case TK_EQ_LE: printf("<="); break;
-        case TK_NE:    printf("!="); break;
-        case TK_AND:   printf("&&"); break;
-        case TK_OR:    printf("||"); break;
-        case TK_GR:    printf(">"); break;
-        case TK_LE:    printf("<"); break;
-
-        case TK_QM:    printf("?"); break;
-        case TK_COLON: printf(":"); break;
-
-        default:
-            if( IS_KWCODE(token->code) ) {
-                const char * kwstr = kwcode_to_str(token->code);
-                unsigned long kwhash = kwcode_to_strhash(token->code);
-                printf("keyword \"%s\" (hash: %ul, len: %u)", kwstr, kwhash, strlen(kwstr));
-            }
-            else printf("[???]");
-    }
-}
-*/

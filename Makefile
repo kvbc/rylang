@@ -1,3 +1,7 @@
 SRC = $(wildcard */*.c */*/*.c */*/*/*.c)
-all:
-	gcc -O2 -s -o ry $(SRC) -Wpedantic -Wall -Wno-format
+OUT = ry
+FLAGS = -O2 -Wpedantic -Wall -Wno-format -Wno-unknown-pragmas
+debug:
+	gcc -o $(OUT) $(SRC) $(FLAGS) -D RY_DEBUG
+release:
+	gcc -o $(OUT) $(SRC) $(FLAGS) -s

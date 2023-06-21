@@ -23,7 +23,7 @@ void ryUSTR_StrView_init_alloc ( struct ryUSTR_StrView * out_view, struct ryUSTR
 void ryUSTR_StrView_init_dyn   ( struct ryUSTR_StrView * out_view, struct ryUSTR_DynStr * str );
 
 // Getters
-usize ryUSTR_StrView_get_len( const struct ryUSTR_StrView * view );
+usize      ryUSTR_StrView_get_len( const struct ryUSTR_StrView * view );
 const u8 * ryUSTR_StrView_get_buf( const struct ryUSTR_StrView * view );
 
 // 

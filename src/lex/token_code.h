@@ -12,7 +12,7 @@ enum ryL_TokenCode {
     TK_STRING, // "string"
     TK_INT, // 123
     TK_FLOAT, // 123.123
-    TK_CHAR,
+    TK_CHAR, // 'c'
 
     // 
     // Keywords
@@ -92,6 +92,7 @@ enum ryL_TokenCode {
 #define RYL_TOKEN_CODE_KW_COUNT (TK__KW_LAST - TK__KW_FIRST - 1)
 
 bool ryL_TokenCode_is_keyword( enum ryL_TokenCode code );
+bool ryL_TokenCode_is_char( enum ryL_TokenCode code );
 enum ryL_TokenCode ryL_TokenCode_from_char( u8 c );
 
 #endif // RYL_TOKEN_CODE_H

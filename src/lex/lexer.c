@@ -418,7 +418,7 @@ static struct ryL_Token lex_string( struct ryL_Lexer * lex ) {
 // 
 // 
 
-void ryL_Lexer_init( struct ryL_Lexer * out_lex, enum ryL_LexerFlags flags, struct ryUSTR_DynStr * id, struct ryUSTR_DynStr * src ) {
+void ryL_Lexer_init( struct ryL_Lexer * out_lex, struct ryUSTR_DynStr * id, struct ryUSTR_DynStr * src ) {
     RY_ASSERT(out_lex != NULL);
     out_lex->id = id;
     out_lex->src = src;
@@ -451,18 +451,6 @@ void ryL_Lexer_print_infos( struct ryL_Lexer * lex ) {
             info->pos.col,
             info->msg
         );
-    }
-}
-
-void ryL_Lexer_print_tokens( struct ryL_Lexer * lex ) {
-    usize tokens_len = ryU_Array_get_len(&lex->tokens);
-    for( size_t i = 0; i < tokens_len; i++ ) {
-        struct ryL_Token * tk = (struct ryL_Token *)ryU_Array_get(&lex->tokens, i);
-        struct ryUSTR_DynStr str;
-        ryL_Token_to_string(tk, &str);
-        ryO_print_DynStr(&str);
-        ryO_print_char('\n');
-        ryUSTR_DynStr_free(&str);
     }
 }
 
@@ -549,3 +537,22 @@ void ryL_Lexer_lex( struct ryL_Lexer * lex ) {
             break;
     }
 }
+
+// 
+// Debug
+// 
+#ifdef RY_DEBUG
+
+void ryL_Lexer_print_tokens( struct ryL_Lexer * lex ) {
+    usize tokens_len = ryU_Array_get_len(&lex->tokens);
+    for( size_t i = 0; i < tokens_len; i++ ) {
+        struct ryL_Token * tk = (struct ryL_Token *)ryU_Array_get(&lex->tokens, i);
+        struct ryUSTR_DynStr str;
+        ryL_Token_to_string(tk, &str);
+        ryO_print_DynStr(&str);
+        ryO_print_char('\n');
+        ryUSTR_DynStr_free(&str);
+    }
+}
+
+#endif
