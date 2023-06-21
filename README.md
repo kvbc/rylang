@@ -9,7 +9,6 @@ For ease of reading the Markdown files, I recommend opening them up in VSCode
 TODO: Link to external Markdown reader, for example: https://dillinger.io/ (this one is broken with custom heading ids)
 
 TODO: clean up `lexer.c`, `lexer.h` and `ry.c` \
-TODO: add character literals to the spec \
 TODO: finish the lexer - match with the spec
 
 # Compiler
