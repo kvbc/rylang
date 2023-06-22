@@ -1,7 +1,7 @@
 #include "out.h"
 #include <stdio.h>
 #include <stdarg.h>
-#include "../util/str/cstr.h"
+#include "../util/str.h"
 
 void ryO_vprintf( const u8 * fmt, va_list args ) {
     vprintf((const char *)fmt, args);
@@ -22,28 +22,33 @@ void ryO_print_char( u8 c ) {
 // 
 
 void ryO_print_cstr( const u8 * buf ) {
-    ryO_print_cstrlen(buf, ryUSTR_cstr_len(buf));
+    ryO_print_cstrlen(buf, ryU_cstr_len(buf));
 
 }
 void ryO_print_cstrlen( const u8 * buf, usize len ) {
     fwrite(buf, sizeof(*buf), len, stdout);
 }
 
-void ryO_print_StrView( const struct ryUSTR_StrView * view ) {
+void ryO_print_strview( const struct ryU_ArrView * view ) {
+    RY_ASSERT(ryU_ArrView_get_itemsz(view) == 1);
     ryO_print_cstrlen(
-        ryUSTR_StrView_get_buf(view),
-        ryUSTR_StrView_get_len(view)
+        (const u8 *)ryU_ArrView_get_buf(view),
+        ryU_ArrView_get_len(view)
     );
 }
-void ryO_print_AllocStr( const struct ryUSTR_AllocStr * str ) {
+
+void ryO_print_str( const struct ryU_Arr * str ) {
+    RY_ASSERT(ryU_Arr_get_itemsz(str) == 1);
     ryO_print_cstrlen(
-        ryUSTR_AllocStr_get_buf(str),
-        ryUSTR_AllocStr_get_len(str)
+        (const u8 *)ryU_Arr_get_buf(str),
+        ryU_Arr_get_len(str)
     );
 }
-void ryO_print_DynStr( const struct ryUSTR_DynStr * str ) {
+
+void ryO_print_dynstr( const struct ryU_DynArr * str ) {
+    RY_ASSERT(ryU_DynArr_get_itemsz(str) == 1);
     ryO_print_cstrlen(
-        ryUSTR_DynStr_get_buf(str),
-        ryUSTR_DynStr_get_len(str)
+        (const u8 *)ryU_DynArr_get_buf(str),
+        ryU_DynArr_get_len(str)
     );
 }

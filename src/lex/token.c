@@ -1,7 +1,7 @@
 #include "token.h"
 #include "token_code.h"
-#include "../util/str/alloc_str.h"
-#include "../util/str/str.h"
+#include "../util/arr.h"
+#include "../util/str.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -60,13 +60,13 @@ static usize kwcode_to_strhash (enum ryL_TokenCode code) {
     const size_t idx = code - (TK__KW_FIRST + 1);
     if( code_hashes[idx] == 0 ) {
         const u8 * kwstr = kwcode_to_str(code);
-        code_hashes[idx] = ryUSTR_cstr_hash(kwstr, ryUSTR_cstr_len(kwstr));
+        code_hashes[idx] = ryU_cstr_hash(kwstr, ryU_cstr_len(kwstr));
     }
     return code_hashes[idx];
 }
 
-static struct ryUSTR_DynStr * Token_get_string( struct ryL_Token * tk ) {
-    return (struct ryUSTR_DynStr *)ryL_Token_get_string((const struct ryL_Token *)tk);
+static struct ryU_DynArr * Token_get_string( struct ryL_Token * tk ) {
+    return (struct ryU_DynArr *)ryL_Token_get_string((const struct ryL_Token *)tk);
 }
 
 #pragma endregion
@@ -82,7 +82,7 @@ void ryL_Token_init( struct ryL_Token * tk ) {
 
 void ryL_Token_free( struct ryL_Token * tk ) {
     if( tk->_value_type == TKVAL_STRING )
-        ryUSTR_DynStr_free(Token_get_string(tk));
+        ryU_DynArr_free(Token_get_string(tk));
 }
 
 // set
@@ -93,11 +93,11 @@ void ryL_Token_set( struct ryL_Token * tk, enum ryL_TokenCode code ) {
     tk->_code = code;
     tk->_value_type = TKVAL_NONE;
 }
-struct ryUSTR_DynStr * ryL_Token_set_string( struct ryL_Token * tk, enum ryL_TokenCode code ) {
+void ryL_Token_set_string( struct ryL_Token * tk, enum ryL_TokenCode code, struct ryU_DynArr * str ) {
     ryL_Token_free(tk);
     tk->_code = code;
     tk->_value_type = TKVAL_STRING;
-    return Token_get_string(tk);
+    tk->_value.str = str;
 }
 void ryL_Token_set_int( struct ryL_Token * tk, enum ryL_TokenCode code, ryL_int_t intv ) {
     ryL_Token_free(tk);
@@ -122,7 +122,7 @@ void ryL_Token_set_char( struct ryL_Token * tk, enum ryL_TokenCode code, ryL_cha
 // 
 
 enum ryL_TokenCode ryL_Token_string_to_keyword (const u8 * str, usize len) {
-    usize strhash = ryUSTR_cstr_hash(str, len);
+    usize strhash = ryU_cstr_hash(str, len);
     for(
         enum ryL_TokenCode kwcode = (enum ryL_TokenCode)(TK__KW_FIRST + 1);
         kwcode < TK__KW_LAST;
@@ -141,19 +141,18 @@ enum ryL_TokenCode ryL_Token_string_to_keyword (const u8 * str, usize len) {
 // 
 #ifdef RY_DEBUG
 
-void ryL_Token_to_string( struct ryL_Token * tk, struct ryUSTR_DynStr * out_str ) {
+void ryL_Token_to_string( struct ryL_Token * tk, struct ryU_ArrView * out_strview, struct ryU_Arr * out_str, bool * out_is_view ) {
     const u8 * cstr = NULL;
 
     switch( tk->_code ) {
         case TK_CHAR: {
-            struct ryUSTR_AllocStr * alloc_str = ryUSTR_DynStr_init_alloc(out_str);
-            ryUSTR_format(alloc_str,
-                ryUSTR_cstr("char '%c'"),
+            ryU_str_format(out_str,
+                ryU_cstr("char '%c'"),
                 (char)tk->_code
             );
         }
 
-        #define CASE_LIT(tkcode, strlit) case tkcode: cstr = ryUSTR_cstr(strlit); break
+        #define CASE_LIT(tkcode, strlit) case tkcode: cstr = ryU_cstr(strlit); break
         CASE_LIT(TK_NONE, "NONE");
         CASE_LIT(TK_OP_POWER,        "**");
         CASE_LIT(TK_OP_FLOORDIV,     "//");
@@ -186,11 +185,10 @@ void ryL_Token_to_string( struct ryL_Token * tk, struct ryUSTR_DynStr * out_str 
                 if( tk->_code == TK_STRING )
                     fmt = "string \"%.*s\"";
 
-                const struct ryUSTR_DynStr * tk_str = ryL_Token_get_string(tk);
-                struct ryUSTR_AllocStr * alloc_str = ryUSTR_DynStr_init_alloc(out_str);
-                ryUSTR_format(alloc_str, ryUSTR_cstr(fmt),
-                    ryUSTR_DynStr_get_len(tk_str),
-                    ryUSTR_DynStr_get_buf(tk_str)
+                const struct ryU_DynArr * tk_str = ryL_Token_get_string(tk);
+                ryU_str_format(out_str, ryU_cstr(fmt),
+                    ryU_DynArr_get_len(tk_str),
+                    ryU_DynArr_get_buf(tk_str)
                 );
             }
             else if( tk->_code == TK_INT || tk->_code == TK_FLOAT ) {
@@ -198,8 +196,7 @@ void ryL_Token_to_string( struct ryL_Token * tk, struct ryUSTR_DynStr * out_str 
                 if( tk->_code == TK_FLOAT )
                     fmt = "float %f";
 
-                struct ryUSTR_AllocStr * alloc_str = ryUSTR_DynStr_init_alloc(out_str);
-                ryUSTR_format(alloc_str, ryUSTR_cstr(fmt),
+                ryU_str_format(out_str, ryU_cstr(fmt),
                     (tk->_code == TK_INT)
                         ? ryL_Token_get_int(tk)
                         : ryL_Token_get_float(tk)
@@ -208,19 +205,16 @@ void ryL_Token_to_string( struct ryL_Token * tk, struct ryUSTR_DynStr * out_str 
             else if( ryL_TokenCode_is_keyword(tk->_code) ) {
                 const u8 * kwstr = kwcode_to_str(tk->_code);
                 usize kwhash = kwcode_to_strhash(tk->_code);
-                struct ryUSTR_AllocStr * alloc_str = ryUSTR_DynStr_init_alloc(out_str);
-                ryUSTR_format(alloc_str, ryUSTR_cstr("keyword \"%s\" (hash: %ul)"), (const char *)kwstr, kwhash);
+                ryU_str_format(out_str, ryU_cstr("keyword \"%s\" (hash: %ul)"), (const char *)kwstr, kwhash);
             }
             else if( ryL_TokenCode_is_char(tk->_code) ) {
-                struct ryUSTR_AllocStr * alloc_str = ryUSTR_DynStr_init_alloc(out_str);
-                ryUSTR_format(alloc_str, ryUSTR_cstr("'%c'"), (char)tk->_code);
+                ryU_str_format(out_str, ryU_cstr("'%c'"), (char)tk->_code);
             }
             else RY_ASSERT(false);
     }
 
     if( cstr != NULL ) {
-        struct ryUSTR_StrView * view = ryUSTR_DynStr_init_view(out_str);
-        ryUSTR_StrView_init_buf(view, cstr);
+        ryU_ArrView_set(out_strview, cstr, ryU_cstr_len(cstr));
     }
 }
 
@@ -240,9 +234,9 @@ enum ryL_TokenValueType ryL_Token_get_value_type( const struct ryL_Token * tk ) 
 
 // value
 
-const struct ryUSTR_DynStr * ryL_Token_get_string( const struct ryL_Token * tk ) {
+const struct ryU_DynArr * ryL_Token_get_string( const struct ryL_Token * tk ) {
     RY_ASSERT(tk->_value_type == TKVAL_STRING);
-    return &(tk->_value.str);
+    return tk->_value.str;
 }
 ryL_int_t ryL_Token_get_int( const struct ryL_Token * tk ) {
     RY_ASSERT(tk->_value_type == TKVAL_INT);

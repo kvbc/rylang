@@ -7,7 +7,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-// #define RY_DEBUG
+#define RY_DEBUG 1 // FIXME
 
 #define RY_MEMCPY(dest, src, sz) (memcpy(dest, src, sz))
 #define RY_MALLOC(sz)            (malloc(sz))
