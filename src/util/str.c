@@ -20,6 +20,8 @@ void ryU_str_format( struct ryU_Arr * out_str, const u8 * fmt, ... ) {
     va_end(args);
 }
 
+// cstr
+
 // djb2 (http://www.cse.yorku.ca/~oz/hash.html)
 usize ryU_cstr_hash( const u8 * str, usize len ) {
     usize hash = 5381;

@@ -19,8 +19,8 @@ struct ryU_Arr {
     usize _itemsz; // in bytes
 };
 
-void ryU_Arr_init        ( struct ryU_Arr * out_arr, usize itemsz );
-void ryU_Arr_free        ( struct ryU_Arr * arr );
+void ryU_Arr_init( struct ryU_Arr * out_arr, usize itemsz );
+void ryU_Arr_free( struct ryU_Arr * arr );
 
 void * ryU_Arr_next( struct ryU_Arr * arr );
 
@@ -33,7 +33,7 @@ void ryU_Arr_push_dyn ( struct ryU_Arr * arr, const struct ryU_DynArr * in_arr )
 
 // modify
 void   ryU_Arr_clear( struct ryU_Arr * arr );
-void * ryU_Arr_get  ( const struct ryU_Arr * arr, usize idx );
+void * ryU_Arr_get  ( struct ryU_Arr * arr, usize idx );
 
 // move into
 void ryU_Arr_move_buf( struct ryU_Arr * out_arr, void * buf, usize len );
@@ -46,9 +46,13 @@ void ryU_Arr_copy_view( struct ryU_Arr * out_arr, const struct ryU_ArrView * vie
 void ryU_Arr_copy_dyn ( struct ryU_Arr * out_arr, const struct ryU_DynArr * in_arr );
 
 // getters
-usize        ryU_Arr_get_cap    ( const struct ryU_Arr * arr );
-usize        ryU_Arr_get_len    ( const struct ryU_Arr * arr );
-usize        ryU_Arr_get_itemsz ( const struct ryU_Arr * arr );
-const void * ryU_Arr_get_buf    ( const struct ryU_Arr * arr );
+usize        ryU_Arr_get_cap   ( const struct ryU_Arr * arr );
+usize        ryU_Arr_get_len   ( const struct ryU_Arr * arr );
+usize        ryU_Arr_get_itemsz( const struct ryU_Arr * arr );
+const void * ryU_Arr_get_buf   ( const struct ryU_Arr * arr );
+
+// 
+// 
+// 
 
 #endif // RYU_ARR_H

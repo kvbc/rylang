@@ -6,6 +6,8 @@
 
 void ryU_str_format( struct ryU_Arr * out_str, const u8 * fmt, ... );
 
+// cstr
+
 usize ryU_cstr_hash( const u8 * str, usize len );
 usize ryU_cstr_len ( const u8 * str );
 const u8 * ryU_cstr( const char * str );

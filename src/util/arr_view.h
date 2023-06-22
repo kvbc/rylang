@@ -11,13 +11,14 @@ struct ryU_DynArr;
 // 
 
 struct ryU_ArrView {
-    usize _len;
+    usize _len; // item count
     const void * _buf;
-    usize _itemsz;
+    usize _itemsz; // in bytes
 };
 
 void ryU_ArrView_init( struct ryU_ArrView * out_view, usize itemsz );
 
+// setters
 void ryU_ArrView_set     ( struct ryU_ArrView * out_view, const void * buf, usize len );
 void ryU_ArrView_set_view( struct ryU_ArrView * out_view, const struct ryU_ArrView * view );
 void ryU_ArrView_set_arr ( struct ryU_ArrView * out_view, const struct ryU_Arr * arr );

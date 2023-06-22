@@ -32,9 +32,9 @@ struct ryL_Lexer {
     usize _src_idx;
     struct ryL_Lexer__Pos _pos;
 
-    struct ryU_Arr _str_views; // of ryU_ArrView<u8> (str view)
-    struct ryU_Arr _dyn_strs; // of ryU_DynArr<u8> (dyn str)
-    struct ryU_Arr _strs; // of ryU_Arr<u8> (str)
+    struct ryU_Arr _str_views; // arr of ryU_ArrView<u8> (str view)
+    struct ryU_Arr _dyn_strs; // arr of ryU_DynArr<u8> (dyn str)
+    struct ryU_Arr _strs; // arr of ryU_Arr<u8> (str)
 
     struct ryU_Arr _tokens; // ryL_Token[]
     struct ryU_Arr _msgs; // LexerInfo[]

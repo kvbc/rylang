@@ -1,12 +1,36 @@
 #include "arr.h"
 #include "dyn_arr.h"
 #include "arr_view.h"
+#include <stdio.h>
+
+// 
+// 
+// 
+
+static inline void * Arr_unsafe_get( struct ryU_Arr * arr, usize idx ) {
+    RY_ASSERT(arr);
+    RY_ASSERT(idx <= arr->_len); // <= !
+    return (u8*)arr->_buf + (idx * arr->_itemsz);
+}
+
+static inline void * Arr_unsafe_next( struct ryU_Arr * arr ) {
+    RY_ASSERT(arr);
+    RY_ASSERT(arr->_buf);
+    RY_ASSERT(arr->_itemsz > 0);
+    return Arr_unsafe_get(arr, arr->_len);
+}
+
+static inline void * Arr_top( struct ryU_Arr * arr ) {
+    RY_ASSERT(arr);
+    return Arr_unsafe_get(arr, arr->_len - 1);
+}
 
 // 
 // 
 // 
 
 void ryU_Arr_init (struct ryU_Arr * out_arr, usize itemsz) {
+    RY_ASSERT(out_arr);
     RY_ASSERT(itemsz > 0);
     out_arr->_cap = 0;
     out_arr->_itemsz = itemsz;
@@ -28,8 +52,10 @@ void ryU_Arr_free (struct ryU_Arr * arr) {
 void * ryU_Arr_next( struct ryU_Arr * arr ) {
     RY_ASSERT(arr);
     if( arr->_len >= arr->_cap )
-        ryU_Arr_push(arr, NULL);
-    return (u8*)arr->_buf + (arr->_len * arr->_itemsz);
+        ryU_Arr_push(arr, NULL); // make sure there's enough space for the next item (grows if that's not the case)
+    else
+        arr->_len++;
+    return Arr_top(arr);
 }
 
 // 
@@ -37,10 +63,13 @@ void * ryU_Arr_next( struct ryU_Arr * arr ) {
 // 
 
 void ryU_Arr_push( struct ryU_Arr * arr, const void * data ) {
+    RY_ASSERT(arr);
     ryU_Arr_push_buf(arr, data, 1);
 }
 
 void ryU_Arr_push_buf( struct ryU_Arr * arr, const void * buf, usize len ) {
+    RY_ASSERT(arr);
+    RY_ASSERT(len > 0);
     if( arr->_len + len >= arr->_cap ) {
         if( arr->_cap == 0 )
             arr->_cap = 5;
@@ -49,23 +78,26 @@ void ryU_Arr_push_buf( struct ryU_Arr * arr, const void * buf, usize len ) {
         arr->_buf = RY_REALLOC(arr->_buf, arr->_cap * arr->_itemsz);
     }
     if( buf != NULL ) {
-        RY_MEMCPY(
-            (u8*)arr->_buf + (arr->_len * arr->_itemsz),
-            buf, len * arr->_itemsz
-        );
+        RY_MEMCPY(Arr_unsafe_next(arr), buf, len * arr->_itemsz);
     }
     arr->_len += len;
 }
 
 void ryU_Arr_push_arr( struct ryU_Arr * arr, const struct ryU_Arr * in_arr ) {
+    RY_ASSERT(arr);
+    RY_ASSERT(in_arr);
     ryU_Arr_push_buf(arr, ryU_Arr_get_buf(in_arr), ryU_Arr_get_len(in_arr));
 }
 
 void ryU_Arr_push_view( struct ryU_Arr * arr, const struct ryU_ArrView * view ) {
+    RY_ASSERT(arr);
+    RY_ASSERT(view);
     ryU_Arr_push_buf(arr, ryU_ArrView_get_buf(view), ryU_ArrView_get_len(view));
 }
 
 void ryU_Arr_push_dyn( struct ryU_Arr * arr, const struct ryU_DynArr * dyn ) {
+    RY_ASSERT(arr);
+    RY_ASSERT(dyn);
     if( ryU_DynArr_is_view(dyn) )
         ryU_Arr_push_view(arr, ryU_DynArr_cget_view(dyn));
     else
@@ -76,9 +108,10 @@ void ryU_Arr_push_dyn( struct ryU_Arr * arr, const struct ryU_DynArr * dyn ) {
 // Modify
 // 
 
-void * ryU_Arr_get( const struct ryU_Arr * arr, usize idx ) {
+void * ryU_Arr_get( struct ryU_Arr * arr, usize idx ) {
+    RY_ASSERT(arr);
     RY_ASSERT(idx < arr->_len);
-    return (u8*)arr->_buf + (idx * arr->_itemsz);
+    return Arr_unsafe_get(arr, idx);
 }
 
 void ryU_Arr_clear (struct ryU_Arr * arr) {

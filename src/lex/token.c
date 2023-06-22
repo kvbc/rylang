@@ -142,6 +142,8 @@ enum ryL_TokenCode ryL_Token_string_to_keyword (const u8 * str, usize len) {
 #ifdef RY_DEBUG
 
 void ryL_Token_to_string( struct ryL_Token * tk, struct ryU_ArrView * out_strview, struct ryU_Arr * out_str, bool * out_is_view ) {
+    *out_is_view = false;
+
     const u8 * cstr = NULL;
 
     switch( tk->_code ) {
@@ -214,6 +216,7 @@ void ryL_Token_to_string( struct ryL_Token * tk, struct ryU_ArrView * out_strvie
     }
 
     if( cstr != NULL ) {
+        *out_is_view = true;
         ryU_ArrView_set(out_strview, cstr, ryU_cstr_len(cstr));
     }
 }
