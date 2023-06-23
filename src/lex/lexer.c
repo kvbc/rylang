@@ -50,7 +50,7 @@ struct LexerMsg {
     struct ryU_DynArr * str;
 };
 
-static void LexerMsg_init( struct LexerMsg * msg, struct ryL_Strings * strings, enum LexerMsgCode code, struct ryL_Lexer__Pos pos, ... ) {
+static void LexerMsg_init( struct LexerMsg * msg, struct ryU_Strings * strings, enum LexerMsgCode code, struct ryL_Lexer__Pos pos, ... ) {
     RY_ASSERT(msg);
     RY_ASSERT(strings);
 
@@ -72,7 +72,7 @@ static void LexerMsg_init( struct LexerMsg * msg, struct ryL_Strings * strings, 
             va_start(args, pos);
 
             RY_ASSERT(str == NULL);
-            str = ryL_Strings_get_next_str(strings);
+            str = ryU_Strings_push_str(strings);
             ryU_str_vformat(str,
                 ryU_cstr("escape sequence is out of bounds: \\\\(%u / 0x%X / 0%o) is not in range (%d, %d / 0x%X / 0%o)"),
                 args
@@ -88,18 +88,18 @@ static void LexerMsg_init( struct LexerMsg * msg, struct ryL_Strings * strings, 
     struct ryU_DynArr * dyn = NULL;
     if( lit == NULL ) {
         RY_ASSERT(str);
-        dyn = ryL_Strings_get_next_dyn(strings);
+        dyn = ryU_Strings_push_dyn(strings);
         ryU_DynArr_init_arr(dyn, str);
     } else { // lit
         RY_ASSERT(str == NULL);
         static struct ryU_DynArr * lit_dyn_cache[MSG__COUNT] = {NULL};
         dyn = lit_dyn_cache[code];
         if( dyn == NULL ) {
-            struct ryU_ArrView * view = ryL_Strings_get_next_view(strings);
+            struct ryU_ArrView * view = ryU_Strings_push_view(strings);
             ryU_ArrView_init(view, sizeof(u8));
             ryU_ArrView_set(view, ryU_cstr(lit), strlen(lit));
 
-            dyn = ryL_Strings_get_next_dyn(strings);
+            dyn = ryU_Strings_push_dyn(strings);
             ryU_DynArr_init_view(dyn, view);
             lit_dyn_cache[code] = dyn;
         }
@@ -260,19 +260,19 @@ static void lex_name( struct ryL_Lexer * lex, struct ryL_Token * out_tk ) {
 
     usize namelen = Lexer_srcptr(lex) - name + 1;
 
-    struct ryU_ArrView * name_view = ryL_Strings_get_next_view(&lex->_strings);
+    struct ryU_ArrView * name_view = ryU_Strings_push_view(&lex->_strings);
     ryU_ArrView_init(name_view, sizeof(ryL_char_t));
     ryU_ArrView_set(name_view, name, namelen);
-    struct ryU_DynArr * name_dyn = ryL_Strings_get_next_dyn(&lex->_strings);
+    struct ryU_DynArr * name_dyn = ryU_Strings_push_dyn(&lex->_strings);
     ryU_DynArr_init_view(name_dyn, name_view);
     bool pop = true;
 
     enum ryL_TokenCode kwcode = ryL_Token_string_to_keyword(name_dyn, &lex->_strings);
     if( kwcode == TK_NONE ) {
         const struct ryU_DynArr * tk_dyn = name_dyn;
-        const struct ryU_DynArr * cached_dyn = ryL_Strings_get_dyn(
+        const struct ryU_DynArr * cached_dyn = ryU_Strings_get_dyn(
             &lex->_strings,
-            ryL_Strings_get_hash(&lex->_strings, name_dyn)
+            ryU_Strings_get_hash(&lex->_strings, name_dyn)
         );
         if( cached_dyn == NULL ) {
             pop = false; // use name_dyn for tk_dyn
@@ -283,8 +283,8 @@ static void lex_name( struct ryL_Lexer * lex, struct ryL_Token * out_tk ) {
     else ryL_Token_set(out_tk, kwcode);
 
     if( pop ) {
-        ryL_Strings_pop_view(&lex->_strings);
-        ryL_Strings_pop_dyn(&lex->_strings);
+        ryU_Strings_pop_view(&lex->_strings);
+        ryU_Strings_pop_dyn(&lex->_strings);
     }
 }
 
@@ -446,11 +446,11 @@ static struct ryL_Token lex_string( struct ryL_Lexer * lex ) {
     struct ryL_Token tk;
     ryL_Token_init(&tk);
 
-    struct ryU_Arr * str = ryL_Strings_get_next_str(&lex->_strings);
+    struct ryU_Arr * str = ryU_Strings_push_str(&lex->_strings);
     ryU_Arr_init(str, sizeof(u8));
     ryU_Arr_copy_arr(str, &chars);
 
-    struct ryU_DynArr * dynstr = ryL_Strings_get_next_dyn(&lex->_strings);
+    struct ryU_DynArr * dynstr = ryU_Strings_push_dyn(&lex->_strings);
     ryU_DynArr_init_arr(dynstr, str);
 
     ryL_Token_set_string(&tk, TK_STRING, dynstr);
@@ -473,7 +473,7 @@ void ryL_Lexer_init( struct ryL_Lexer * out_lex, struct ryU_DynArr * id, struct 
     out_lex->_src_idx = 0;
     ryU_Arr_init(&out_lex->_msgs, sizeof(struct LexerMsg));
     ryU_Arr_init(&out_lex->_tokens, sizeof(struct ryL_Token));
-    ryL_Strings_init(&out_lex->_strings);
+    ryU_Strings_init(&out_lex->_strings);
     LexerPos_init(&out_lex->_pos);
 }
 
@@ -482,7 +482,7 @@ void ryL_Lexer_free( struct ryL_Lexer * lex ) {
     ryU_Arr_free(&lex->_tokens);
     ryU_DynArr_free(lex->_id);
     ryU_DynArr_free(lex->_src);
-    ryL_Strings_free(&lex->_strings);
+    ryU_Strings_free(&lex->_strings);
 }
 
 void ryL_Lexer_lex( struct ryL_Lexer * lex ) {

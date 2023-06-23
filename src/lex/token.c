@@ -102,9 +102,9 @@ void ryL_Token_set_float( struct ryL_Token * tk, enum ryL_TokenCode code, ryL_fl
 #pragma endregion set
 // 
 
-enum ryL_TokenCode ryL_Token_string_to_keyword (const struct ryU_DynArr * str, struct ryL_Strings * strings) {
+enum ryL_TokenCode ryL_Token_string_to_keyword (const struct ryU_DynArr * str, struct ryU_Strings * strings) {
     RY_ASSERT(str);
-    usize strhash = ryL_Strings_get_hash(strings, str);
+    usize strhash = ryU_Strings_get_hash(strings, str);
     for(
         enum ryL_TokenCode kwcode = (enum ryL_TokenCode)(TK__KW_FIRST + 1);
         kwcode < TK__KW_LAST;

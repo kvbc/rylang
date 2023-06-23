@@ -6,7 +6,7 @@
 #include "../util/arr.h"
 #include "../util/arr_view.h"
 #include "../util/dyn_arr.h"
-#include "lex_strings.h"
+#include "../util/strings.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -33,7 +33,7 @@ struct ryL_Lexer {
     usize _src_idx;
     struct ryL_Lexer__Pos _pos;
 
-    struct ryL_Strings _strings;
+    struct ryU_Strings _strings;
 
     struct ryU_Arr _tokens; // ryL_Token[]
     struct ryU_Arr _msgs; // LexerInfo[]
