@@ -12,12 +12,16 @@ void ryU_str_format( struct ryU_Arr * out_str, const u8 * fmt, ... ) {
     va_list args;
     va_start(args, fmt);
 
+    ryU_str_vformat(out_str, fmt, args);
+    
+    va_end(args);
+}
+
+void ryU_str_vformat( struct ryU_Arr * out_str, const u8 * fmt, va_list args ) {
     usize len = vsnprintf(NULL, 0, (const char *)fmt, args);
     u8 * buf = (u8 *)RY_MALLOC(len);
     vsnprintf((char *)buf, len + 1, (const char *)fmt, args);
     ryU_Arr_move_buf(out_str, buf, len);
-    
-    va_end(args);
 }
 
 // cstr

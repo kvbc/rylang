@@ -16,8 +16,7 @@ enum ryL_TokenValueType {
     TKVAL_NONE,
     TKVAL_STRING,
     TKVAL_INT,
-    TKVAL_FLOAT,
-    TKVAL_CHAR
+    TKVAL_FLOAT
 };
 
 struct ryL_Token {
@@ -32,15 +31,13 @@ struct ryL_Token {
 };
 
 void ryL_Token_init( struct ryL_Token * tk );
-void ryL_Token_free( struct ryL_Token * tk );
 
 void ryL_Token_set       ( struct ryL_Token * tk, enum ryL_TokenCode code );
 void ryL_Token_set_string( struct ryL_Token * tk, enum ryL_TokenCode code, struct ryU_DynArr * str );
 void ryL_Token_set_int   ( struct ryL_Token * tk, enum ryL_TokenCode code, ryL_int_t intv );
 void ryL_Token_set_float ( struct ryL_Token * tk, enum ryL_TokenCode code, ryL_float_t floatv );
-void ryL_Token_set_char  ( struct ryL_Token * tk, enum ryL_TokenCode code, ryL_char_t charv );
 
-enum ryL_TokenCode ryL_Token_string_to_keyword( const u8 * str, usize len );
+enum ryL_TokenCode ryL_Token_string_to_keyword( const u8 * str, usize len, usize * out_hash );
 
 // 
 // Debug
@@ -60,7 +57,6 @@ enum ryL_TokenValueType ryL_Token_get_value_type( const struct ryL_Token * tk );
 const struct ryU_DynArr * ryL_Token_get_string( const struct ryL_Token * tk );
 ryL_int_t                 ryL_Token_get_int   ( const struct ryL_Token * tk );
 ryL_float_t               ryL_Token_get_float ( const struct ryL_Token * tk );
-ryL_char_t                ryL_Token_get_char  ( const struct ryL_Token * tk );
 
 // 
 // 

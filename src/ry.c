@@ -16,6 +16,7 @@ int main (void) {
         "}"
         "\"this is a string\""
         "\"this is a\\nnl \\tstring \\10 nl 2!!! \\n \\75\\0x55\\0124\\65\\0x53 \\0xFE \""
+        " 0_  "
     );
     ryU_ArrView_set(&srcview, src, ryU_cstr_len(src));
     struct ryU_DynArr srcdyn;

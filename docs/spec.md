@@ -235,7 +235,7 @@ TODO
 **Typer**
 
 String literals of length `1` are considered character literals and are of primitive type `u8`. \
-Otherwise their type is `!*u8`
+Otherwise their type is `*![u8 * N]`, where `N` is the length of the string literal.
 
 **Examples**
 

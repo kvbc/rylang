@@ -3,8 +3,10 @@
 
 #include "../ry.h"
 #include "arr.h"
+#include <stdarg.h>
 
 void ryU_str_format( struct ryU_Arr * out_str, const u8 * fmt, ... );
+void ryU_str_vformat( struct ryU_Arr * out_str, const u8 * fmt, va_list args );
 
 // cstr
 

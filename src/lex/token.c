@@ -65,10 +65,6 @@ static usize kwcode_to_strhash (enum ryL_TokenCode code) {
     return code_hashes[idx];
 }
 
-static struct ryU_DynArr * Token_get_string( struct ryL_Token * tk ) {
-    return (struct ryU_DynArr *)ryL_Token_get_string((const struct ryL_Token *)tk);
-}
-
 #pragma endregion
 // 
 // Public
@@ -80,49 +76,37 @@ void ryL_Token_init( struct ryL_Token * tk ) {
     tk->_value_type = TKVAL_NONE;
 }
 
-void ryL_Token_free( struct ryL_Token * tk ) {
-    if( tk->_value_type == TKVAL_STRING )
-        ryU_DynArr_free(Token_get_string(tk));
-}
-
 // set
 #pragma region set
 
 void ryL_Token_set( struct ryL_Token * tk, enum ryL_TokenCode code ) {
-    ryL_Token_free(tk);
     tk->_code = code;
     tk->_value_type = TKVAL_NONE;
 }
 void ryL_Token_set_string( struct ryL_Token * tk, enum ryL_TokenCode code, struct ryU_DynArr * str ) {
-    ryL_Token_free(tk);
     tk->_code = code;
     tk->_value_type = TKVAL_STRING;
     tk->_value.str = str;
 }
 void ryL_Token_set_int( struct ryL_Token * tk, enum ryL_TokenCode code, ryL_int_t intv ) {
-    ryL_Token_free(tk);
     tk->_code = code;
     tk->_value_type = TKVAL_INT;
     tk->_value.intv = intv;
 }
 void ryL_Token_set_float( struct ryL_Token * tk, enum ryL_TokenCode code, ryL_float_t floatv ) {
-    ryL_Token_free(tk);
     tk->_code = code;
     tk->_value_type = TKVAL_FLOAT;
     tk->_value.floatv = floatv;
-}
-void ryL_Token_set_char( struct ryL_Token * tk, enum ryL_TokenCode code, ryL_char_t charv ) {
-    ryL_Token_free(tk);
-    tk->_code = code;
-    tk->_value_type = TKVAL_CHAR;
-    tk->_value.charv = charv;
 }
 
 #pragma endregion set
 // 
 
-enum ryL_TokenCode ryL_Token_string_to_keyword (const u8 * str, usize len) {
+enum ryL_TokenCode ryL_Token_string_to_keyword (const u8 * str, usize len, usize * out_hash) {
+    RY_ASSERT(str);
     usize strhash = ryU_cstr_hash(str, len);
+    if( out_hash != NULL )
+        *out_hash = strhash;
     for(
         enum ryL_TokenCode kwcode = (enum ryL_TokenCode)(TK__KW_FIRST + 1);
         kwcode < TK__KW_LAST;
@@ -248,10 +232,6 @@ ryL_int_t ryL_Token_get_int( const struct ryL_Token * tk ) {
 ryL_float_t ryL_Token_get_float( const struct ryL_Token * tk ) {
     RY_ASSERT(tk->_value_type == TKVAL_FLOAT);
     return tk->_value.floatv;
-}
-ryL_char_t ryL_Token_get_char( const struct ryL_Token * tk ) {
-    RY_ASSERT(tk->_value_type == TKVAL_CHAR);
-    return tk->_value.charv;
 }
 
 #pragma endregion
