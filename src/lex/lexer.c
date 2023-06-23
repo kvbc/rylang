@@ -260,20 +260,32 @@ static void lex_name( struct ryL_Lexer * lex, struct ryL_Token * out_tk ) {
 
     usize namelen = Lexer_srcptr(lex) - name + 1;
 
-    usize namehash;
-    enum ryL_TokenCode kwcode = ryL_Token_string_to_keyword(name, namelen, &namehash);
+    struct ryU_ArrView * name_view = ryL_Strings_get_next_view(&lex->_strings);
+    ryU_ArrView_init(name_view, sizeof(ryL_char_t));
+    ryU_ArrView_set(name_view, name, namelen);
+    struct ryU_DynArr * name_dyn = ryL_Strings_get_next_dyn(&lex->_strings);
+    ryU_DynArr_init_view(name_dyn, name_view);
+    bool pop = true;
+
+    enum ryL_TokenCode kwcode = ryL_Token_string_to_keyword(name_dyn, &lex->_strings);
     if( kwcode == TK_NONE ) {
-        struct ryU_DynArr * dyn = ryL_Strings_get_dyn(&lex->_strings, namehash);
-        if( dyn == NULL ) {
-            struct ryU_ArrView * view = ryL_Strings_get_next_view(&lex->_strings);
-            ryU_ArrView_init(view, sizeof(ryL_char_t));
-            ryU_ArrView_set(view, name, namelen);
-            dyn = ryL_Strings_get_next_dyn(&lex->_strings);
-            ryU_DynArr_init_view(dyn, view);
+        const struct ryU_DynArr * tk_dyn = name_dyn;
+        const struct ryU_DynArr * cached_dyn = ryL_Strings_get_dyn(
+            &lex->_strings,
+            ryL_Strings_get_hash(&lex->_strings, name_dyn)
+        );
+        if( cached_dyn == NULL ) {
+            pop = false; // use name_dyn for tk_dyn
         }
-        ryL_Token_set_string(out_tk, TK_NAME, dyn);
+        else tk_dyn = cached_dyn;
+        ryL_Token_set_string(out_tk, TK_NAME, tk_dyn);
     }
     else ryL_Token_set(out_tk, kwcode);
+
+    if( pop ) {
+        ryL_Strings_pop_view(&lex->_strings);
+        ryL_Strings_pop_dyn(&lex->_strings);
+    }
 }
 
 // 

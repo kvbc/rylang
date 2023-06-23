@@ -7,6 +7,7 @@
 #include "lexer.h"
 #include "lex.h"
 #include "token_code.h"
+#include "lex_strings.h"
 
 // 
 // [Public]
@@ -22,7 +23,7 @@ enum ryL_TokenValueType {
 struct ryL_Token {
     enum ryL_TokenCode _code;
     union {
-        struct ryU_DynArr * str;
+        const struct ryU_DynArr * str;
         ryL_int_t intv;
         ryL_float_t floatv;
         ryL_char_t charv;
@@ -33,11 +34,11 @@ struct ryL_Token {
 void ryL_Token_init( struct ryL_Token * tk );
 
 void ryL_Token_set       ( struct ryL_Token * tk, enum ryL_TokenCode code );
-void ryL_Token_set_string( struct ryL_Token * tk, enum ryL_TokenCode code, struct ryU_DynArr * str );
+void ryL_Token_set_string( struct ryL_Token * tk, enum ryL_TokenCode code, const struct ryU_DynArr * str );
 void ryL_Token_set_int   ( struct ryL_Token * tk, enum ryL_TokenCode code, ryL_int_t intv );
 void ryL_Token_set_float ( struct ryL_Token * tk, enum ryL_TokenCode code, ryL_float_t floatv );
 
-enum ryL_TokenCode ryL_Token_string_to_keyword( const u8 * str, usize len, usize * out_hash );
+enum ryL_TokenCode ryL_Token_string_to_keyword( const struct ryU_DynArr * str, struct ryL_Strings * strings );
 
 // 
 // Debug

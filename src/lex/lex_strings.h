@@ -13,10 +13,15 @@ struct ryL_Strings {
 void ryL_Strings_init( struct ryL_Strings * strs );
 void ryL_Strings_free( struct ryL_Strings * strs );
 // getters
-struct ryU_DynArr * ryL_Strings_get_dyn( struct ryL_Strings * strs, usize hash );
+const struct ryU_DynArr * ryL_Strings_get_dyn ( struct ryL_Strings * strs, usize hash );
+usize                     ryL_Strings_get_hash( struct ryL_Strings * strs, const struct ryU_DynArr * dyn );
 // getters : next
 struct ryU_Arr     * ryL_Strings_get_next_str ( struct ryL_Strings * strs );
 struct ryU_ArrView * ryL_Strings_get_next_view( struct ryL_Strings * strs );
 struct ryU_DynArr  * ryL_Strings_get_next_dyn ( struct ryL_Strings * strs );
+// pop
+void ryL_Strings_pop_str ( struct ryL_Strings * strs );
+void ryL_Strings_pop_view( struct ryL_Strings * strs );
+void ryL_Strings_pop_dyn ( struct ryL_Strings * strs );
 
 #endif // RYL_STRINGS_H

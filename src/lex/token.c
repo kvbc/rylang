@@ -83,7 +83,7 @@ void ryL_Token_set( struct ryL_Token * tk, enum ryL_TokenCode code ) {
     tk->_code = code;
     tk->_value_type = TKVAL_NONE;
 }
-void ryL_Token_set_string( struct ryL_Token * tk, enum ryL_TokenCode code, struct ryU_DynArr * str ) {
+void ryL_Token_set_string( struct ryL_Token * tk, enum ryL_TokenCode code, const struct ryU_DynArr * str ) {
     tk->_code = code;
     tk->_value_type = TKVAL_STRING;
     tk->_value.str = str;
@@ -102,11 +102,9 @@ void ryL_Token_set_float( struct ryL_Token * tk, enum ryL_TokenCode code, ryL_fl
 #pragma endregion set
 // 
 
-enum ryL_TokenCode ryL_Token_string_to_keyword (const u8 * str, usize len, usize * out_hash) {
+enum ryL_TokenCode ryL_Token_string_to_keyword (const struct ryU_DynArr * str, struct ryL_Strings * strings) {
     RY_ASSERT(str);
-    usize strhash = ryU_cstr_hash(str, len);
-    if( out_hash != NULL )
-        *out_hash = strhash;
+    usize strhash = ryL_Strings_get_hash(strings, str);
     for(
         enum ryL_TokenCode kwcode = (enum ryL_TokenCode)(TK__KW_FIRST + 1);
         kwcode < TK__KW_LAST;

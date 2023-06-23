@@ -1,13 +1,14 @@
 #include "arr.h"
 #include "dyn_arr.h"
 #include "arr_view.h"
+#include "str.h"
 #include <stdio.h>
 
 // 
 // 
 // 
 
-static inline void * Arr_unsafe_get( struct ryU_Arr * arr, usize idx ) {
+static inline void * Arr_unsafe_get( const struct ryU_Arr * arr, usize idx ) {
     RY_ASSERT(arr);
     RY_ASSERT(idx <= arr->_len); // <= !
     return (u8*)arr->_buf + (idx * arr->_itemsz);
@@ -56,6 +57,17 @@ void * ryU_Arr_next( struct ryU_Arr * arr ) {
     else
         arr->_len++;
     return Arr_top(arr);
+}
+
+// pop
+
+void * ryU_Arr_pop( struct ryU_Arr * arr ) {
+    RY_ASSERT(arr);
+    if( arr->_len == 0 )
+        return NULL;
+    void * top = ryU_Arr_get_top(arr);
+    arr->_len--;
+    return top;
 }
 
 // 
@@ -108,7 +120,7 @@ void ryU_Arr_push_dyn( struct ryU_Arr * arr, const struct ryU_DynArr * dyn ) {
 // Modify
 // 
 
-void * ryU_Arr_get( struct ryU_Arr * arr, usize idx ) {
+void * ryU_Arr_get( const struct ryU_Arr * arr, usize idx ) {
     RY_ASSERT(arr);
     RY_ASSERT(idx < arr->_len);
     return Arr_unsafe_get(arr, idx);
@@ -196,4 +208,10 @@ usize ryU_Arr_get_itemsz( const struct ryU_Arr * arr ) {
 
 const void * ryU_Arr_get_buf( const struct ryU_Arr * arr ) {
     return arr->_buf;
+}
+
+void * ryU_Arr_get_top( const struct ryU_Arr * arr ) {
+    RY_ASSERT(arr);
+    RY_ASSERT(arr->_len > 0);
+    return ryU_Arr_get(arr, arr->_len - 1);
 }

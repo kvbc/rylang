@@ -24,6 +24,9 @@ void ryU_Arr_free( struct ryU_Arr * arr );
 
 void * ryU_Arr_next( struct ryU_Arr * arr );
 
+// pop
+void * ryU_Arr_pop( struct ryU_Arr * arr );
+
 // push
 void ryU_Arr_push     ( struct ryU_Arr * arr, const void * data );
 void ryU_Arr_push_buf ( struct ryU_Arr * arr, const void * buf, usize len );
@@ -33,7 +36,7 @@ void ryU_Arr_push_dyn ( struct ryU_Arr * arr, const struct ryU_DynArr * in_arr )
 
 // modify
 void   ryU_Arr_clear( struct ryU_Arr * arr );
-void * ryU_Arr_get  ( struct ryU_Arr * arr, usize idx );
+void * ryU_Arr_get  ( const struct ryU_Arr * arr, usize idx );
 
 // move into
 void ryU_Arr_move_buf( struct ryU_Arr * out_arr, void * buf, usize len );
@@ -50,6 +53,7 @@ usize        ryU_Arr_get_cap   ( const struct ryU_Arr * arr );
 usize        ryU_Arr_get_len   ( const struct ryU_Arr * arr );
 usize        ryU_Arr_get_itemsz( const struct ryU_Arr * arr );
 const void * ryU_Arr_get_buf   ( const struct ryU_Arr * arr );
+void *       ryU_Arr_get_top   ( const struct ryU_Arr * arr );
 
 // 
 // 
