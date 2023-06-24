@@ -133,11 +133,11 @@ __Big_Word__
 
 **Syntax**
 
-| Tag                                  | Syntax                                                                | Comment             |
-| ------------------------------------ | --------------------------------------------------------------------- | ------------------- |
-| \<comment>                           | `// {<src_char>} [<new_line>]` where `<src_char>` is not `<new_line>` | Single-line comment |
-| \<comment>                           | `/* {<src_char>} */`                                                  | Multi-line comment  |
-| &emsp; \<src_char>, <br> \<new_line> | See [Lexical Analysis](#lexical-analysis)                             |
+| Tag                                         | Syntax                                                                | Comment             |
+| ------------------------------------------- | --------------------------------------------------------------------- | ------------------- |
+| \<comment>                                  | `// {<src_char>} [<new_line>]` where `<src_char>` is not `<new_line>` | Single-line comment |
+| \<comment>                                  | `/* {<src_char>} */`                                                  | Multi-line comment  |
+| &emsp; \<src_char>, <br> &emsp; \<new_line> | See [Lexical Analysis](#lexical-analysis)                             |
 
 **Context**
 

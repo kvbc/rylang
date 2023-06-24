@@ -240,10 +240,10 @@ static void Lexer_advance( struct ryL_Lexer * lex ) {
 
 #pragma endregion // [Static]
 // 
-// Lexer : name
+// Lexer : lex : name
 // 
 
-static void lex_name( struct ryL_Lexer * lex, struct ryL_Token * out_tk ) {
+static void Lexer_lex_name( struct ryL_Lexer * lex, struct ryL_Token * out_tk ) {
     char c = Lexer_read(lex);
     RY_ASSERT(is_name_start_char(c)); // starts on name
 
@@ -289,7 +289,7 @@ static void lex_name( struct ryL_Lexer * lex, struct ryL_Token * out_tk ) {
 }
 
 // 
-// Lexer : number
+// Lexer : lex : number
 // 
 
 static ryL_int_t lex_number__base(
@@ -366,6 +366,10 @@ static ryL_int_t lex_number( struct ryL_Lexer * lex ) {
     // dec
     return lex_number__base(lex, 10, &is_char_decimal_digit, &char_to_decimal_digit);
 }
+
+// 
+// Lexer : lex : string
+// 
 
 static struct ryL_Token lex_string( struct ryL_Lexer * lex ) {
     {
@@ -461,9 +465,7 @@ static struct ryL_Token lex_string( struct ryL_Lexer * lex ) {
 }
 
 // 
-// 
-// 
-// 
+// Lexer 
 // 
 
 void ryL_Lexer_init( struct ryL_Lexer * out_lex, struct ryU_DynArr * id, struct ryU_DynArr * src ) {
@@ -543,7 +545,7 @@ void ryL_Lexer_lex( struct ryL_Lexer * lex ) {
             default:
             default_lbl:
                 if( is_name_start_char(c) ) {
-                    lex_name(lex, &tk);
+                    Lexer_lex_name(lex, &tk);
                 }
                 else if( c == '"' ) {
                     tk = lex_string(lex);

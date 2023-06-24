@@ -8,7 +8,7 @@
 #include <limits.h>
 
 // 
-// Static
+// [Static]
 // 
 #pragma region
 
@@ -67,9 +67,9 @@ static usize kwcode_to_strhash (enum ryL_TokenCode code) {
 
 #pragma endregion
 // 
-// Public
+// [Public]
 // 
-#pragma region public
+#pragma region
 
 void ryL_Token_init( struct ryL_Token * tk ) {
     tk->_code = TK_NONE;
@@ -77,7 +77,6 @@ void ryL_Token_init( struct ryL_Token * tk ) {
 }
 
 // set
-#pragma region set
 
 void ryL_Token_set( struct ryL_Token * tk, enum ryL_TokenCode code ) {
     tk->_code = code;
@@ -99,7 +98,6 @@ void ryL_Token_set_float( struct ryL_Token * tk, enum ryL_TokenCode code, ryL_fl
     tk->_value.floatv = floatv;
 }
 
-#pragma endregion set
 // 
 
 enum ryL_TokenCode ryL_Token_string_to_keyword (const struct ryU_DynArr * str, struct ryU_Strings * strings) {
@@ -117,10 +115,8 @@ enum ryL_TokenCode ryL_Token_string_to_keyword (const struct ryU_DynArr * str, s
     return TK_NONE;
 }
 
-#pragma endregion
-// 
-// Debug
-// 
+// debug
+
 #ifdef RY_DEBUG
 
 void ryL_Token_to_string( struct ryL_Token * tk, struct ryU_ArrView * out_strview, struct ryU_Arr * out_str, bool * out_is_view ) {
@@ -204,10 +200,8 @@ void ryL_Token_to_string( struct ryL_Token * tk, struct ryU_ArrView * out_strvie
 }
 
 #endif
-// 
-// Getters
-// 
-#pragma region
+
+// getters
 
 enum ryL_TokenCode ryL_Token_get_code( const struct ryL_Token * tk ) {
     return tk->_code;
