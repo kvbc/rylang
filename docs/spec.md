@@ -2,15 +2,14 @@
 
 Other Languages
 
+-   [ ] [Go](https://go.dev/ref/spec)
 -   [x] [Zig](https://ziglang.org/documentation/master/)
--   [ ] [D](https://dlang.org/spec/spec.html)
-
--   [ ] [R](https://cran.r-project.org/doc/manuals/r-release/R-lang.pdf)
+-   [x] [Haxe](https://haxe.org/manual/introduction.html)
+-   [ ] [Nim](https://nim-lang.org/docs/manual.html)
 -   [x] [Odin](https://odin-lang.org/docs/overview/) - no spec
 -   [x] [Rust](https://doc.rust-lang.org/reference/index.html)
--   [ ] [Go](https://go.dev/ref/spec)
--   [ ] [Nim](https://nim-lang.org/docs/manual.html)
--   [ ] [Haxe](https://haxe.org/manual/introduction.html)
+-   [ ] [D](https://dlang.org/spec/spec.html)
+-   [ ] [R](https://cran.r-project.org/doc/manuals/r-release/R-lang.pdf)
 
 ---
 
