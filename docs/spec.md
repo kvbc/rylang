@@ -173,6 +173,13 @@ comment
 | &emsp; \<hex_digit>         | `(0 - 9)                          | (a - z)                     | (A - Z)` | Hexadecimal digit      |
 | \<integer>                  | `0o 0-7 {[_]0-7}`                 | Octal integer literal       |
 
+**Implementation**
+
+| Error                     | Example              |
+| ------------------------- | -------------------- |
+| Trailing Number Separator | `_3`, `5_`           |
+| Unfinished Number Literal | `0x<eof>`, `0o<eof>` |
+
 **Examples**
 
 ```rust

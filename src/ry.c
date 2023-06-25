@@ -11,13 +11,16 @@ int main (void) {
     struct ryU_ArrView srcview;
     ryU_ArrView_init(&srcview, sizeof(u8));
     const u8 * src = ryU_cstr(
-        "if( x == 3 ) {"
-        "   break;"
-        "}"
-        "\"this is a string\""
-        "\"this is a\\nnl \\tstring \\10 nl 2!!! \\n \\75\\0x55\\0124\\65\\0x53 \\0xFE \""
-        " 0_  "
+        "if( x == 3 ) { \n"
+        "   break; \n"
+        "} \n"
+        "\"this is a string\" \n"
+        "\"this is a\\nnl \\tstring \\10 nl 2!!! \\n \\75\\0x55\\0124\\65\\0x53 \\0xFE \" \n"
+        " 0  \n"
+        "weird \n"
+        " \" string ... \\0xFFFF \" huh? "
     );
+    printf("%s\n-----------------\n", (const char *)src);
     ryU_ArrView_set(&srcview, src, ryU_cstr_len(src));
     struct ryU_DynArr srcdyn;
     ryU_DynArr_init_view(&srcdyn, &srcview);

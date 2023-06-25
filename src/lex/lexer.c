@@ -37,7 +37,7 @@ enum LexerMsgCode {
     MSG_ESC_SEQ_OVERFLOW,
     
     MSG_TRAILING_NUMBER_SEPARATOR,
-    MSG_MALFORMED_NUMBER_LITERAL,
+    MSG_UNFINISHED_NUMBER_LITERAL,
 
     MSG__LAST
 };
@@ -66,13 +66,14 @@ static void LexerMsg_init( struct LexerMsg * msg, struct ryU_Strings * strings, 
         case MSG_UNFINISHED_STRING:         lit = "unfinished string literal";   break;
         case MSG_UNDEFINED_ESC_EQ:          lit = "undefined escape sequence";   break;
         case MSG_TRAILING_NUMBER_SEPARATOR: lit = "trailing number separator";   break;
-        case MSG_MALFORMED_NUMBER_LITERAL:  lit = "malformed number literal";    break;
+        case MSG_UNFINISHED_NUMBER_LITERAL: lit = "unfinished number literal";   break;
         case MSG_ESC_SEQ_OVERFLOW: {
             va_list args;
             va_start(args, pos);
 
             RY_ASSERT(str == NULL);
             str = ryU_Strings_push_str(strings);
+            ryU_Arr_init(str, sizeof(u8));
             ryU_str_vformat(str,
                 ryU_cstr("escape sequence is out of bounds: \\\\(%u / 0x%X / 0%o) is not in range (%d, %d / 0x%X / 0%o)"),
                 args
@@ -274,6 +275,7 @@ static void Lexer_lex_name( struct ryL_Lexer * lex, struct ryL_Token * out_tk ) 
             &lex->_strings,
             ryU_Strings_get_hash(&lex->_strings, name_dyn)
         );
+        printf("we got \"%.*s\", cached_dyn = %p\n", namelen, name, cached_dyn);
         if( cached_dyn == NULL ) {
             pop = false; // use name_dyn for tk_dyn
         }
@@ -282,6 +284,7 @@ static void Lexer_lex_name( struct ryL_Lexer * lex, struct ryL_Token * out_tk ) 
     }
     else ryL_Token_set(out_tk, kwcode);
 
+    printf("we got \"%.*s\", pop = %d\n", namelen, name, pop);
     if( pop ) {
         ryU_Strings_pop_view(&lex->_strings);
         ryU_Strings_pop_dyn(&lex->_strings);
@@ -289,10 +292,10 @@ static void Lexer_lex_name( struct ryL_Lexer * lex, struct ryL_Token * out_tk ) 
 }
 
 // 
-// Lexer : lex : number
+// Lexer : lex : int
 // 
 
-static ryL_int_t lex_number__base(
+static ryL_int_t Lexer_lex_int__base(
     struct ryL_Lexer * lex,
     size_t base,
     bool (* is_valid_char) (char c),
@@ -329,7 +332,8 @@ static ryL_int_t lex_number__base(
 
     return num;
 }
-static ryL_int_t lex_number( struct ryL_Lexer * lex ) {
+
+static ryL_int_t Lexer_lex_number( struct ryL_Lexer * lex ) {
     char c1 = Lexer_read(lex);
 
     if( c1 == RYL_NUMLIT_SEP_CHAR ) {
@@ -349,29 +353,35 @@ static ryL_int_t lex_number( struct ryL_Lexer * lex ) {
             Lexer_advance(lex);
             if( Lexer_is_eof(lex) ) {
                 struct LexerMsg info;
-                LexerMsg_init(&info, &lex->_strings, MSG_MALFORMED_NUMBER_LITERAL, lex->_pos);
+                LexerMsg_init(&info, &lex->_strings, MSG_UNFINISHED_NUMBER_LITERAL, lex->_pos);
                 ryU_Arr_push(&lex->_msgs, &info);
                 return -1;
             }
 
             if( c2 == 'x' ) // hex
-                return lex_number__base(lex, 16, &is_char_hex_digit, &char_to_hex_digit); 
+                return Lexer_lex_int__base(lex, 16, &is_char_hex_digit, &char_to_hex_digit); 
             else if( c2 == 'b' ) // bin
-                return lex_number__base(lex, 2, &is_char_binary_digit, &char_to_binary_digit);            
+                return Lexer_lex_int__base(lex, 2, &is_char_binary_digit, &char_to_binary_digit);            
             else if( c2 == 'o' ) // oct
-                return lex_number__base(lex, 8, &is_char_oct_digit, &char_to_oct_digit);
+                return Lexer_lex_int__base(lex, 8, &is_char_oct_digit, &char_to_oct_digit);
         }
     }
     
     // dec
-    return lex_number__base(lex, 10, &is_char_decimal_digit, &char_to_decimal_digit);
+    ryL_int_t num = Lexer_lex_int__base(lex, 10, &is_char_decimal_digit, &char_to_decimal_digit);
+
+    if( Lexer_read(lex) == '.' ) {
+
+    }
+
+    return num;
 }
 
 // 
 // Lexer : lex : string
 // 
 
-static struct ryL_Token lex_string( struct ryL_Lexer * lex ) {
+static struct ryL_Token Lexer_lex_string( struct ryL_Lexer * lex ) {
     {
         char c = Lexer_read(lex);
         RY_ASSERT(c == '"');
@@ -408,7 +418,7 @@ static struct ryL_Token lex_string( struct ryL_Lexer * lex ) {
                 case '\\': esc = '\\'; break;
                 default:
                     if( is_char_decimal_digit(nc) ) {
-                        ryL_int_t num = lex_number(lex);
+                        ryL_int_t num = Lexer_lex_number(lex);
                         if( (num < RYL_CHAR_MIN) || (num > RYL_CHAR_MAX) ) {
                             struct LexerMsg info;
                             LexerMsg_init(&info, &lex->_strings, MSG_ESC_SEQ_OVERFLOW, lex->_pos, num);
@@ -548,10 +558,10 @@ void ryL_Lexer_lex( struct ryL_Lexer * lex ) {
                     Lexer_lex_name(lex, &tk);
                 }
                 else if( c == '"' ) {
-                    tk = lex_string(lex);
+                    tk = Lexer_lex_string(lex);
                 }
                 else if( is_char_decimal_digit(c) ) {
-                    ryL_Token_set_int(&tk, TK_INT, lex_number(lex));
+                    ryL_Token_set_int(&tk, TK_INT, Lexer_lex_number(lex));
                 }
                 else {
                     ryL_Token_set(&tk, ryL_TokenCode_from_char(c));
