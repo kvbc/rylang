@@ -36,46 +36,47 @@ Consider
 
 Table of Contents
 
-| Chapter                                                                     | Syntax | Implemented | Description                                    |
-| --------------------------------------------------------------------------- | :----: | :---------: | ---------------------------------------------- |
-| 1. [Lexical Analysis](#lexical-analysis)                                    |   ✔️   |     N/A     | Grouping characters into tokens                |
-| &emsp; 1.1. [Names](#names)                                                 |   ✔️   |     ✔️      |
-| &emsp; 1.2. [Comments](#comments)                                           |   ✔️   |     ❌      |
-| &emsp; 1.3. [Literals](#literals)                                           |   ✔️   |     N/A     |
-| &emsp; &emsp; 1.3.1. [Integer Literals](#integer-literals)                  |   ✔️   |     ✔️      |
-| &emsp; &emsp; 1.3.2. [Float Literals](#float-literals)                      |   ✔️   |     ❌      |
-| &emsp; &emsp; 1.3.3. [String & Character Literals](#string-n-char-literals) |   ✔️   |     ❌      |
-| &emsp; &emsp; 1.3.4. [Struct Literals](#lexical-struct-literals)            |  N/A   |     N/A     |
-| &emsp; 1.4. [Keywords](#keywords)                                           |   ✔️   |     ✔️      |
-| &emsp; 1.5. [Operators](#lexical-operators)                                 |  N/A   |     ✔️      |
-| &emsp; 1.6. [Tokens](#tokens)                                               |  N/A   |     N/A     |
-| &emsp; &emsp; &emsp; &nbsp;**Parsing and**                                  |        |             | Grouping tokens into untyped AST nodes         |
-| &emsp; &emsp; **Semantic Analysis**                                         |        |             | Analyzing untyped AST nodes                    |
-| 1.9. [Struct Literals](#parsing-struct-literals)                            |   ✔️   |     ❌      |
-| 2. [Variables](#variables)                                                  |   ✔️   |     ❌      |
-| 3. [Operators](#operators)                                                  |   ✔️   |     ❌      |
-| &emsp; 3.1. [Arithmetic Operators](#arithmetic-operators)                   |   ✔️   |     ❌      |
-| &emsp; 3.2. [Bitwise Operators](#bitwise-operators)                         |   ✔️   |     ❌      |
-| &emsp; 3.3. [Comparison Operators](#comparison-operators)                   |   ✔️   |     ❌      |
-| &emsp; 3.4. [Logical Operators](#logical-operators)                         |   ✔️   |     ❌      |
-| &emsp; 3.5. [Other Operators](#other-operators)                             |   ✔️   |     ❌      |
-| 4. [Expressions](#expressions)                                              |   〰️   |     ❌      |
-| &emsp; 4.1. [Block](#block) (& `break`)                                     |   ✔️   |     ❌      |
-| &emsp; 4.2. [Control Flow](#control-flow)                                   |   ✔️   |     ❌      |
-| &emsp; &emsp; 4.2.1. [If / Elif / Else](#if-elif-else)                      |   ✔️   |     ❌      |
-| &emsp; &emsp; 4.2.2. [Loop](#loop)                                          |   ✔️   |     ❌      |
-| &emsp; &emsp; &emsp; 4.2.2.1. [Continue](#continue)                         |   ✔️   |     ❌      |
-| &emsp; 4.3. [Compile-time Expressions](#compile-time-expressions)           |   ❌   |     ❌      |
-| 5. [Statements](#statements)                                                |   〰️   |     ❌      |
-| 6. [Metadata](#metadata)                                                    |   ✔️   |     ❌      |
-| &emsp; &emsp; &emsp; &emsp; **Typing**                                      |        |             | "Typing" the untyped AST nodes                 |
-| 7. [Types](#types)                                                          |        |     ❌      |
-| &emsp; 7.1. [Primitives](#primitives)                                       |        |     ❌      |
-| &emsp; 7.2. [Function Type](#function-type)                                 |        |     ❌      |
-| &emsp; 7.3. [Struct Type](#struct-type)                                     |        |     ❌      |
-| &emsp; &emsp; &emsp; &emsp; **Transpilation**                               |        |             | Transpiling typed AST nodes into C source code |
-| &ensp; &ensp; &nbsp; **Compile-time Evaluation**                            |        |             | JIT compile-time expression evaluation         |
-| 8. [Macros](#macros)                                                        |   ❌   |     ❌      |
+| Chapter                                                           | Syntax | Implemented | Description                                    |
+| ----------------------------------------------------------------- | :----: | :---------: | ---------------------------------------------- |
+| 1. [Lexical Analysis](#lexical-analysis)                          |   ✔️   |     N/A     | Grouping characters into tokens                |
+| &emsp; 1.1. [Names](#names)                                       |   ✔️   |     ✔️      |
+| &emsp; 1.2. [Comments](#comments)                                 |   ✔️   |     ❌      |
+| &emsp; 1.3. [Literals](#literals)                                 |   ✔️   |     N/A     |
+| &emsp; &emsp; 1.3.1. [Integer Literals](#integer-literals)        |   ✔️   |     ✔️      |
+| &emsp; &emsp; 1.3.2. [Float Literals](#float-literals)            |   ✔️   |     ❌      |
+| &emsp; &emsp; 1.3.3. [String Literals](#string-literals)          |   ✔️   |     ❌      |
+| &emsp; &emsp; 1.3.4. [Struct Literals](#lexical-struct-literals)  |  N/A   |     N/A     |
+| &emsp; &emsp; 1.3.5. [Character Literals](#char-literals)         |   ❌   |     ❌      |
+| &emsp; 1.4. [Keywords](#keywords)                                 |   ✔️   |     ✔️      |
+| &emsp; 1.5. [Operators](#lexical-operators)                       |  N/A   |     ✔️      |
+| &emsp; 1.6. [Tokens](#tokens)                                     |  N/A   |     N/A     |
+| &emsp; &emsp; &emsp; &nbsp;**Parsing and**                        |        |             | Grouping tokens into untyped AST nodes         |
+| &emsp; &emsp; **Semantic Analysis**                               |        |             | Analyzing untyped AST nodes                    |
+| 1.9. [Struct Literals](#parsing-struct-literals)                  |   ✔️   |     ❌      |
+| 2. [Variables](#variables)                                        |   ✔️   |     ❌      |
+| 3. [Operators](#operators)                                        |   ✔️   |     ❌      |
+| &emsp; 3.1. [Arithmetic Operators](#arithmetic-operators)         |   ✔️   |     ❌      |
+| &emsp; 3.2. [Bitwise Operators](#bitwise-operators)               |   ✔️   |     ❌      |
+| &emsp; 3.3. [Comparison Operators](#comparison-operators)         |   ✔️   |     ❌      |
+| &emsp; 3.4. [Logical Operators](#logical-operators)               |   ✔️   |     ❌      |
+| &emsp; 3.5. [Other Operators](#other-operators)                   |   ✔️   |     ❌      |
+| 4. [Expressions](#expressions)                                    |   〰️   |     ❌      |
+| &emsp; 4.1. [Block](#block) (& `break`)                           |   ✔️   |     ❌      |
+| &emsp; 4.2. [Control Flow](#control-flow)                         |   ✔️   |     ❌      |
+| &emsp; &emsp; 4.2.1. [If / Elif / Else](#if-elif-else)            |   ✔️   |     ❌      |
+| &emsp; &emsp; 4.2.2. [Loop](#loop)                                |   ✔️   |     ❌      |
+| &emsp; &emsp; &emsp; 4.2.2.1. [Continue](#continue)               |   ✔️   |     ❌      |
+| &emsp; 4.3. [Compile-time Expressions](#compile-time-expressions) |   ❌   |     ❌      |
+| 5. [Statements](#statements)                                      |   〰️   |     ❌      |
+| 6. [Metadata](#metadata)                                          |   ✔️   |     ❌      |
+| &emsp; &emsp; &emsp; &emsp; **Typing**                            |        |             | "Typing" the untyped AST nodes                 |
+| 7. [Types](#types)                                                |        |     ❌      |
+| &emsp; 7.1. [Primitives](#primitives)                             |        |     ❌      |
+| &emsp; 7.2. [Function Type](#function-type)                       |        |     ❌      |
+| &emsp; 7.3. [Struct Type](#struct-type)                           |        |     ❌      |
+| &emsp; &emsp; &emsp; &emsp; **Transpilation**                     |        |             | Transpiling typed AST nodes into C source code |
+| &ensp; &ensp; &nbsp; **Compile-time Evaluation**                  |        |             | JIT compile-time expression evaluation         |
+| 8. [Macros](#macros)                                              |   ❌   |     ❌      |
 
 ---
 
@@ -218,7 +219,7 @@ _1_    // INVALID
 
 TODO
 
-### 1.3.3. String & Character Literals {#string-n-char-literals}
+### 1.3.3. String Literals {#string-literals}
 
 **Syntax**
 
@@ -230,11 +231,6 @@ TODO
 | \<string_esc_seq>  | `<integer>`                                                                |
 | &emsp; \<src_char> | See [Lexical Analysis](#lexical-analysis)                                  |
 | &emsp; \<integer>  | See [Integer Literals](#integer-literals)                                  |
-
-**Typer**
-
-String literals of length `1` are considered character literals and are of primitive type `u8`. \
-Otherwise their type is `*![u8 * N]`, where `N` is the length of the string literal.
 
 **Examples**
 
@@ -257,14 +253,27 @@ Otherwise their type is `*![u8 * N]`, where `N` is the length of the string lite
     line \
     multi \
 " == "onelinemulti"
-
-char u8 = "x";
 ```
 
 ### 1.3.4. Struct Literals {#lexical-struct-literals}
 
 Struct Literals are not part of the lexing phase.
 See [Struct Literals](#parsing-struct-literals) in **Parsing**.
+
+### 1.3.5. Character Literals {#char-literals}
+
+**Syntax**
+
+| Tag                | Syntax                                                                |
+| ------------------ | --------------------------------------------------------------------- |
+| \<char>            | `' {<src_char> \| \<string_esc_seq>} '` where `<src_char>` is not `\` |
+| &emsp; \<src_char> | See [Lexical Analysis](#lexical-analysis)                             |
+
+**Examples**
+
+```rust
+ch u8 = 'x';
+```
 
 ## 1.4. Keywords {#keywords}
 
