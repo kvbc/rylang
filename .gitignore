@@ -1,0 +1,6 @@
+*.exe
+push.bat
+Makefile
+*.make
+.vs/
+_bin/
