@@ -38,18 +38,38 @@ namespace ry {
         return m_msg;
     }
 
-    std::string Info::Stringify() const {
-        return std::format("[{}:{}]: {}", m_startLn, m_startCol, m_msg);
-    }
+    std::size_t Info::GetStartLineNumber() const { return m_startLn;  }
+    std::size_t Info::GetStartColumn    () const { return m_startCol; }
+    std::size_t Info::GetEndLineNumber  () const { return m_endLn;    }
+    std::size_t Info::GetEndColumn      () const { return m_endCol;   }
 
     // 
 
-    Lexer::Lexer(std::string_view src):
+    Lexer::Lexer(std::string_view id, std::string_view src):
         m_src(src),
+        m_id(id),
         m_srcIdx(0),
         m_col(1),
         m_ln(1)
-    {}
+    {
+        m_lineStartIndices.push_back(0);
+        for(std::size_t i = 0; i < m_src.length();) {
+            char c1 = m_src.at(i);
+            char c2 = (i + 1 < m_src.length()) ? m_src.at(i + 1) : '\0';
+            if(c1 == '\n' || c1 == '\r') {
+                m_lineEndIndices.push_back(i - 1);
+                i++;
+                if(c1 == '\r' && c2 == '\n')
+                    i++;
+                m_lineStartIndices.push_back(i);
+            }
+            else {
+                if(c2 == '\0')
+                    m_lineEndIndices.push_back(i + 1);
+                i++;
+            }
+        }
+    }
 
     std::vector<Token> Lexer::Lex() {
         std::vector<Token> tokens;
@@ -89,10 +109,30 @@ namespace ry {
         return m_infos;
     }
 
+    std::string Lexer::StringifyInfo(const Info& info) const {  
+        std::size_t ln = info.GetStartLineNumber();
+        std::size_t col = info.GetStartColumn();
+        auto startPtr = m_src.data() + m_lineStartIndices[ln - 1];
+        auto endPtr = m_src.data() + m_lineEndIndices[ln - 1];
+        std::string_view line(startPtr, endPtr);
+        std::size_t lnLen = std::floor(std::log10(ln)) + 1;
+        std::size_t leftBarLen = std::max(lnLen, m_id.length());
+        std::string underLine(col - 1, ' ');
+        underLine += '^';
+        underLine += ' ';
+        underLine += info.GetMessage();
+        return std::format(
+            " {:>{}} |\n {:>{}} | {}\n {:>{}} | {}",
+            m_id, leftBarLen,
+            ln, leftBarLen, line,
+            "", leftBarLen, underLine
+        );
+    }
+
     // 
 
-    std::string_view::const_pointer Lexer::getSourcePointer() {
-        return m_src.data() + m_srcIdx;
+    std::string_view::const_pointer Lexer::getSourcePointer(int offset) {
+        return m_src.data() + m_srcIdx + offset;
     }
 
     std::optional<Token> Lexer::tryLexNameOrKeyword() {
@@ -243,7 +283,7 @@ namespace ry {
             intlit_t base = 10;
             const char * baseName = "decimal";
             if(c1=='0' && (c2=='b' || c2=='o' || c2=='x')) {
-                        if(c2 == 'b') { base = 2;  baseName = "binary"; eatChar(2); }
+                     if(c2 == 'b') { base = 2;  baseName = "binary"; eatChar(2); }
                 else if(c2 == 'o') { base = 8;  baseName = "octal";  eatChar(2); }
                 else if(c2 == 'x') { base = 16; baseName = "hex";    eatChar(2); }
                 char c3 = getChar();

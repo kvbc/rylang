@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <cstring>
 
-namespace ry {
+namespace ry {                                                      
 
     Token::Token(Token::Type type):
         m_type(type)

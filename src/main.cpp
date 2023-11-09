@@ -2,7 +2,7 @@
 #include "Lexer.hpp"
 
 int main() {
-    ry::Lexer lexer(
+    ry::Lexer lexer("main.ry",
         "Hello! \n"
         "// Everyone \n"
         "// This is a /*string*/hmm :) \n"
@@ -37,7 +37,7 @@ int main() {
 
         " \"\\078\" \n"
 
-        " 'c' \n"
+        " 'c \n"
         " '\\0x26' \n"
     );
     
@@ -52,5 +52,5 @@ int main() {
 
     std::cout << header << " Info" << std::endl;
     for(const ry::Lexer::Info& info : lexer.GetInfos())
-        std::cout << info.Stringify() << std::endl;
+        std::cout << lexer.StringifyInfo(info) << std::endl << std::endl;
 }

@@ -14,7 +14,7 @@ namespace ry {
         using floatlit_t = double;
 
         // must be in same order as in the Type enum
-        static constexpr const char * KEYWORDS[] = {
+        static constexpr const char * const KEYWORDS[] = {
             "if",    "elif",     "else",
             "loop",  "continue", "break",
             "false", "true",
@@ -59,7 +59,7 @@ namespace ry {
         };
 
         // must be in the same order as the Type enum
-        static constexpr const char * TYPE_STRINGS[] = {
+        static constexpr const char * const TYPE_STRINGS[] = {
             "NAME",
             "INT_LIT",
             "FLOAT_LIT",

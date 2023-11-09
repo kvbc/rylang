@@ -31,8 +31,11 @@ namespace ry {
 
             std::string_view GetMessage() const;
             Level GetLevel() const;
-            
-            std::string Stringify() const;
+
+            std::size_t GetStartLineNumber() const;
+            std::size_t GetStartColumn() const;
+            std::size_t GetEndLineNumber() const;
+            std::size_t GetEndColumn() const;
 
         private:
             std::size_t m_startLn;
@@ -43,17 +46,19 @@ namespace ry {
             Level m_level;
         };
 
-        Lexer(std::string_view src);
+        Lexer(std::string_view id, std::string_view src);
 
         std::vector<Token> Lex();
         std::string_view GetSource() const;
         std::vector<Info> GetInfos() const;
 
+        std::string StringifyInfo(const Info& info) const;
+
     private:
         using intlit_t = Token::intlit_t;
         using floatlit_t = Token::floatlit_t;
 
-        std::string_view::const_pointer getSourcePointer();
+        std::string_view::const_pointer getSourcePointer(int offset = 0);
 
         std::optional<Token> tryLexNameOrKeyword();
         bool tryLexComment();
@@ -68,10 +73,13 @@ namespace ry {
         char getChar(int offset = 0) const;
         void eatChar(std::size_t count = 1);
 
+        std::vector<std::size_t> m_lineStartIndices;
+        std::vector<std::size_t> m_lineEndIndices;
         std::vector<Info> m_infos;
         std::size_t m_col;
         std::size_t m_ln;
         int m_srcIdx;
+        std::string_view m_id;
         std::string_view m_src;
     };
 
