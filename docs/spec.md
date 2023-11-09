@@ -43,7 +43,7 @@ Table of Contents
 | &emsp; 1.2. [Comments](#comments)                                 |   ✔️   |     ✔️      |      ❌       | Single-line and multi-line                         |
 | &emsp; 1.3. [Literals](#literals)                                 |   ✔️   |     N/A     |      N/A      |
 | &emsp; &emsp; 1.3.1. [Integer Literals](#integer-literals)        |   ✔️   |     ✔️      |      ❌       |
-| &emsp; &emsp; 1.3.2. [Float Literals](#float-literals)            |   ✔️   |     ❌      |      ❌       |
+| &emsp; &emsp; 1.3.2. [Float Literals](#float-literals)            |   ✔️   |     ✔️      |      ❌       |
 | &emsp; &emsp; 1.3.3. [String Literals](#string-literals)          |   ✔️   |     ❌      |      ❌       |
 | &emsp; &emsp; 1.3.4. [Struct Literals](#lexical-struct-literals)  |  N/A   |     N/A     |      N/A      |
 | &emsp; &emsp; 1.3.5. [Character Literals](#char-literals)         |   ❌   |     ❌      |      ❌       |
@@ -179,10 +179,10 @@ comment
 
 **Implementation**
 
-| Error                     | Example              |
-| ------------------------- | -------------------- |
+| Error                        | Example                           |
+| ---------------------------- | --------------------------------- |
 | ❗ Unfinished Number Literal | `0x<eof>`, `0o<eof>`, `0x<space>` |
-| ❗ Invalid digit | `0xZ`, `0o99`, `0oAZ` |
+| ❗ Invalid digit             | `0xZ`, `0o99`, `0oAZ`             |
 
 **Examples**
 
@@ -219,12 +219,19 @@ _1_    // INVALID
 
 **Syntax**
 
-| Tag               | Syntax                                    | Comment |
-| ----------------- | ----------------------------------------- | ------- |
+| Tag               | Syntax                                    | Comment  |
+| ----------------- | ----------------------------------------- | -------- |
 | \<float>          | `<dec_int> . <dec_int> [<float_exp>]`     |
 | \<float>          | `<dec_int> <float_exp>`                   |
-| \<float_exp>      | `e\|E +\|- <dec_int>`                     | Exponent
+| \<float_exp>      | `e\|E +\|- <dec_int>`                     | Exponent |
 | &emsp; \<dec_int> | See [Integer Literals](#integer-literals) |
+
+**Implementation**
+
+| Error                       | Example            |
+| --------------------------- | ------------------ |
+| ❗ Unfinished float literal | `3.`, `5.`, `7.`   |
+| ❗ Unfinished exponent      | `3e`, `5e+`, `7e-` |
 
 **Examples**
 

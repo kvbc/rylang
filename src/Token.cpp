@@ -30,7 +30,7 @@ namespace ry {
         assert(m_type == Token::Type::INT_LIT);
     }
 
-    Token::Token(Token::Type type, float value):
+    Token::Token(Token::Type type, floatlit_t value):
         m_type(type),
         m_data({ .floatv = value })
     {
@@ -72,7 +72,7 @@ namespace ry {
         return m_data->intv;
     }
 
-    float Token::GetFloatValue() const {
+    Token::floatlit_t Token::GetFloatValue() const {
         assert(m_type == Token::Type::FLOAT_LIT);
         return m_data->floatv;
     }
@@ -103,13 +103,13 @@ namespace ry {
             std::string str = "";
             intlit_t val = GetIntValue();
             do {
-                str += (val % 10) - '0';
+                str = std::string(1 ,'0' + (val % 10)) + str;
                 val /= 10;
             } while(val > 0);
             return std::string(cstr) + '(' + str + ')';
         }
         if(m_type == Type::FLOAT_LIT)
-            return std::string(cstr) + '(' + std::format("{:.15f}", GetFloatValue()) + ')';
+            return std::string(cstr) + '(' + std::format("{:.14f}", GetFloatValue()) + ')';
         if(m_type == Type::CHAR_LIT)
             return std::string(cstr) + '(' + std::to_string(GetCharValue()) + ')';
         return cstr;

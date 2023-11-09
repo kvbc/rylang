@@ -7,6 +7,7 @@ project "rylang"
     cppdialect "C++20"
     targetdir "_bin/%{cfg.buildcfg}"
     objdir "_bin/%{cfg.buildcfg}"
+    linkoptions { "-static-libgcc -static-libstdc++" }
 
     files {"src/**.cpp"}
 

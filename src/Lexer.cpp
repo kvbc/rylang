@@ -209,7 +209,7 @@ namespace ry {
     }
 
     std::optional<Token> Lexer::tryLexNumber() {
-        auto tryLexInteger = [&]() -> std::optional<std::pair<intlit_t, std::size_t>> {
+        auto tryLexInteger = [&]() -> std::optional<intlit_t> {
             auto isValidDigit = [](char c, int base = 10) -> bool {
                 bool is09 = c >= '0' && c < '0' + base;
                 if(base <= 10)
@@ -224,7 +224,7 @@ namespace ry {
                 intlit_t base = 10;
                 const char * baseName = "decimal";
                 if(c1=='0' && (c2=='b' || c2=='o' || c2=='x')) {
-                        if(c2 == 'b') { base = 2;  baseName = "binary"; eatChar(2); }
+                         if(c2 == 'b') { base = 2;  baseName = "binary"; eatChar(2); }
                     else if(c2 == 'o') { base = 8;  baseName = "octal";  eatChar(2); }
                     else if(c2 == 'x') { base = 16; baseName = "hex";    eatChar(2); }
                     char c3 = getChar();
@@ -273,20 +273,43 @@ namespace ry {
                     num += digit * curBase;
                     curBase *= base;
                 }
-                return {{num, numStr.length()}};
+                return num;
             }
             return {};
         };
-        auto int1pair = tryLexInteger();
-        if(int1pair.has_value()) {
-            if(getChar() == '.') {
-                float num = float(int1pair.value().first);
+        auto tryLexExponent = [&]() -> std::optional<floatlit_t> {
+            char c1 = getChar(0);
+            char c2 = getChar(1);
+            if(c1=='e' || c1=='E') {
                 eatChar();
-                auto int2pair = tryLexInteger();
-                if(int2pair.has_value()) {
-                    intlit_t int2 = int2pair.value().first;
-                    std::size_t int2len = int2pair.value().second;
-                    num += float(int2) / std::pow(10, int2len);
+                floatlit_t e = 1;
+                if(c2=='+' || c2=='-') {
+                    eatChar();
+                    if(c2 == '-')
+                        e *= -1;
+                }
+                auto posE = tryLexInteger();
+                if(posE.has_value())
+                    e = std::pow(10.0, e * posE.value());
+                else
+                    m_infos.push_back(Info(
+                        Info::Level::ERROR,
+                        "Unfinished exponent",
+                        m_ln, m_col
+                    ));
+                return e;
+            }
+            return {};
+        };
+        auto int1 = tryLexInteger();
+        if(int1.has_value()) {
+            if(getChar() == '.') {
+                eatChar();
+                floatlit_t num = floatlit_t(int1.value());
+                auto int2 = tryLexInteger();
+                if(int2.has_value()) {
+                    std::size_t int2len = std::floor(std::log10(floatlit_t(int2.value()))) + 1;
+                    num += floatlit_t(int2.value()) / std::pow(10, int2len);
                 } else {
                      m_infos.push_back(Info(
                         Info::Level::ERROR,
@@ -294,10 +317,13 @@ namespace ry {
                         m_ln, m_col
                      ));
                 }
+                num *= tryLexExponent().value_or(1);
                 return Token(Token::Type::FLOAT_LIT, num);
-            } else {
-                return Token(Token::Type::INT_LIT, int1pair.value().first);
             }
+            std::optional<floatlit_t> exp = tryLexExponent();
+            if(exp.has_value())
+                return Token(Token::Type::FLOAT_LIT, floatlit_t(int1.value()) * exp.value());
+            return Token(Token::Type::INT_LIT, int1.value());
         }
         return {};
     }

@@ -49,6 +49,7 @@ namespace ry {
 
     private:
         using intlit_t = Token::intlit_t;
+        using floatlit_t = Token::floatlit_t;
 
         std::optional<Token> tryLexNameOrKeyword();
         bool tryLexComment();

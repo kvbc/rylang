@@ -3,12 +3,14 @@
 #include <limits.h>
 #include <optional>
 #include <string_view>
+#include <stdint.h>
 
 namespace ry {
 
     class Token {
     public:
         using intlit_t = __uint128_t;
+        using floatlit_t = double;
 
         // must be in same order as in the Type enum
         static constexpr const char * KEYWORDS[] = {
@@ -76,16 +78,16 @@ namespace ry {
         Token(Type type);
         Token(Type type, std::string_view value);
         Token(Type type, intlit_t value);
-        Token(Type type, float value);
+        Token(Type type, floatlit_t value);
         Token(Type type, char value);
 
         static std::optional<Type> GetStringToKeywordType(std::string_view str);
 
         Type GetType() const;
         std::string_view GetStringValue() const;
-        intlit_t GetIntValue  () const;
-        float    GetFloatValue() const;
-        char     GetCharValue () const;
+        intlit_t   GetIntValue  () const;
+        floatlit_t GetFloatValue() const;
+        char       GetCharValue () const;
 
         bool Is(char c) const;
         std::string Stringify() const;
@@ -94,7 +96,7 @@ namespace ry {
         union Data {
             std::string_view string;
             intlit_t intv;
-            float floatv;
+            floatlit_t floatv;
             char charv;
         };
 
