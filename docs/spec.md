@@ -44,9 +44,9 @@ Table of Contents
 | &emsp; 1.3. [Literals](#literals)                                 |   ✔️   |     N/A     |      N/A      |
 | &emsp; &emsp; 1.3.1. [Integer Literals](#integer-literals)        |   ✔️   |     ✔️      |      ❌       |
 | &emsp; &emsp; 1.3.2. [Float Literals](#float-literals)            |   ✔️   |     ✔️      |      ❌       |
-| &emsp; &emsp; 1.3.3. [String Literals](#string-literals)          |   ✔️   |     ❌      |      ❌       |
+| &emsp; &emsp; 1.3.3. [String Literals](#string-literals)          |   ✔️   |     ✔️      |      ❌       |
 | &emsp; &emsp; 1.3.4. [Struct Literals](#lexical-struct-literals)  |  N/A   |     N/A     |      N/A      |
-| &emsp; &emsp; 1.3.5. [Character Literals](#char-literals)         |   ❌   |     ❌      |      ❌       |
+| &emsp; &emsp; 1.3.5. [Character Literals](#char-literals)         |   ✔️   |     ✔️      |      ❌       |
 | &emsp; 1.4. [Keywords](#keywords)                                 |   ✔️   |     ✔️      |      ❌       |
 | &emsp; 1.5. [Operators](#lexical-operators)                       |  N/A   |     ✔️      |      ❌       |
 | &emsp; 1.6. [Tokens](#tokens)                                     |  N/A   |     N/A     |      N/A      |
@@ -241,10 +241,12 @@ TODO
 
 **Syntax**
 
-| Tag                | Syntax                                                                     | Comment                  |
-| ------------------ | -------------------------------------------------------------------------- | ------------------------ |
-| \<string>          | `` ` {<src_char>} ` ``                                                     | Raw string literal       |
-| \<string>          | `" {<src_char> \| \<string_esc_seq>} "`where`<src_char>`is not`\`          | Escapable string literal |
+| Tag                | Syntax                                                                     | Comment                              |
+| ------------------ | -------------------------------------------------------------------------- | ------------------------------------ |
+| \<string>          | `` ` {<src_char>} ` ``                                                     | Single-line raw string literal       |
+| \<string>          | <code>\`\`\` {<src_char>} \`\`\`</code>                                    | Multi-line raw string literal        |
+| \<string>          | `" {<src_char> \| \<string_esc_seq>} "` where `<src_char>` is not `\`      | Single-line escapable string literal |
+| \<string>          | `""" {<src_char> \| \<string_esc_seq>} """` where `<src_char>` is not `\`  | Multi-line escapable string literal  |
 | \<string_esc_seq>  | <code>a \| b \| e \| f \| n \| r \| t \| v \| ` \| \ \| <new_line> </code> |
 | \<string_esc_seq>  | `<integer>`                                                                |
 | &emsp; \<src_char> | See [Lexical Analysis](#lexical-analysis)                                  |
@@ -282,11 +284,11 @@ See [Struct Literals](#parsing-struct-literals) in **Parsing**.
 
 **Syntax**
 
-| Tag                     | Syntax                                                                |
-| ----------------------- | --------------------------------------------------------------------- |
-| \<char>                 | `' {<src_char> \| \<string_esc_seq>} '` where `<src_char>` is not `\` |
-| &emsp; \<src_char>      | See [Lexical Analysis](#lexical-analysis)                             |
-| &emsp; \<string_esc_eq> | See [String Literals](#string-literals)                               |
+| Tag                      | Syntax                                                                |
+| ------------------------ | --------------------------------------------------------------------- |
+| \<char>                  | `' {<src_char> \| \<string_esc_seq>} '` where `<src_char>` is not `\` |
+| &emsp; \<src_char>       | See [Lexical Analysis](#lexical-analysis)                             |
+| &emsp; \<string_esc_seq> | See [String Literals](#string-literals)                               |
 
 **Examples**
 

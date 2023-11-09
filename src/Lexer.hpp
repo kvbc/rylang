@@ -51,11 +51,17 @@ namespace ry {
         using intlit_t = Token::intlit_t;
         using floatlit_t = Token::floatlit_t;
 
+        std::string_view::const_pointer getSourcePointer();
+
         std::optional<Token> tryLexNameOrKeyword();
         bool tryLexComment();
         std::optional<Token> tryLexOperator();
         bool trySkipWhitespace();
+        std::optional<intlit_t> tryLexInteger();
         std::optional<Token> tryLexNumber();
+        std::optional<char> tryLexEscapeSequence(bool escapeNewlines);
+        std::optional<Token> tryLexCharLiteral();
+        std::optional<Token> tryLexStringLiteral();
 
         char getChar(int offset = 0) const;
         void eatChar(std::size_t count = 1);

@@ -17,7 +17,7 @@ namespace ry {
 
     Token::Token(Token::Type type, std::string_view value):
         m_type(type),
-        m_data({ .string = value })
+        m_stringValue(value)
     {
         assert(m_type == Token::Type::STRING_LIT
             || m_type == Token::Type::NAME);
@@ -25,21 +25,21 @@ namespace ry {
 
     Token::Token(Token::Type type, intlit_t value):
         m_type(type),
-        m_data({ .intv = value })
+        m_intValue({ .intv = value })
     {
         assert(m_type == Token::Type::INT_LIT);
     }
 
     Token::Token(Token::Type type, floatlit_t value):
         m_type(type),
-        m_data({ .floatv = value })
+        m_intValue({ .floatv = value })
     {
         assert(m_type == Token::Type::FLOAT_LIT);
     }
 
     Token::Token(Token::Type type, char value):
         m_type(type),
-        m_data({ .charv = value })
+        m_intValue({ .charv = value })
     {
         assert(m_type == Token::Type::CHAR_LIT);
     }
@@ -64,29 +64,25 @@ namespace ry {
     std::string_view Token::GetStringValue() const {
         assert(m_type == Token::Type::STRING_LIT
             || m_type == Token::Type::NAME);
-        return m_data->string;
+        return m_stringValue;
     }
 
     Token::intlit_t Token::GetIntValue() const {
         assert(m_type == Token::Type::INT_LIT);
-        return m_data->intv;
+        return m_intValue->intv;
     }
 
     Token::floatlit_t Token::GetFloatValue() const {
         assert(m_type == Token::Type::FLOAT_LIT);
-        return m_data->floatv;
+        return m_intValue->floatv;
     }
 
     char Token::GetCharValue() const {
         assert(m_type == Token::Type::CHAR_LIT);
-        return m_data->charv;
+        return m_intValue->charv;
     }
 
     // 
-
-    bool Token::Is(char c) const {
-        return char(m_type) == c;
-    }
 
     std::string Token::Stringify() const {
         if(int(m_type) < int(Type::_FIRST)) {
@@ -111,8 +107,12 @@ namespace ry {
         if(m_type == Type::FLOAT_LIT)
             return std::string(cstr) + '(' + std::format("{:.14f}", GetFloatValue()) + ')';
         if(m_type == Type::CHAR_LIT)
-            return std::string(cstr) + '(' + std::to_string(GetCharValue()) + ')';
+            return std::string(cstr) + '(' + std::string(1, GetCharValue()) + ')';
         return cstr;
+    }
+
+    bool Token::operator==(char c) const {
+        return char(m_type) == c;
     }
 
 }

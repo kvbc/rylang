@@ -14,7 +14,30 @@ int main() {
         "123.123456789123456789e+2 \n"
         "123.123456789123456789e2 \n"
         "123.123e-1 \n"
-        "123.123456789123456789e-3"
+        "123.123456789123456789e-3 \n"
+        " `ok so this work or not?` \n"
+        " ``` \n"
+        " well it \n"
+        " does seem \n"
+        " to be \n"
+        " working sir \n"
+        "``` \n"
+        " \" ye it wukrs?? \" \n"
+        " \"\"\" \n "
+        " well it \n"
+        " seeems so \n"
+        " \"\"\" \n"
+        " \" does\\nit\\nreally\\n?\" \n"
+
+        " \"\"\" \\\n"
+        " hello \\\n"
+        " everywon \\\n"
+        " \"\"\" \n"
+
+        " \"\\078\" \n"
+
+        " 'c' \n"
+        " '\\0x26' \n"
     );
     std::cout << lexer.GetSource() << std::endl;
     std::cout << std::string(20, '-') << std::endl;

@@ -3,6 +3,7 @@
 #include <limits.h>
 #include <optional>
 #include <string_view>
+#include <string>
 #include <stdint.h>
 
 namespace ry {
@@ -89,19 +90,20 @@ namespace ry {
         floatlit_t GetFloatValue() const;
         char       GetCharValue () const;
 
-        bool Is(char c) const;
         std::string Stringify() const;
 
+        bool operator==(char c) const;
+
     private:
-        union Data {
-            std::string_view string;
+        union IntValue {
             intlit_t intv;
             floatlit_t floatv;
             char charv;
         };
 
         Type m_type;
-        std::optional<Data> m_data;
+        std::string m_stringValue;
+        std::optional<IntValue> m_intValue;
     };
 
 }

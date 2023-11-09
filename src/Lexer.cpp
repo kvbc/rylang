@@ -69,6 +69,10 @@ namespace ry {
                 continue;
             if(tryPushToken(tryLexNumber()))
                 continue;
+            if(tryPushToken(tryLexStringLiteral()))
+                continue;
+            if(tryPushToken(tryLexCharLiteral()))
+                continue;
             tokens.push_back(Token(getChar()));
             eatChar();
         }
@@ -85,6 +89,10 @@ namespace ry {
     }
 
     // 
+
+    std::string_view::const_pointer Lexer::getSourcePointer() {
+        return m_src.data() + m_srcIdx;
+    }
 
     std::optional<Token> Lexer::tryLexNameOrKeyword() {
         auto isValidStartChar = [](char c) -> bool {
@@ -208,75 +216,76 @@ namespace ry {
         }
     }
 
-    std::optional<Token> Lexer::tryLexNumber() {
-        auto tryLexInteger = [&]() -> std::optional<intlit_t> {
-            auto isValidDigit = [](char c, int base = 10) -> bool {
-                bool is09 = c >= '0' && c < '0' + base;
-                if(base <= 10)
-                    return is09;
-                return is09
-                    || (c >= 'a' && c < 'a' + base - 10)
-                    || (c >= 'A' && c < 'A' + base - 10);
-            };
-            char c1 = getChar(0);
-            char c2 = getChar(1);
-            if(isValidDigit(c1)) {
-                intlit_t base = 10;
-                const char * baseName = "decimal";
-                if(c1=='0' && (c2=='b' || c2=='o' || c2=='x')) {
-                         if(c2 == 'b') { base = 2;  baseName = "binary"; eatChar(2); }
-                    else if(c2 == 'o') { base = 8;  baseName = "octal";  eatChar(2); }
-                    else if(c2 == 'x') { base = 16; baseName = "hex";    eatChar(2); }
-                    char c3 = getChar();
-                    if(c3!='_' && !isValidDigit(c3, base)) {
-                        m_infos.push_back(Info(
-                            Info::Level::ERROR,
-                            "Unfinished integer literal",
-                            m_ln, m_col
-                        ));
-                        return {};
-                    }
-                }
-
-                auto srcStartPtr = m_src.data() + m_srcIdx;
-                eatChar();
-                for(;;) {
-                    char c = getChar();
-                    if(isValidDigit(c, base)) {
-                        eatChar();
-                    } else if(isValidDigit(c, 10)) {
-                        m_infos.push_back(Info(
-                            Info::Level::ERROR,
-                            std::format("Invalid digit '{}' in {} integer literal", c, baseName),
-                            m_ln, m_col
-                        ));
-                        eatChar();
-                    } else { // not a digit
-                        if(c == '_')
-                            do eatChar(); while(getChar() == '_');
-                        else
-                            break;
-                    }
-                }
-                auto srcEndPtr = m_src.data() + m_srcIdx;
-                
-                intlit_t num = 0;
-                intlit_t curBase = 1;
-                std::string_view numStr(srcStartPtr, srcEndPtr);
-                for(auto it = numStr.crbegin(); it != numStr.crend(); it++) {
-                    char c = *it;
-                    if(c == '_')
-                        continue;
-                    bool is_09 = (c >= '0' && c <= '9');
-                    bool is_az = (c >= 'a' && c <= 'z');
-                    intlit_t digit = is_09 ? c-'0' : is_az ? c-'a'+10 : c-'A'+10;
-                    num += digit * curBase;
-                    curBase *= base;
-                }
-                return num;
-            }
-            return {};
+    std::optional<Token::intlit_t> Lexer::tryLexInteger() {
+        auto isValidDigit = [](char c, int base = 10) -> bool {
+            bool is09 = c >= '0' && c < '0' + base;
+            if(base <= 10)
+                return is09;
+            return is09
+                || (c >= 'a' && c < 'a' + base - 10)
+                || (c >= 'A' && c < 'A' + base - 10);
         };
+        char c1 = getChar(0);
+        char c2 = getChar(1);
+        if(isValidDigit(c1)) {
+            intlit_t base = 10;
+            const char * baseName = "decimal";
+            if(c1=='0' && (c2=='b' || c2=='o' || c2=='x')) {
+                        if(c2 == 'b') { base = 2;  baseName = "binary"; eatChar(2); }
+                else if(c2 == 'o') { base = 8;  baseName = "octal";  eatChar(2); }
+                else if(c2 == 'x') { base = 16; baseName = "hex";    eatChar(2); }
+                char c3 = getChar();
+                if(c3!='_' && !isValidDigit(c3, base)) {
+                    m_infos.push_back(Info(
+                        Info::Level::ERROR,
+                        "Unfinished integer literal",
+                        m_ln, m_col
+                    ));
+                    return {};
+                }
+            }
+
+            auto srcStartPtr = m_src.data() + m_srcIdx;
+            eatChar();
+            for(;;) {
+                char c = getChar();
+                if(isValidDigit(c, base)) {
+                    eatChar();
+                } else if(isValidDigit(c, 10)) {
+                    m_infos.push_back(Info(
+                        Info::Level::ERROR,
+                        std::format("Invalid digit '{}' in {} integer literal", c, baseName),
+                        m_ln, m_col
+                    ));
+                    eatChar();
+                } else { // not a digit
+                    if(c == '_')
+                        do eatChar(); while(getChar() == '_');
+                    else
+                        break;
+                }
+            }
+            auto srcEndPtr = m_src.data() + m_srcIdx;
+            
+            intlit_t num = 0;
+            intlit_t curBase = 1;
+            std::string_view numStr(srcStartPtr, srcEndPtr);
+            for(auto it = numStr.crbegin(); it != numStr.crend(); it++) {
+                char c = *it;
+                if(c == '_')
+                    continue;
+                bool is_09 = (c >= '0' && c <= '9');
+                bool is_az = (c >= 'a' && c <= 'z');
+                intlit_t digit = is_09 ? c-'0' : is_az ? c-'a'+10 : c-'A'+10;
+                num += digit * curBase;
+                curBase *= base;
+            }
+            return num;
+        }
+        return {};
+    }
+
+    std::optional<Token> Lexer::tryLexNumber() {
         auto tryLexExponent = [&]() -> std::optional<floatlit_t> {
             char c1 = getChar(0);
             char c2 = getChar(1);
@@ -324,6 +333,152 @@ namespace ry {
             if(exp.has_value())
                 return Token(Token::Type::FLOAT_LIT, floatlit_t(int1.value()) * exp.value());
             return Token(Token::Type::INT_LIT, int1.value());
+        }
+        return {};
+    }
+
+    std::optional<char> Lexer::tryLexEscapeSequence(bool escapeNewlines) {
+        if(getChar() == '\\') {
+            eatChar();
+            char c2 = getChar();
+            switch(c2) {
+                case '0': case '1': case '2': case '3': case '4':
+                case '5': case '6': case '7': case '8': case '9': {
+                    std::optional<intlit_t> num = tryLexInteger();
+                    assert(num.has_value());
+                    if(num < 1 || num > 127)
+                        m_infos.push_back(Info(
+                            Info::Level::ERROR,
+                            "Escape sequence out of bounds <1,127>",
+                            m_ln, m_col
+                        ));
+                    return char(num.value());
+                }
+                case 'a':  eatChar(); return '\a';
+                case 'b':  eatChar(); return '\b';
+                case 'e':  eatChar(); return '\e';
+                case 'f':  eatChar(); return '\f';
+                case 'n':  eatChar(); return '\n';
+                case 'r':  eatChar(); return '\r';
+                case 't':  eatChar(); return '\t';
+                case 'v':  eatChar(); return '\v';
+                case '\\': eatChar(); return '\\';
+                case '\r':
+                case '\n':
+                    if(escapeNewlines) {
+                        eatChar();
+                        return {};
+                    }
+                    // else fallback
+                default:
+                    m_infos.push_back(Info(
+                        Info::Level::ERROR,
+                        std::format("Invalid escape sequence '\\{}'", c2),
+                        m_ln, m_col
+                    ));
+                    eatChar();
+                    return {};
+            }
+        }
+        return {};
+    }
+
+    std::optional<Token> Lexer::tryLexCharLiteral() {
+        if(getChar() == '\'') {
+            eatChar();
+            char ch = getChar();
+
+            std::optional<char> escChar = tryLexEscapeSequence(false);
+            if(escChar.has_value())
+                ch = escChar.value();
+            else
+                eatChar();
+
+            if(getChar() != '\'')
+                m_infos.push_back(Info(
+                    Info::Level::ERROR,
+                    "Unterminated character literal",
+                    m_ln, m_col
+                ));
+            eatChar();
+
+            return Token(Token::Type::CHAR_LIT, ch);
+        }
+        return {};
+    }
+
+    std::optional<Token> Lexer::tryLexStringLiteral() {
+        char c1 = getChar(0);
+        char c2 = getChar(1);
+        char c3 = getChar(2);
+        if(c1=='`' || c1=='"') {
+            bool isRaw = (c1 == '`');
+            bool isMultiline = (c2==c1 && c3==c1);
+            size_t numQuotes = isMultiline ? 3 : 1;
+            size_t ln = m_ln;
+            eatChar(numQuotes);
+            auto srcStartPos = getSourcePointer();
+            std::string escapedStr;
+            for(;;) {
+                char c = getChar();
+                if(!isMultiline && ln != m_ln) {
+                    ln = m_ln;
+                    m_infos.push_back(Info(
+                        Info::Level::ERROR,
+                        "Unexpected new line in single-line string literal",
+                        m_ln, m_col
+                    ));
+                }
+                if(c == c1) {
+                    if(isMultiline) {
+                        char c2 = getChar(1);
+                        char c3 = getChar(2);
+                        if(c2 != c1 || c3 != c1)
+                            m_infos.push_back(Info(
+                                Info::Level::ERROR,
+                                "Expected termination of multi-line string literal",
+                                m_ln, m_col
+                            ));
+                        eatChar(3);
+                    }
+                    else
+                        eatChar();
+                    break;
+                }
+                if(c == CHAR_EOF) {
+                    m_infos.push_back(Info(
+                        Info::Level::ERROR,
+                        "Unfinished single-line string literal",
+                        m_ln, m_col
+                    ));
+                    break;
+                }
+                if(isRaw) {
+                    eatChar();
+                }
+                if(!isRaw) {
+                    if(c == '\\') {
+                        bool escapeNewlines = isMultiline;
+                        std::optional<char> escChar = tryLexEscapeSequence(escapeNewlines);
+                        if(escChar.has_value())
+                            escapedStr += escChar.value();
+                    }
+                    else {
+                        escapedStr += c;
+                        eatChar();
+                    }
+                }
+            }
+            auto srcEndPos = getSourcePointer();
+            if(isRaw)
+                return Token(
+                    Token::Type::STRING_LIT,
+                    std::string_view(srcStartPos, srcEndPos - numQuotes)
+                );
+            return Token(
+                Token::Type::STRING_LIT,
+                escapedStr
+            );
         }
         return {};
     }
