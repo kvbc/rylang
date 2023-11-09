@@ -6,6 +6,7 @@
 #include <vector>
 #include <cstddef>
 #include <optional>
+#include <set>
 
 namespace ry {
 
@@ -64,7 +65,7 @@ namespace ry {
         bool tryLexComment();
         std::optional<Token> tryLexOperator();
         bool trySkipWhitespace();
-        std::optional<intlit_t> tryLexInteger();
+        std::optional<intlit_t> tryLexInteger(std::string_view allowedSuffixChars = "");
         std::optional<Token> tryLexNumber();
         std::optional<char> tryLexEscapeSequence(bool escapeNewlines);
         std::optional<Token> tryLexCharLiteral();

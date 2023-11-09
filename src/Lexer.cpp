@@ -3,6 +3,7 @@
 #include <format>
 #include <iostream>
 #include <optional>
+#include <stdio.h>
 #include <string_view>
 #include <utility>
 #include <math.h>
@@ -57,7 +58,7 @@ namespace ry {
             char c1 = m_src.at(i);
             char c2 = (i + 1 < m_src.length()) ? m_src.at(i + 1) : '\0';
             if(c1 == '\n' || c1 == '\r') {
-                m_lineEndIndices.push_back(i - 1);
+                m_lineEndIndices.push_back(i);
                 i++;
                 if(c1 == '\r' && c2 == '\n')
                     i++;
@@ -85,16 +86,17 @@ namespace ry {
         while(getChar() != CHAR_EOF) {
             if(tryPushToken(tryLexNameOrKeyword())) continue;
             if(             tryLexComment      () ) continue;
-            if(             trySkipWhitespace  () ) continue;
             if(tryPushToken(tryLexNumber       ())) continue;
             if(tryPushToken(tryLexStringLiteral())) continue;
             if(tryPushToken(tryLexCharLiteral  ())) continue;
             if(tryPushToken(tryLexOperator     ())) continue; // after tryLexComment()!
-            m_infos.push_back(Info(
-                Info::Level::WARN,
-                std::format("Unexpected character '{}'", getChar()),
-                m_ln, m_col
-            ));
+            if(             trySkipWhitespace  () ) continue;
+            if(getChar() != CHAR_EOF)
+                m_infos.push_back(Info(
+                    Info::Level::WARN,
+                    std::format("Unexpected character '{}'", getChar()),
+                    m_ln, m_col
+                ));
             eatChar();
         }
 
@@ -110,22 +112,32 @@ namespace ry {
     }
 
     std::string Lexer::StringifyInfo(const Info& info) const {  
-        std::size_t ln = info.GetStartLineNumber();
-        std::size_t col = info.GetStartColumn();
-        auto startPtr = m_src.data() + m_lineStartIndices[ln - 1];
-        auto endPtr = m_src.data() + m_lineEndIndices[ln - 1];
+        std::size_t startLn = info.GetStartLineNumber();
+        std::size_t startCol = info.GetStartColumn();
+        std::size_t endLn = info.GetEndLineNumber();
+        std::size_t endCol = info.GetEndColumn();
+
+        auto startPtr = m_src.data() + m_lineStartIndices[startLn - 1];
+        auto endPtr = m_src.data() + m_lineEndIndices[startLn - 1];
         std::string_view line(startPtr, endPtr);
-        std::size_t lnLen = std::floor(std::log10(ln)) + 1;
+        
+        std::size_t lnLen = std::floor(std::log10(startLn)) + 1;
         std::size_t leftBarLen = std::max(lnLen, m_id.length());
-        std::string underLine(col - 1, ' ');
-        underLine += '^';
-        underLine += ' ';
-        underLine += info.GetMessage();
+
+        std::string underLine =
+            std::string(startCol - 1, ' ')
+            + '^'
+            + std::string(endCol - startCol, '~');
+        std::string msg =
+            std::string(startCol - 1, ' ')
+            + std::string(info.GetMessage());
+
         return std::format(
-            " {:>{}} |\n {:>{}} | {}\n {:>{}} | {}",
+            " {:>{}} |\n {:>{}} | {}\n {:>{}} | {}\n {:>{}} | {}",
             m_id, leftBarLen,
-            ln, leftBarLen, line,
-            "", leftBarLen, underLine
+            startLn, leftBarLen, line,
+            "", leftBarLen, underLine,
+            "", leftBarLen, msg
         );
     }
 
@@ -144,7 +156,7 @@ namespace ry {
         };
 
         if(isValidStartChar(getChar())) {
-            auto srcStartPtr = m_src.data() + m_srcIdx;
+            auto srcStartPtr = getSourcePointer();
             std::size_t len = 1;
 
             eatChar();
@@ -173,6 +185,8 @@ namespace ry {
                     eatChar();
                 return true;
             } else if(c2 == '*') {// "/*" multi line
+                std::size_t startLn = m_ln;
+                std::size_t startCol = m_col;
                 eatChar(2);
                 for(;;) {
                     c1 = getChar(0);
@@ -181,7 +195,8 @@ namespace ry {
                         m_infos.push_back(Info(
                             Info::Level::ERROR,
                             "Unterminated multi-line comment",
-                            m_ln, m_col
+                            startLn, startCol,
+                            startLn, startCol + 1
                         ));
                         break;
                     }
@@ -268,7 +283,7 @@ namespace ry {
         }
     }
 
-    std::optional<Token::intlit_t> Lexer::tryLexInteger() {
+    std::optional<Token::intlit_t> Lexer::tryLexInteger(std::string_view allowedSuffixChars) {
         auto isValidDigit = [](char c, int base = 10) -> bool {
             bool is09 = c >= '0' && c < '0' + base;
             if(base <= 10)
@@ -276,6 +291,21 @@ namespace ry {
             return is09
                 || (c >= 'a' && c < 'a' + base - 10)
                 || (c >= 'A' && c < 'A' + base - 10);
+        };
+        auto tryErrorInvalidDigit = [&](char c, int base, const char * baseName) -> bool {
+            if(!isValidDigit(c, base) && isValidDigit(c, 10)) {
+                static bool hasErrored = false;
+                if(!hasErrored) {
+                    hasErrored = true;
+                    m_infos.push_back(Info(
+                        Info::Level::ERROR,
+                        std::format("Invalid digit '{}' in {} integer literal", c, baseName),
+                        m_ln, m_col
+                    ));
+                }
+                return true;
+            }
+            return false;
         };
         char c1 = getChar(0);
         char c2 = getChar(1);
@@ -288,36 +318,40 @@ namespace ry {
                 else if(c2 == 'x') { base = 16; baseName = "hex";    eatChar(2); }
                 char c3 = getChar();
                 if(c3!='_' && !isValidDigit(c3, base)) {
-                    m_infos.push_back(Info(
+                    if(!tryErrorInvalidDigit(c3, base, baseName))
+                        m_infos.push_back(Info(
                         Info::Level::ERROR,
-                        "Unfinished integer literal",
+                        "Malformed integer literal",
                         m_ln, m_col
-                    ));
-                    return {};
+                        ));
                 }
             }
 
-            auto srcStartPtr = m_src.data() + m_srcIdx;
+            auto srcStartPtr = getSourcePointer();
             eatChar();
             for(;;) {
                 char c = getChar();
                 if(isValidDigit(c, base)) {
                     eatChar();
                 } else if(isValidDigit(c, 10)) {
-                    m_infos.push_back(Info(
-                        Info::Level::ERROR,
-                        std::format("Invalid digit '{}' in {} integer literal", c, baseName),
-                        m_ln, m_col
-                    ));
+                    tryErrorInvalidDigit(c, base, baseName);
                     eatChar();
                 } else { // not a digit
                     if(c == '_')
                         do eatChar(); while(getChar() == '_');
-                    else
+                    else {
+                        if((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+                            if(allowedSuffixChars.find(c) == std::string_view::npos)
+                                m_infos.push_back(Info(
+                                Info::Level::ERROR,
+                                "Malformed integer literal",
+                                m_ln, m_col
+                                ));
                         break;
+                    }
                 }
             }
-            auto srcEndPtr = m_src.data() + m_srcIdx;
+            auto srcEndPtr = getSourcePointer();
             
             intlit_t num = 0;
             intlit_t curBase = 1;
@@ -362,7 +396,7 @@ namespace ry {
             }
             return {};
         };
-        auto int1 = tryLexInteger();
+        auto int1 = tryLexInteger("eE");
         if(int1.has_value()) {
             if(getChar() == '.') {
                 eatChar();
@@ -381,9 +415,11 @@ namespace ry {
                 num *= tryLexExponent().value_or(1);
                 return Token(Token::Type::FLOAT_LIT, num);
             }
+
             std::optional<floatlit_t> exp = tryLexExponent();
             if(exp.has_value())
                 return Token(Token::Type::FLOAT_LIT, floatlit_t(int1.value()) * exp.value());
+
             return Token(Token::Type::INT_LIT, int1.value());
         }
         return {};
@@ -477,12 +513,13 @@ namespace ry {
             for(;;) {
                 char c = getChar();
                 if(!isMultiline && ln != m_ln) {
-                    ln = m_ln;
+                    std::size_t prevCol = m_lineEndIndices[ln - 1] - m_lineStartIndices[ln - 1];
                     m_infos.push_back(Info(
                         Info::Level::ERROR,
                         "Unexpected new line in single-line string literal",
-                        m_ln, m_col
+                        ln, prevCol + 1
                     ));
+                    ln = m_ln;
                 }
                 if(c == c1) {
                     if(isMultiline) {

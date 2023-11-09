@@ -177,10 +177,10 @@ comment
 
 **Errors**
 
-| Error                         | Example                           |
-| ----------------------------- | --------------------------------- |
-| ❗ Unfinished integer literal | `0x<eof>`, `0o<eof>`, `0x<space>` |
-| ❗ Invalid digit              | `0xZ`, `0o99`, `0oAZ`             |
+| Error                        | Example                           |
+| ---------------------------- | --------------------------------- |
+| ❗ Malformed integer literal | `0x<eof>`, `0o<eof>`, `0x<space>` |
+| ❗ Invalid digit             | `0xZ`, `0o99`, `0oAZ`             |
 
 **Examples**
 
