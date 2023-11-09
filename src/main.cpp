@@ -15,6 +15,7 @@ int main() {
         "123.123456789123456789e2 \n"
         "123.123e-1 \n"
         "123.123456789123456789e-3 \n"
+        " #  \n"
         " `ok so this work or not?` \n"
         " ``` \n"
         " well it \n"
@@ -39,12 +40,17 @@ int main() {
         " 'c' \n"
         " '\\0x26' \n"
     );
+    
+    std::string header(20, '-');
+    std::cout << header << " Source" << std::endl;
     std::cout << lexer.GetSource() << std::endl;
-    std::cout << std::string(20, '-') << std::endl;
+
+    std::cout << header << " Tokens" << std::endl;
     std::vector<ry::Token> tokens = lexer.Lex();
     for(const ry::Token& token : tokens)
         std::cout << token.Stringify() << std::endl;
-    std::cout << std::string(20, '-') << std::endl;
+
+    std::cout << header << " Info" << std::endl;
     for(const ry::Lexer::Info& info : lexer.GetInfos())
-        std::cout << info.GetMessage() << std::endl;
+        std::cout << info.Stringify() << std::endl;
 }

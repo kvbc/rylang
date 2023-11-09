@@ -473,8 +473,12 @@ Assignment
 |   ⭐    | Binary | `*=`     | multiplication     | `<name> *= <expr> ;`  | `<stmt>` |
 |   ⭐    | Binary | `**=`    | power of           | `<name> **= <expr> ;` | `<stmt>` |
 |   ⭐    | Binary | `/=`     | division           | `<name> /= <expr> ;`  | `<stmt>` |
-|   ⭐    | Binary | `//=`    | floor division     | `<name> //= <expr> ;` | `<stmt>` |
 |   ⭐    | Binary | `%=`     | modulo (remainder) | `<name> %= <expr> ;`  | `<stmt>` |
+
+<!--
+doesnt work because comments use the same syntax :facepalm:
+|   ⭐    | Binary | `//=`    | floor division     | `<name> //= <expr> ;` | `<stmt>` |
+-->
 
 ## 3.2. Bitwise Operators {#bitwise-operators}
 

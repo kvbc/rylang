@@ -31,13 +31,15 @@ namespace ry {
 
             std::string_view GetMessage() const;
             Level GetLevel() const;
+            
+            std::string Stringify() const;
 
         private:
             std::size_t m_startLn;
             std::size_t m_startCol;
             std::size_t m_endLn;
             std::size_t m_endCol;
-            std::string_view m_msg;
+            std::string m_msg;
             Level m_level;
         };
 

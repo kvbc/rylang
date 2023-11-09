@@ -7,10 +7,6 @@
 
 namespace ry {
 
-    Token::Token(char c):
-        m_type(Type(c))
-    {}
-
     Token::Token(Token::Type type):
         m_type(type)
     {}
@@ -85,11 +81,7 @@ namespace ry {
     // 
 
     std::string Token::Stringify() const {
-        if(int(m_type) < int(Type::_FIRST)) {
-            assert(int(m_type) > 0);
-            return std::string(1, char(m_type));
-        }
-        int stringsIdx = int(m_type) - int(Type::_FIRST);
+        int stringsIdx = int(m_type);
         assert(stringsIdx >= 0
             && stringsIdx < TYPE_STRINGS_LEN);
         const char * cstr = TYPE_STRINGS[stringsIdx];
@@ -109,10 +101,6 @@ namespace ry {
         if(m_type == Type::CHAR_LIT)
             return std::string(cstr) + '(' + std::string(1, GetCharValue()) + ')';
         return cstr;
-    }
-
-    bool Token::operator==(char c) const {
-        return char(m_type) == c;
     }
 
 }

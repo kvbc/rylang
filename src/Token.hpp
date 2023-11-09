@@ -24,8 +24,6 @@ namespace ry {
 
         // keywords must be in same order as in KEYWORDS
         enum class Type {
-            _FIRST = CHAR_MAX,
-
             NAME,
             INT_LIT,
             FLOAT_LIT,
@@ -39,43 +37,63 @@ namespace ry {
             KW_AS,
             _KW_LAST,
 
-            OP_POWER,
-            OP_ADD_EQ, OP_SUB_EQ, OP_MUL_EQ, OP_POWER_EQ, OP_DIV_EQ, OP_FLOORDIV_EQ, OP_MOD_EQ,
-            OP_BIT_LSHIFT, OP_BIT_RSHIFT, OP_BIT_OR, OP_BIT_XOR, OP_BIT_AND, OP_BIT_LSHIFT_EQ, OP_BIT_RSHIFT_EQ,
-            OP_EQ, OP_UNEQ, OP_LESS_EQ, OP_GREAT_EQ,
-            OP_OR, OP_AND,
-            OP_2DOT,
+            OP_SUB,    OP_ADD,    OP_MUL,    OP_DIV,    OP_MOD,    OP_POWER,
+            OP_SUB_EQ, OP_ADD_EQ, OP_MUL_EQ, OP_DIV_EQ, OP_MOD_EQ, OP_POWER_EQ,
 
-            _LAST
+            OP_BIT_NEG,
+            OP_BIT_OR_EQ, OP_BIT_XOR_EQ, OP_BIT_LSHIFT_EQ, OP_BIT_RSHIFT_EQ, OP_BIT_AND_EQ,        
+            OP_BIT_OR,    OP_BIT_XOR,    OP_BIT_LSHIFT,    OP_BIT_RSHIFT,    OP_BIT_AND,
+            /**/ OP_ADDRESS = OP_BIT_AND, /**/
+
+            OP_EQ,   OP_LESS,    OP_GREAT,
+            OP_UNEQ, OP_LESS_EQ, OP_GREAT_EQ,
+
+            OP_NOT, OP_OR, OP_AND,
+
+            OP_TERNARY_TRUE, OP_TERNARY_FALSE,
+            // OP_ADDRESS,
+            OP_STRUCT_FIELD_ACCESS,
+            OP_STRUCT_FIELD_IDX_ACCESS,
+            OP_SCOPE_ACCESS,
+            OP_ASSIGN,
         };
 
         // must be in the same order as the Type enum
         static constexpr const char * TYPE_STRINGS[] = {
-            "???",
             "NAME",
             "INT_LIT",
             "FLOAT_LIT",
             "STRING_LIT",
             "CHAR_LIT",
 
-            "???",
+            "_KW_FIRST",
             "KW_IF",    "KW_ELIF",     "KW_ELSE",
             "KW_LOOP",  "KW_CONTINUE", "KW_BREAK",
             "KW_FALSE", "KW_TRUE",
             "KW_AS",
-            "???",
+            "_KW_LAST",
 
-            "OP_POWER",
-            "OP_ADD_EQ", "OP_SUB_EQ", "OP_MUL_EQ", "OP_POWER_EQ", "OP_DIV_EQ", "OP_FLOORDIV_EQ", "OP_MOD_EQ",
-            "OP_BIT_LSHIFT", "OP_BIT_RSHIFT", "OP_BIT_OR", "OP_BIT_XOR", "OP_BIT_AND", "OP_BIT_LSHIFT_EQ", "OP_BIT_RSHIFT_EQ",
-            "OP_EQ", "OP_UNEQ", "OP_LESS_EQ", "OP_GREAT_EQ",
-            "OP_OR", "OP_AND",
-            "OP_2DOT",
-            "???"
+            "OP_SUB",    "OP_ADD",    "OP_MUL",    "OP_DIV",    "OP_MOD",    "OP_POWER",
+            "OP_SUB_EQ", "OP_ADD_EQ", "OP_MUL_EQ", "OP_DIV_EQ", "OP_MOD_EQ", "OP_POWER_EQ",
+
+            "OP_BIT_NEG",
+            "OP_BIT_OR_EQ", "OP_BIT_XOR_EQ", "OP_BIT_LSHIFT_EQ", "OP_BIT_RSHIFT_EQ", "OP_BIT_AND_EQ",        
+            "OP_BIT_OR",    "OP_BIT_XOR",    "OP_BIT_LSHIFT",    "OP_BIT_RSHIFT",    "OP_BIT_AND/OP_ADDRESS",
+
+            "OP_EQ",   "OP_LESS",    "OP_GREAT",
+            "OP_UNEQ", "OP_LESS_EQ", "OP_GREAT_EQ",
+
+            "OP_NOT", "OP_OR", "OP_AND",
+
+            "OP_TERNARY_TRUE", "OP_TERNARY_FALSE",
+            // OP_ADDRESS,
+            "OP_STRUCT_FIELD_ACCESS",
+            "OP_STRUCT_FIELD_IDX_ACCESS",
+            "OP_SCOPE_ACCESS",
+            "OP_ASSIGN",
         };
         static constexpr std::size_t TYPE_STRINGS_LEN = sizeof(TYPE_STRINGS) / sizeof(*TYPE_STRINGS);
 
-        Token(char c);
         Token(Type type);
         Token(Type type, std::string_view value);
         Token(Type type, intlit_t value);
@@ -91,8 +109,6 @@ namespace ry {
         char       GetCharValue () const;
 
         std::string Stringify() const;
-
-        bool operator==(char c) const;
 
     private:
         union IntValue {

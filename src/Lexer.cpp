@@ -38,6 +38,10 @@ namespace ry {
         return m_msg;
     }
 
+    std::string Info::Stringify() const {
+        return std::format("[{}:{}]: {}", m_startLn, m_startCol, m_msg);
+    }
+
     // 
 
     Lexer::Lexer(std::string_view src):
@@ -59,21 +63,18 @@ namespace ry {
         };
 
         while(getChar() != CHAR_EOF) {
-            if(tryPushToken(tryLexNameOrKeyword()))
-                continue;
-            if(tryPushToken(tryLexOperator()))
-                continue;
-            if(tryLexComment())
-                continue;
-            if(trySkipWhitespace())
-                continue;
-            if(tryPushToken(tryLexNumber()))
-                continue;
-            if(tryPushToken(tryLexStringLiteral()))
-                continue;
-            if(tryPushToken(tryLexCharLiteral()))
-                continue;
-            tokens.push_back(Token(getChar()));
+            if(tryPushToken(tryLexNameOrKeyword())) continue;
+            if(             tryLexComment      () ) continue;
+            if(             trySkipWhitespace  () ) continue;
+            if(tryPushToken(tryLexNumber       ())) continue;
+            if(tryPushToken(tryLexStringLiteral())) continue;
+            if(tryPushToken(tryLexCharLiteral  ())) continue;
+            if(tryPushToken(tryLexOperator     ())) continue; // after tryLexComment()!
+            m_infos.push_back(Info(
+                Info::Level::WARN,
+                std::format("Unexpected character '{}'", getChar()),
+                m_ln, m_col
+            ));
             eatChar();
         }
 
@@ -157,45 +158,56 @@ namespace ry {
     }
 
     std::optional<Token> Lexer::tryLexOperator() {
-        char c1 = getChar(0);
-        char c2 = getChar(1);
-        char c3 = getChar(2);
         auto getType = [&]() -> std::optional<Token::Type> {
-            auto is3 = [&](const char * str) -> bool {
-                bool is = c1==str[0] && c2==str[1] && c3==str[2];
-                if(is)
-                    eatChar(3);
-                return is;
-            };
-            auto is2 = [&](const char * str) -> bool {
-                bool is = c1==str[0] && c2==str[1];
-                if(is)
-                    eatChar(2);
-                return is;
+            auto is = [&](const char * str) -> bool {
+                size_t i = 0;
+                for(; i < 3 && str[i]!='\0'; i++)
+                    if(getChar(i) != str[i])
+                        return false;
+                eatChar(i);
+                return true;
             };
             using T = Token::Type;
-            if(is3("//=")) return T::OP_FLOORDIV_EQ;
-            if(is3("<<=")) return T::OP_BIT_LSHIFT_EQ;
-            if(is3(">>=")) return T::OP_BIT_RSHIFT_EQ;
-            // check 3-length ops first!
-            if(is2("**" )) return T::OP_POWER;
-            if(is2("+=" )) return T::OP_ADD_EQ;
-            if(is2("-=" )) return T::OP_SUB_EQ;
-            if(is2("*=" )) return T::OP_MUL_EQ;
-            if(is2("/=" )) return T::OP_DIV_EQ;
-            if(is2("%=" )) return T::OP_MOD_EQ;
-            if(is2("<<" )) return T::OP_BIT_LSHIFT;
-            if(is2(">>" )) return T::OP_BIT_RSHIFT;
-            if(is2("|=" )) return T::OP_BIT_OR;
-            if(is2("^=" )) return T::OP_BIT_XOR;
-            if(is2("&=" )) return T::OP_BIT_AND;
-            if(is2("==" )) return T::OP_EQ;
-            if(is2("!=" )) return T::OP_UNEQ;
-            if(is2("<=" )) return T::OP_LESS_EQ;
-            if(is2(">=" )) return T::OP_GREAT_EQ;
-            if(is2("||" )) return T::OP_OR;
-            if(is2("&&" )) return T::OP_AND;
-            if(is2(".." )) return T::OP_2DOT;
+            // check 3-length ops
+            if(is("**=")) return T::OP_POWER_EQ;
+            if(is("<<=")) return T::OP_BIT_LSHIFT_EQ;
+            if(is(">>=")) return T::OP_BIT_RSHIFT_EQ;
+            // check 2-length ops
+            if(is("**" )) return T::OP_POWER;
+            if(is("+=" )) return T::OP_ADD_EQ;
+            if(is("-=" )) return T::OP_SUB_EQ;
+            if(is("*=" )) return T::OP_MUL_EQ;
+            if(is("/=" )) return T::OP_DIV_EQ;
+            if(is("%=" )) return T::OP_MOD_EQ;
+            if(is("<<" )) return T::OP_BIT_LSHIFT;
+            if(is(">>" )) return T::OP_BIT_RSHIFT;
+            if(is("|=" )) return T::OP_BIT_OR;
+            if(is("^=" )) return T::OP_BIT_XOR;
+            if(is("&=" )) return T::OP_BIT_AND;
+            if(is("==" )) return T::OP_EQ;
+            if(is("!=" )) return T::OP_UNEQ;
+            if(is("<=" )) return T::OP_LESS_EQ;
+            if(is(">=" )) return T::OP_GREAT_EQ;
+            if(is("||" )) return T::OP_OR;
+            if(is("&&" )) return T::OP_AND;
+            if(is(".." )) return T::OP_STRUCT_FIELD_IDX_ACCESS;
+            // check 1-length ops
+            if(is("-"  )) return T::OP_SUB;
+            if(is("+"  )) return T::OP_ADD;
+            if(is("*"  )) return T::OP_MUL;
+            if(is("/"  )) return T::OP_DIV;
+            if(is("%"  )) return T::OP_MOD;
+            if(is("~"  )) return T::OP_BIT_NEG;
+            if(is("|"  )) return T::OP_BIT_OR;
+            if(is("&"  )) return T::OP_BIT_AND;
+            if(is("<"  )) return T::OP_LESS;
+            if(is(">"  )) return T::OP_GREAT;
+            if(is("!"  )) return T::OP_NOT;
+            if(is("?"  )) return T::OP_TERNARY_TRUE;
+            if(is(":"  )) return T::OP_TERNARY_FALSE;
+            if(is("."  )) return T::OP_STRUCT_FIELD_ACCESS;
+            if(is(":"  )) return T::OP_SCOPE_ACCESS;
+            if(is("="  )) return T::OP_ASSIGN;
             return {};
         };
         std::optional<Token::Type> tkType = getType();
