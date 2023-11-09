@@ -133,19 +133,17 @@ __Big_Word__
 
 **Syntax**
 
-| Tag                                         | Syntax                                                                | Comment             |
-| ------------------------------------------- | --------------------------------------------------------------------- | ------------------- |
-| \<comment>                                  | `// {<src_char>} [<new_line>]` where `<src_char>` is not `<new_line>` | Single-line comment |
-| \<comment>                                  | `/* {<src_char>} */`                                                  | Multi-line comment  |
+| Tag                                         | Syntax                                                                | Comment                                                                                       |
+| ------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| \<comment>                                  | `// {<src_char>} [<new_line>]` where `<src_char>` is not `<new_line>` | Single-line comment                                                                           |
+| \<comment>                                  | `/* {<src_char>} */` where `<src_char>` is not `*/`                   | Multi-line comment. <br> Multiple multi-line comments can NOT be nested inside of each other. |
 | &emsp; \<src_char>, <br> &emsp; \<new_line> | See [Lexical Analysis](#lexical-analysis)                             |
 
-**Context**
+**Errors**
 
--   Multiple multi-line comments can NOT be nested inside of each other.
-
-⚠️ **Warnings**
-
--   Unterminated multi-line comment
+| Error                              | Example        |
+| ---------------------------------- | -------------- |
+| ❗ Unterminated multi-line comment | `/* ... <eof>` |
 
 **Examples**
 
@@ -177,12 +175,12 @@ comment
 | &emsp; \<hex_digit>         | `(0 - 9) \| (a - z) \| (A - Z)`   | Hexadecimal digit           |
 | \<integer>                  | `0o 0-7 {[_]0-7}`                 | Octal integer literal       |
 
-**Implementation**
+**Errors**
 
-| Error                        | Example                           |
-| ---------------------------- | --------------------------------- |
-| ❗ Unfinished Number Literal | `0x<eof>`, `0o<eof>`, `0x<space>` |
-| ❗ Invalid digit             | `0xZ`, `0o99`, `0oAZ`             |
+| Error                         | Example                           |
+| ----------------------------- | --------------------------------- |
+| ❗ Unfinished integer literal | `0x<eof>`, `0o<eof>`, `0x<space>` |
+| ❗ Invalid digit              | `0xZ`, `0o99`, `0oAZ`             |
 
 **Examples**
 
@@ -226,7 +224,7 @@ _1_    // INVALID
 | \<float_exp>      | `e\|E +\|- <dec_int>`                     | Exponent |
 | &emsp; \<dec_int> | See [Integer Literals](#integer-literals) |
 
-**Implementation**
+**Errors**
 
 | Error                       | Example            |
 | --------------------------- | ------------------ |
@@ -251,6 +249,16 @@ TODO
 | \<string_esc_seq>  | `<integer>`                                                                |
 | &emsp; \<src_char> | See [Lexical Analysis](#lexical-analysis)                                  |
 | &emsp; \<integer>  | See [Integer Literals](#integer-literals)                                  |
+
+**Errors**
+
+| Error                                                | Example                         |
+| ---------------------------------------------------- | ------------------------------- |
+| ❗ Unexpected new line in single-line string literal | `"abc <new_line>"`              |
+| ❗ Expected termination of multi-line string literal | `""" hello "`, `"""hello <eof>` |
+| ❗ Unterminated single-line string literal           | `"sup <eof>`                    |
+| ❗ Invalid escape sequence                           | `"string \x"`                   |
+| ❗ Escape sequence out of bounds                     | `"string \200"`                 |
 
 **Examples**
 
@@ -289,6 +297,14 @@ See [Struct Literals](#parsing-struct-literals) in **Parsing**.
 | \<char>                  | `' {<src_char> \| \<string_esc_seq>} '` where `<src_char>` is not `\` |
 | &emsp; \<src_char>       | See [Lexical Analysis](#lexical-analysis)                             |
 | &emsp; \<string_esc_seq> | See [String Literals](#string-literals)                               |
+
+**Errors**
+
+| Error                             | Example              |
+| --------------------------------- | -------------------- |
+| ❗ Unterminated character literal | `'c abc`, `'a <eof>` |
+| ❗ Invalid escape sequence        | `'\x'`               |
+| ❗ Escape sequence out of bounds  | `'\200'`             |
 
 **Examples**
 
@@ -349,7 +365,7 @@ pos [x i32; y i32] = [3; 5];
 
 **Syntax**
 
-| Tag            | Syntax                                                          |
+| Tag            | Syntax                                                          | Comment             |
 | -------------- | --------------------------------------------------------------- | ------------------- |
 | \<var>         | `<name> <type> = <expr> ;` where `<expr>` coerces into `<type>` | Non-struct variable |
 | &emsp; \<name> | See [Names](#names)                                             |

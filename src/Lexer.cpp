@@ -138,7 +138,7 @@ namespace ry {
                     c2 = getChar(1);
                     if(c1 == CHAR_EOF) {
                         m_infos.push_back(Info(
-                            Info::Level::WARN,
+                            Info::Level::ERROR,
                             "Unterminated multi-line comment",
                             m_ln, m_col
                         ));
@@ -448,7 +448,7 @@ namespace ry {
                 if(c == CHAR_EOF) {
                     m_infos.push_back(Info(
                         Info::Level::ERROR,
-                        "Unfinished single-line string literal",
+                        "Unterminated single-line string literal",
                         m_ln, m_col
                     ));
                     break;
