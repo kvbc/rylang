@@ -4,7 +4,7 @@ workspace "rylang"
 project "rylang"
     kind "ConsoleApp"
     language "C++"
-    cppdialect "C++17"
+    cppdialect "C++20"
     targetdir "_bin/%{cfg.buildcfg}"
     objdir "_bin/%{cfg.buildcfg}"
 

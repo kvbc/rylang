@@ -48,9 +48,13 @@ namespace ry {
         std::vector<Info> GetInfos() const;
 
     private:
+        using intlit_t = Token::intlit_t;
+
         std::optional<Token> tryLexNameOrKeyword();
         bool tryLexComment();
         std::optional<Token> tryLexOperator();
+        bool trySkipWhitespace();
+        std::optional<Token> tryLexNumber();
 
         char getChar(int offset = 0) const;
         void eatChar(std::size_t count = 1);

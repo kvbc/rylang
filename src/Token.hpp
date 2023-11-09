@@ -8,6 +8,8 @@ namespace ry {
 
     class Token {
     public:
+        using intlit_t = __uint128_t;
+
         // must be in same order as in the Type enum
         static constexpr const char * KEYWORDS[] = {
             "if",    "elif",     "else",
@@ -70,9 +72,10 @@ namespace ry {
         };
         static constexpr std::size_t TYPE_STRINGS_LEN = sizeof(TYPE_STRINGS) / sizeof(*TYPE_STRINGS);
 
+        Token(char c);
         Token(Type type);
         Token(Type type, std::string_view value);
-        Token(Type type, int value);
+        Token(Type type, intlit_t value);
         Token(Type type, float value);
         Token(Type type, char value);
 
@@ -80,17 +83,17 @@ namespace ry {
 
         Type GetType() const;
         std::string_view GetStringValue() const;
-        int   GetIntValue  () const;
-        float GetFloatValue() const;
-        char  GetCharValue () const;
+        intlit_t GetIntValue  () const;
+        float    GetFloatValue() const;
+        char     GetCharValue () const;
 
         bool Is(char c) const;
-        std::string_view Stringify() const;
+        std::string Stringify() const;
 
     private:
         union Data {
             std::string_view string;
-            int intv;
+            intlit_t intv;
             float floatv;
             char charv;
         };

@@ -42,7 +42,7 @@ Table of Contents
 | &emsp; 1.1. [Names](#names)                                       |   ✔️   |     ✔️      |      ❌       |
 | &emsp; 1.2. [Comments](#comments)                                 |   ✔️   |     ✔️      |      ❌       | Single-line and multi-line                         |
 | &emsp; 1.3. [Literals](#literals)                                 |   ✔️   |     N/A     |      N/A      |
-| &emsp; &emsp; 1.3.1. [Integer Literals](#integer-literals)        |   ✔️   |     ❌      |      ❌       |
+| &emsp; &emsp; 1.3.1. [Integer Literals](#integer-literals)        |   ✔️   |     ✔️      |      ❌       |
 | &emsp; &emsp; 1.3.2. [Float Literals](#float-literals)            |   ✔️   |     ❌      |      ❌       |
 | &emsp; &emsp; 1.3.3. [String Literals](#string-literals)          |   ✔️   |     ❌      |      ❌       |
 | &emsp; &emsp; 1.3.4. [Struct Literals](#lexical-struct-literals)  |  N/A   |     N/A     |      N/A      |
@@ -85,9 +85,9 @@ Table of Contents
 **Syntax**
 
 | Tag         | Syntax                                                                                |
-| ----------- | ------------------------------------------------------------------------------------- | --- | ---------- | --- | ----- |
-| \<new_line> | `\n                                                                                   | \r  | \r\n`or`LF | CR  | CRLF` |
-| \<src_char> | Any valid [UTF-8](https://en.wikipedia.org/wiki/UTF-8) character in range of (1, 255) |
+| ----------- | ------------------------------------------------------------------------------------- |
+| \<new_line> | `\n \| \r \| \r\n` or `LF \| CR \| CRLF`                                              |
+| \<src_char> | Any valid [UTF-8](https://en.wikipedia.org/wiki/UTF-8) character in range of <1, 127> |
 
 **Interpretation**
 
@@ -95,7 +95,7 @@ Table of Contents
     -   LF
     -   CR
     -   CRLF
--   The source code is written in the UTF-8 encoding.
+-   The source code is written in the UTF-8 character encoding.
 
 ## 1.1. Names {#names}
 
@@ -143,7 +143,7 @@ __Big_Word__
 
 -   Multiple multi-line comments can NOT be nested inside of each other.
 
-**Warnings**
+⚠️ **Warnings**
 
 -   Unterminated multi-line comment
 
@@ -181,8 +181,8 @@ comment
 
 | Error                     | Example              |
 | ------------------------- | -------------------- |
-| Trailing Number Separator | `_3`, `5_`           |
-| Unfinished Number Literal | `0x<eof>`, `0o<eof>` |
+| ❗ Unfinished Number Literal | `0x<eof>`, `0o<eof>`, `0x<space>` |
+| ❗ Invalid digit | `0xZ`, `0o99`, `0oAZ` |
 
 **Examples**
 
@@ -223,7 +223,7 @@ _1_    // INVALID
 | ----------------- | ----------------------------------------- | ------- |
 | \<float>          | `<dec_int> . <dec_int> [<float_exp>]`     |
 | \<float>          | `<dec_int> <float_exp>`                   |
-| \<float_exp>      | `e\|E +\|- <dec_int>` \| Exponent         |
+| \<float_exp>      | `e\|E +\|- <dec_int>`                     | Exponent
 | &emsp; \<dec_int> | See [Integer Literals](#integer-literals) |
 
 **Examples**

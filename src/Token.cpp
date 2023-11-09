@@ -1,10 +1,15 @@
 #include "Token.hpp"
+#include <format>
 #include <string_view>
 #include <string>
 #include <assert.h>
 #include <cstring>
 
 namespace ry {
+
+    Token::Token(char c):
+        m_type(Type(c))
+    {}
 
     Token::Token(Token::Type type):
         m_type(type)
@@ -18,7 +23,7 @@ namespace ry {
             || m_type == Token::Type::NAME);
     }
 
-    Token::Token(Token::Type type, int value):
+    Token::Token(Token::Type type, intlit_t value):
         m_type(type),
         m_data({ .intv = value })
     {
@@ -62,7 +67,7 @@ namespace ry {
         return m_data->string;
     }
 
-    int Token::GetIntValue() const {
+    Token::intlit_t Token::GetIntValue() const {
         assert(m_type == Token::Type::INT_LIT);
         return m_data->intv;
     }
@@ -83,17 +88,28 @@ namespace ry {
         return char(m_type) == c;
     }
 
-    std::string_view Token::Stringify() const {
+    std::string Token::Stringify() const {
+        if(int(m_type) < int(Type::_FIRST)) {
+            assert(int(m_type) > 0);
+            return std::string(1, char(m_type));
+        }
         int stringsIdx = int(m_type) - int(Type::_FIRST);
         assert(stringsIdx >= 0
             && stringsIdx < TYPE_STRINGS_LEN);
         const char * cstr = TYPE_STRINGS[stringsIdx];
         if(m_type == Type::STRING_LIT || m_type == Type::NAME)
             return std::string(cstr) + '(' + std::string(GetStringValue()) + ')';
-        if(m_type == Type::INT_LIT)
-            return std::string(cstr) + '(' + std::to_string(GetIntValue()) + ')';
+        if(m_type == Type::INT_LIT) {
+            std::string str = "";
+            intlit_t val = GetIntValue();
+            do {
+                str += (val % 10) - '0';
+                val /= 10;
+            } while(val > 0);
+            return std::string(cstr) + '(' + str + ')';
+        }
         if(m_type == Type::FLOAT_LIT)
-            return std::string(cstr) + '(' + std::to_string(GetFloatValue()) + ')';
+            return std::string(cstr) + '(' + std::format("{:.15f}", GetFloatValue()) + ')';
         if(m_type == Type::CHAR_LIT)
             return std::string(cstr) + '(' + std::to_string(GetCharValue()) + ')';
         return cstr;

@@ -1,7 +1,11 @@
 #include "Lexer.hpp"
 #include <assert.h>
+#include <format>
 #include <iostream>
+#include <optional>
 #include <string_view>
+#include <utility>
+#include <math.h>
 
 namespace ry {
 
@@ -61,6 +65,11 @@ namespace ry {
                 continue;
             if(tryLexComment())
                 continue;
+            if(trySkipWhitespace())
+                continue;
+            if(tryPushToken(tryLexNumber()))
+                continue;
+            tokens.push_back(Token(getChar()));
             eatChar();
         }
 
@@ -184,6 +193,112 @@ namespace ry {
         std::optional<Token::Type> tkType = getType();
         if(tkType.has_value())
             return Token(tkType.value());
+        return {};
+    }
+
+    bool Lexer::trySkipWhitespace() {
+        for(bool skipped = false ;;) {
+            char c = getChar();
+            if(c==' ' || c=='\t' || c=='\n' || c=='\r' || c=='\f' || c=='\v') {
+                eatChar();
+                skipped = true;
+            }
+            else
+                return skipped;
+        }
+    }
+
+    std::optional<Token> Lexer::tryLexNumber() {
+        auto tryLexInteger = [&]() -> std::optional<std::pair<intlit_t, std::size_t>> {
+            auto isValidDigit = [](char c, int base = 10) -> bool {
+                bool is09 = c >= '0' && c < '0' + base;
+                if(base <= 10)
+                    return is09;
+                return is09
+                    || (c >= 'a' && c < 'a' + base - 10)
+                    || (c >= 'A' && c < 'A' + base - 10);
+            };
+            char c1 = getChar(0);
+            char c2 = getChar(1);
+            if(isValidDigit(c1)) {
+                intlit_t base = 10;
+                const char * baseName = "decimal";
+                if(c1=='0' && (c2=='b' || c2=='o' || c2=='x')) {
+                        if(c2 == 'b') { base = 2;  baseName = "binary"; eatChar(2); }
+                    else if(c2 == 'o') { base = 8;  baseName = "octal";  eatChar(2); }
+                    else if(c2 == 'x') { base = 16; baseName = "hex";    eatChar(2); }
+                    char c3 = getChar();
+                    if(c3!='_' && !isValidDigit(c3, base)) {
+                        m_infos.push_back(Info(
+                            Info::Level::ERROR,
+                            "Unfinished integer literal",
+                            m_ln, m_col
+                        ));
+                        return {};
+                    }
+                }
+
+                auto srcStartPtr = m_src.data() + m_srcIdx;
+                eatChar();
+                for(;;) {
+                    char c = getChar();
+                    if(isValidDigit(c, base)) {
+                        eatChar();
+                    } else if(isValidDigit(c, 10)) {
+                        m_infos.push_back(Info(
+                            Info::Level::ERROR,
+                            std::format("Invalid digit '{}' in {} integer literal", c, baseName),
+                            m_ln, m_col
+                        ));
+                        eatChar();
+                    } else { // not a digit
+                        if(c == '_')
+                            do eatChar(); while(getChar() == '_');
+                        else
+                            break;
+                    }
+                }
+                auto srcEndPtr = m_src.data() + m_srcIdx;
+                
+                intlit_t num = 0;
+                intlit_t curBase = 1;
+                std::string_view numStr(srcStartPtr, srcEndPtr);
+                for(auto it = numStr.crbegin(); it != numStr.crend(); it++) {
+                    char c = *it;
+                    if(c == '_')
+                        continue;
+                    bool is_09 = (c >= '0' && c <= '9');
+                    bool is_az = (c >= 'a' && c <= 'z');
+                    intlit_t digit = is_09 ? c-'0' : is_az ? c-'a'+10 : c-'A'+10;
+                    num += digit * curBase;
+                    curBase *= base;
+                }
+                return {{num, numStr.length()}};
+            }
+            return {};
+        };
+        auto int1pair = tryLexInteger();
+        if(int1pair.has_value()) {
+            if(getChar() == '.') {
+                float num = float(int1pair.value().first);
+                eatChar();
+                auto int2pair = tryLexInteger();
+                if(int2pair.has_value()) {
+                    intlit_t int2 = int2pair.value().first;
+                    std::size_t int2len = int2pair.value().second;
+                    num += float(int2) / std::pow(10, int2len);
+                } else {
+                     m_infos.push_back(Info(
+                        Info::Level::ERROR,
+                        "Unfinished float literal",
+                        m_ln, m_col
+                     ));
+                }
+                return Token(Token::Type::FLOAT_LIT, num);
+            } else {
+                return Token(Token::Type::INT_LIT, int1pair.value().first);
+            }
+        }
         return {};
     }
 
