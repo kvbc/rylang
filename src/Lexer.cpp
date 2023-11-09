@@ -344,15 +344,18 @@ namespace ry {
             switch(c2) {
                 case '0': case '1': case '2': case '3': case '4':
                 case '5': case '6': case '7': case '8': case '9': {
-                    std::optional<intlit_t> num = tryLexInteger();
-                    assert(num.has_value());
-                    if(num < 1 || num > 127)
-                        m_infos.push_back(Info(
-                            Info::Level::ERROR,
-                            "Escape sequence out of bounds <1,127>",
-                            m_ln, m_col
-                        ));
-                    return char(num.value());
+                    std::optional<intlit_t> numOpt = tryLexInteger();
+                    if(numOpt.has_value()) {
+                        intlit_t num = numOpt.value();
+                        if(num < 1 || num > 127)
+                            m_infos.push_back(Info(
+                                Info::Level::ERROR,
+                                "Escape sequence out of bounds <1,127>",
+                                m_ln, m_col
+                            ));
+                        return char(num);
+                    }
+                    return {};
                 }
                 case 'a':  eatChar(); return '\a';
                 case 'b':  eatChar(); return '\b';
