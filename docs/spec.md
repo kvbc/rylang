@@ -52,8 +52,6 @@ Table of Contents
 | &emsp; 1.6. [Tokens](#tokens)                                     |  N/A   |     N/A     |      N/A      |
 | &emsp; &emsp; &emsp; &nbsp;**Parsing and**                        |        |             |               | **Grouping tokens into untyped AST nodes**         |
 | &emsp; &emsp; **Semantic Analysis**                               |        |             |               | **Analyzing untyped AST nodes**                    |
-| 1.9. [Struct Literals](#parsing-struct-literals)                  |   ✔️   |     ❌      |      ❌       |
-| 2. [Variables](#variables)                                        |   ✔️   |     ❌      |      ❌       |
 | 3. [Operators](#operators)                                        |   ✔️   |     ❌      |      N/A      |
 | &emsp; 3.1. [Arithmetic Operators](#arithmetic-operators)         |   ✔️   |     ❌      |      ❌       |
 | &emsp; 3.2. [Bitwise Operators](#bitwise-operators)               |   ✔️   |     ❌      |      ❌       |
@@ -67,7 +65,9 @@ Table of Contents
 | &emsp; &emsp; 4.2.2. [Loop](#loop)                                |   ✔️   |     ❌      |      ❌       |
 | &emsp; &emsp; &emsp; 4.2.2.1. [Continue](#continue)               |   ✔️   |     ❌      |      ❌       |
 | &emsp; 4.3. [Compile-time Expressions](#compile-time-expressions) |   ❌   |     ❌      |      ❌       |
+| &emsp; 4.4. [Struct Literals](#parsing-struct-literals)           |   ✔️   |     ❌      |      ❌       |
 | 5. [Statements](#statements)                                      |   〰️   |     ❌      |      ❌       |
+| &emsp; 5.1. [Variables](#variables)                               |   ✔️   |     ❌      |      ❌       |
 | 6. [Metadata](#metadata)                                          |   ✔️   |     ❌      |      ❌       |
 | &emsp; &emsp; &emsp; &emsp; **Typing**                            |        |             |               | **"Typing" the untyped AST nodes**                 |
 | 7. [Types](#types)                                                |        |     ❌      |      ❌       |
@@ -339,102 +339,7 @@ Tokens represent:
 -   [Operators](#operators)
 -   [Literals](#literals)
 -   Characters
-
-# 1.9. Struct Literals {#parsing-struct-literals}
-
-**Syntax**
-
-| Tag                     | Syntax                                  | Comment                                                       |
-| ----------------------- | --------------------------------------- | ------------------------------------------------------------- |
-| \<struct_literal>       | `[ {<struct_literal_field>} ]`          |
-| \<struct_literal_field> | `[<name> =] <expr> [;]` see **Comment** | The semicolon `;` can only be omitted if it's the last field. |
-| &emsp; \<name>          | See [Names](#names)                     |
-| &emsp; \<expr>          | See [Expressions](#expressions)         |
-
-**Interpretation**
-
-TODO
-
-**Examples**
-
-```rust
-pos [x i32; y i32] = [3; 5];
-```
-
-# 2. Variables {#variables}
-
-**Syntax**
-
-| Tag            | Syntax                                                          | Comment             |
-| -------------- | --------------------------------------------------------------- | ------------------- |
-| \<var>         | `<name> <type> = <expr> ;` where `<expr>` coerces into `<type>` | Non-struct variable |
-| &emsp; \<name> | See [Names](#names)                                             |
-| &emsp; \<expr> | See [Expressions](#expressions)                                 |
-| &emsp; \<type> | See [Types](#types)                                             |
-
--   See `<name>` in [Names](#names) for the rules behind a valid variable name (identifier).
--   See `<expr>` in [Expressions](#expressions) for what a variable can be assigned.
--   The variable's value must be able to coerce into the variable's type.
-    -   See [Type Coercion](#type-coercion)
--   All variables must be initialized.
--   Variables of type `<type>` being `<func_type>` are knows as functions.
-    -   See `<func_type>` in [Types](#types)
--   Variables of type `<type>` being `<struct_type>` are known as structs.
-    -   See `<struct_type>` in [Types](#types)
-
-**Examples**
-
-```rust
-x i32 = 3; // int var
-
-add [a i32; b i32]=>i32 = a + b;
-
-Vec2 var = [ // comp-time variable, type alias
-    x i32;
-    y i32;
-]
-```
-
-<!--
-- Variables of type *struct* `<struct_type>` must be initialized either by copy or by using the struct literal.
-  - See [Struct](#struct).
-  - See `<struct_type>` in [Types](#types).
-  - See [Literals](#literals) for the definition of a *struct literal*.
-  ```rust
-  main ()void = {
-    $Vector2 = { x i32; y i32 };
-    a $Vector2 = { // literal
-        .x = 0,
-        .y = 0
-    };
-    // or
-    b $Vector2 = a; // copy
-    c $Vector2 = { // copy
-        break b;
-    };
-  };
-  ```
-  This supposed copy might not always result in an actual copy of the data. \
-  The compiler is expected to, where applicable, prefer "moving" the data instead of actually copying it. \
-  One such example can be observed below.
-  ```rust
-  $Vector2 = {
-    x i32;
-    y i32;
-    new( x i32, y i32 ) $Vector2 = {
-        v $Vector2 = {
-            .x = x,
-            .y = y
-        };
-        break v;
-    }
-  };
-  main() void = {
-    pos $Vector2 = :$Vector2:new(0, 0);
-  }
-  ```
-  TODO: Talk about how it's done in C - returning a struct by value in C (implicit return pointer)
--->
+-   [Primitive Types](#primitives)
 
 **Context**
 
@@ -744,6 +649,27 @@ main ${} => ${} = {
 };
 ```
 
+## 4.4. Struct Literals {#parsing-struct-literals}
+
+**Syntax**
+
+| Tag                     | Syntax                                  | Comment                                                       |
+| ----------------------- | --------------------------------------- | ------------------------------------------------------------- |
+| \<struct_literal>       | `[ {<struct_literal_field>} ]`          |
+| \<struct_literal_field> | `[<name> =] <expr> [;]` see **Comment** | The semicolon `;` can only be omitted if it's the last field. |
+| &emsp; \<name>          | See [Names](#names)                     |
+| &emsp; \<expr>          | See [Expressions](#expressions)         |
+
+**Interpretation**
+
+TODO
+
+**Examples**
+
+```rust
+pos [x i32; y i32] = [3; 5];
+```
+
 # 5. Statements {#statements}
 
 **Syntax**
@@ -752,7 +678,82 @@ main ${} => ${} = {
 | ------- | ------------------------------------- |
 | \<stmt> | `<var> \| <expr> \| <namespace_stmt>` |
 
-## 6. Metadata {#metadata}
+## 5.1. Variables {#variables}
+
+**Syntax**
+
+| Tag            | Syntax                                                          | Comment             |
+| -------------- | --------------------------------------------------------------- | ------------------- |
+| \<var>         | `<name> <type> = <expr> ;` where `<expr>` coerces into `<type>` | Non-struct variable |
+| &emsp; \<name> | See [Names](#names)                                             |
+| &emsp; \<expr> | See [Expressions](#expressions)                                 |
+| &emsp; \<type> | See [Types](#types)                                             |
+
+-   See `<name>` in [Names](#names) for the rules behind a valid variable name (identifier).
+-   See `<expr>` in [Expressions](#expressions) for what a variable can be assigned.
+-   The variable's value must be able to coerce into the variable's type.
+    -   See [Type Coercion](#type-coercion)
+-   All variables must be initialized.
+-   Variables of type `<type>` being `<func_type>` are knows as functions.
+    -   See `<func_type>` in [Types](#types)
+-   Variables of type `<type>` being `<struct_type>` are known as structs.
+    -   See `<struct_type>` in [Types](#types)
+
+**Examples**
+
+```rust
+x i32 = 3; // int var
+
+add [a i32; b i32]=>i32 = a + b;
+
+Vec2 var = [ // comp-time variable, type alias
+    x i32;
+    y i32;
+]
+```
+
+<!--
+- Variables of type *struct* `<struct_type>` must be initialized either by copy or by using the struct literal.
+  - See [Struct](#struct).
+  - See `<struct_type>` in [Types](#types).
+  - See [Literals](#literals) for the definition of a *struct literal*.
+  ```rust
+  main ()void = {
+    $Vector2 = { x i32; y i32 };
+    a $Vector2 = { // literal
+        .x = 0,
+        .y = 0
+    };
+    // or
+    b $Vector2 = a; // copy
+    c $Vector2 = { // copy
+        break b;
+    };
+  };
+  ```
+  This supposed copy might not always result in an actual copy of the data. \
+  The compiler is expected to, where applicable, prefer "moving" the data instead of actually copying it. \
+  One such example can be observed below.
+  ```rust
+  $Vector2 = {
+    x i32;
+    y i32;
+    new( x i32, y i32 ) $Vector2 = {
+        v $Vector2 = {
+            .x = x,
+            .y = y
+        };
+        break v;
+    }
+  };
+  main() void = {
+    pos $Vector2 = :$Vector2:new(0, 0);
+  }
+  ```
+  TODO: Talk about how it's done in C - returning a struct by value in C (implicit return pointer)
+-->
+
+# 6. Metadata {#metadata}
 
 **Syntax**
 
@@ -800,6 +801,7 @@ TODO
 
 | Type             | Variant(s)                        |
 | ---------------- | --------------------------------- |
+| Character        | `char`                            |
 | Signed Integer   | `i8`, `i16`, `i32`, `i64`, `i128` |
 | Unsigned Integer | `u8`, `u16`, `u32`, `u64`, `u128` |
 | Floating-point   | `f32`, `f64`                      |

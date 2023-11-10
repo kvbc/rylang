@@ -42,12 +42,15 @@ namespace ry {
 
     // 
 
-    std::optional<Token::Type> Token::GetStringToKeywordType(std::string_view str) {
-        for(std::size_t i = 0; i < KEYWORDS_LEN; i++) {
-            const char * keyword = KEYWORDS[i];
-            if(strncmp(keyword, str.data(), str.length()) == 0)
+    std::optional<Token::Type> Token::GetStringToKeywordOrType(std::string_view str) {
+        for(std::size_t i = 0; i < KEYWORDS_LEN; i++)
+            if(strncmp(KEYWORDS[i], str.data(), str.length()) == 0)
                 return Type(int(Type::_KW_FIRST) + 1 + i);
-        }
+
+        for(std::size_t i = 0; i < PRIMITIVE_TYPES_LEN; i++)
+            if(strncmp(PRIMITIVE_TYPES[i], str.data(), str.length()) == 0)
+                return Type(int(Type::_TP_FIRST) + 1 + i);
+            
         return {};
     }
 
@@ -79,6 +82,11 @@ namespace ry {
     }
 
     // 
+
+    bool Token::IsPrimitiveType() const {
+        return m_type > Type::_TP_FIRST
+            && m_type < Type::_TP_LAST;
+    }
 
     std::string Token::Stringify() const {
         int stringsIdx = int(m_type);

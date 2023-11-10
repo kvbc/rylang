@@ -91,12 +91,22 @@ namespace ry {
             if(tryPushToken(tryLexCharLiteral  ())) continue;
             if(tryPushToken(tryLexOperator     ())) continue; // after tryLexComment()!
             if(             trySkipWhitespace  () ) continue;
-            if(getChar() != CHAR_EOF)
-                m_infos.push_back(Info(
-                    Info::Level::WARN,
-                    std::format("Unexpected character '{}'", getChar()),
-                    m_ln, m_col
-                ));
+
+            char c = getChar();
+            switch(getChar()) {
+                case ';': tokens.push_back(Token(Token::Type::SEMICOLON)); break;
+                case '(': tokens.push_back(Token(Token::Type::LPAREN)); break;
+                case ')': tokens.push_back(Token(Token::Type::RPAREN)); break;
+                case CHAR_EOF:
+                    break;
+                default:
+                    m_infos.push_back(Info(
+                        Info::Level::WARN,
+                        std::format("Unexpected character '{}'", getChar()),
+                        m_ln, m_col
+                    ));
+            }
+
             eatChar();
         }
 
@@ -166,9 +176,9 @@ namespace ry {
             }
 
             std::string_view str(srcStartPtr, len);
-            std::optional<Token::Type> kwType = Token::GetStringToKeywordType(str);
-            if(kwType.has_value())
-                return Token(kwType.value());
+            std::optional<Token::Type> type = Token::GetStringToKeywordOrType(str);
+            if(type.has_value())
+                return Token(type.value());
             return Token(Token::Type::NAME, str);
         }
 
