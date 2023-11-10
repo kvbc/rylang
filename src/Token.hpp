@@ -18,19 +18,15 @@ namespace ry {
             "if",    "elif",     "else",
             "loop",  "continue", "break",
             "false", "true",
-            "as"
-        };
-        static constexpr std::size_t KEYWORDS_LEN = sizeof(KEYWORDS) / sizeof(*KEYWORDS);
+            "as",
 
-        // same order as in Type enum
-        static constexpr const char * const PRIMITIVE_TYPES[] = {
             "char",
             "i8", "i16", "i32", "i64", "i128",
             "u8", "u16", "u32", "u64", "u128",
             "f32", "f64",
             "bool"
         };
-        static constexpr std::size_t PRIMITIVE_TYPES_LEN = sizeof(PRIMITIVE_TYPES) / sizeof(*PRIMITIVE_TYPES);
+        static constexpr std::size_t KEYWORDS_LEN = sizeof(KEYWORDS) / sizeof(*KEYWORDS);
 
         // keywords must be in same order as in KEYWORDS
         enum class Type {
@@ -49,15 +45,13 @@ namespace ry {
             KW_LOOP,  KW_CONTINUE, KW_BREAK,
             KW_FALSE, KW_TRUE,
             KW_AS,
+            // 
+            KW_CHAR,
+            KW_I8, KW_I16, KW_I32, KW_I64, KW_I128,
+            KW_U8, KW_U16, KW_U32, KW_U64, KW_U128,
+            KW_F32, KW_F64,
+            KW_BOOL,
             _KW_LAST,
-
-            _TP_FIRST,
-            TP_CHAR,
-            TP_I8, TP_I16, TP_I32, TP_I64, TP_I128,
-            TP_U8, TP_U16, TP_U32, TP_U64, TP_U128,
-            TP_F32, TP_F64,
-            TP_BOOL,
-            _TP_LAST,
 
             OP_SUB,    OP_ADD,    OP_MUL,    OP_DIV,    OP_MOD,    OP_POWER,
             OP_SUB_EQ, OP_ADD_EQ, OP_MUL_EQ, OP_DIV_EQ, OP_MOD_EQ, OP_POWER_EQ,
@@ -95,15 +89,13 @@ namespace ry {
             "KW_LOOP",  "KW_CONTINUE", "KW_BREAK",
             "KW_FALSE", "KW_TRUE",
             "KW_AS",
+            // 
+            "KW_CHAR",
+            "KW_I8", "KW_I16", "KW_I32", "KW_I64", "KW_I128",
+            "KW_U8", "KW_U16", "KW_U32", "KW_U64", "KW_U128",
+            "KW_F32", "KW_F64",
+            "KW_BOOL",
             "_KW_LAST",
-
-            "_TP_FIRST",
-            "TP_CHAR",
-            "TP_I8", "TP_I16", "TP_I32", "TP_I64", "TP_I128",
-            "TP_U8", "TP_U16", "TP_U32", "TP_U64", "TP_U128",
-            "TP_F32", "TP_F64",
-            "TP_BOOL",
-            "_TP_LAST",
 
             "OP_SUB",    "OP_ADD",    "OP_MUL",    "OP_DIV",    "OP_MOD",    "OP_POWER",
             "OP_SUB_EQ", "OP_ADD_EQ", "OP_MUL_EQ", "OP_DIV_EQ", "OP_MOD_EQ", "OP_POWER_EQ",
@@ -130,7 +122,7 @@ namespace ry {
         Token(Type type, floatlit_t value);
         Token(Type type, char value);
 
-        static std::optional<Type> GetStringToKeywordOrType(std::string_view str);
+        static std::optional<Type> GetStringToKeywordType(std::string_view str);
 
         Type GetType() const;
         std::string_view GetStringValue() const;
@@ -138,7 +130,6 @@ namespace ry {
         floatlit_t GetFloatValue() const;
         char       GetCharValue () const;
 
-        bool IsPrimitiveType() const;
         std::string Stringify() const;
 
     private:

@@ -176,7 +176,7 @@ namespace ry {
             }
 
             std::string_view str(srcStartPtr, len);
-            std::optional<Token::Type> type = Token::GetStringToKeywordOrType(str);
+            std::optional<Token::Type> type = Token::GetStringToKeywordType(str);
             if(type.has_value())
                 return Token(type.value());
             return Token(Token::Type::NAME, str);

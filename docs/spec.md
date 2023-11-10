@@ -117,7 +117,7 @@ Table of Contents
 
 **Examples**
 
-```
+```rust
 _var
 a_b_c
 x__
@@ -246,7 +246,7 @@ TODO
 | \<string>          | `" {<src_char> \| \<string_esc_seq>} "` where `<src_char>` is not `\`      | Single-line escapable string literal |
 | \<string>          | `""" {<src_char> \| \<string_esc_seq>} """` where `<src_char>` is not `\`  | Multi-line escapable string literal  |
 | \<string_esc_seq>  | <code>a \| b \| e \| f \| n \| r \| t \| v \| ` \| \ \| <new_line> </code> |
-| \<string_esc_seq>  | `<integer>`                                                                |
+| \<string_esc_seq>  | `<integer>` in range of <1,127>                                            |
 | &emsp; \<src_char> | See [Lexical Analysis](#lexical-analysis)                                  |
 | &emsp; \<integer>  | See [Integer Literals](#integer-literals)                                  |
 
@@ -339,16 +339,6 @@ Tokens represent:
 -   [Operators](#operators)
 -   [Literals](#literals)
 -   Characters
--   [Primitive Types](#primitives)
-
-**Context**
-
-| Tag             | Parent                |
-| --------------- | --------------------- |
-| \<var>          | `<block>`             |
-| &emsp; \<block> | See [Blocks](#blocks) |
-
--   Variables can only exist inside of blocks.
 
 # 3. Operators {#operators}
 
@@ -686,6 +676,15 @@ pos [x i32; y i32] = [3; 5];
     -   See `<func_type>` in [Types](#types)
 -   Variables of type `<type>` being `<struct_type>` are known as structs.
     -   See `<struct_type>` in [Types](#types)
+
+**Context**
+
+| Tag             | Parent                |
+| --------------- | --------------------- |
+| \<var>          | `<block>`             |
+| &emsp; \<block> | See [Blocks](#blocks) |
+
+-   Variables can only exist inside of blocks.
 
 **Examples**
 
