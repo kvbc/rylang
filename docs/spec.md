@@ -52,23 +52,23 @@ Table of Contents
 | &emsp; 1.6. [Tokens](#tokens)                                     |  N/A   |     N/A     |      N/A      |
 | &emsp; &emsp; &emsp; &nbsp;**Parsing and**                        |        |             |               | **Grouping tokens into untyped AST nodes**         |
 | &emsp; &emsp; **Semantic Analysis**                               |        |             |               | **Analyzing untyped AST nodes**                    |
-| 3. [Operators](#operators)                                        |   ✔️   |     ❌      |      N/A      |
-| &emsp; 3.1. [Arithmetic Operators](#arithmetic-operators)         |   ✔️   |     ❌      |      ❌       |
-| &emsp; 3.2. [Bitwise Operators](#bitwise-operators)               |   ✔️   |     ❌      |      ❌       |
-| &emsp; 3.3. [Comparison Operators](#comparison-operators)         |   ✔️   |     ❌      |      ❌       |
-| &emsp; 3.4. [Logical Operators](#logical-operators)               |   ✔️   |     ❌      |      ❌       |
-| &emsp; 3.5. [Other Operators](#other-operators)                   |   ✔️   |     ❌      |      ❌       |
-| 4. [Expressions](#expressions)                                    |   〰️   |     ❌      |      ❌       |
-| &emsp; 4.1. [Block](#block) (& `break`)                           |   ✔️   |     ❌      |      ❌       |
-| &emsp; 4.2. [Control Flow](#control-flow)                         |   ✔️   |     ❌      |      N/A      |
-| &emsp; &emsp; 4.2.1. [If / Elif / Else](#if-elif-else)            |   ✔️   |     ❌      |      ❌       |
-| &emsp; &emsp; 4.2.2. [Loop](#loop)                                |   ✔️   |     ❌      |      ❌       |
-| &emsp; &emsp; &emsp; 4.2.2.1. [Continue](#continue)               |   ✔️   |     ❌      |      ❌       |
+| 3. [Operators](#operators)                                        |   ❌   |     ❌      |      N/A      |
+| &emsp; 3.1. [Arithmetic Operators](#arithmetic-operators)         |   ❌   |     ❌      |      ❌       |
+| &emsp; 3.2. [Bitwise Operators](#bitwise-operators)               |   ❌   |     ❌      |      ❌       |
+| &emsp; 3.3. [Comparison Operators](#comparison-operators)         |   ❌   |     ❌      |      ❌       |
+| &emsp; 3.4. [Logical Operators](#logical-operators)               |   ❌   |     ❌      |      ❌       |
+| &emsp; 3.5. [Other Operators](#other-operators)                   |   ❌   |     ❌      |      ❌       |
+| 4. [Expressions](#expressions)                                    |   ❌   |     ❌      |      ❌       |
+| &emsp; 4.1. [Block](#block) (& `break`)                           |   ❌   |     ❌      |      ❌       |
+| &emsp; 4.2. [Control Flow](#control-flow)                         |   ❌   |     ❌      |      N/A      |
+| &emsp; &emsp; 4.2.1. [If / Elif / Else](#if-elif-else)            |   ❌   |     ❌      |      ❌       |
+| &emsp; &emsp; 4.2.2. [Loop](#loop)                                |   ❌   |     ❌      |      ❌       |
+| &emsp; &emsp; &emsp; 4.2.2.1. [Continue](#continue)               |   ❌   |     ❌      |      ❌       |
 | &emsp; 4.3. [Compile-time Expressions](#compile-time-expressions) |   ❌   |     ❌      |      ❌       |
-| &emsp; 4.4. [Struct Literals](#parsing-struct-literals)           |   ✔️   |     ❌      |      ❌       |
-| 5. [Statements](#statements)                                      |   〰️   |     ❌      |      ❌       |
-| &emsp; 5.1. [Variables](#variables)                               |   ✔️   |     ❌      |      ❌       |
-| 6. [Metadata](#metadata)                                          |   ✔️   |     ❌      |      ❌       |
+| &emsp; 4.4. [Struct Literals](#parsing-struct-literals)           |   ❌   |     ❌      |      ❌       |
+| 5. [Statements](#statements)                                      |   ❌   |     ❌      |      ❌       |
+| &emsp; 5.1. [Variables](#variables)                               |   ❌   |     ❌      |      ❌       |
+| 6. [Metadata](#metadata)                                          |   ❌   |     ❌      |      ❌       |
 | &emsp; &emsp; &emsp; &emsp; **Typing**                            |        |             |               | **"Typing" the untyped AST nodes**                 |
 | 7. [Types](#types)                                                |        |     ❌      |      ❌       |
 | &emsp; 7.1. [Primitives](#primitives)                             |        |     ❌      |      ❌       |
@@ -889,7 +889,7 @@ A _struct_ (Structure) is a collection of variables (fields).
 | ------------------------ | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | \<struct>                | `$ <name> = <struct_block> ;`                                                   |
 | \<struct_block>          | `{ <struct_stmt> {<struct_stmt>} }`                                             |
-| \<struct_stmt>           | `<struct_field>                                                                 | <namespace_stmt>`                                                                                                                                                 |
+| \<struct_stmt>           | `<struct_field> \| <namespace_stmt>`                                            |
 | \<struct_field>          | `<name> <type> [= <compexpr>] ;` where `<type>` isn't the defined struct itself | <li>The semicolon `;` might be omitted if it's the last field in a struct.</li> <li>Struct fields follow the same rules as regular [variables](#1-variables)</li> |
 | &emsp; \<name>           | See [Names](#names)                                                             |
 | &emsp; \<var>            | See [Variables](#variables)                                                     |
