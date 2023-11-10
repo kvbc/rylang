@@ -255,7 +255,6 @@ namespace ry {
             if(is(">=" )) return T::OP_GREAT_EQ;
             if(is("||" )) return T::OP_OR;
             if(is("&&" )) return T::OP_AND;
-            if(is(".." )) return T::OP_STRUCT_FIELD_IDX_ACCESS;
             // check 1-length ops
             if(is("-"  )) return T::OP_SUB;
             if(is("+"  )) return T::OP_ADD;
@@ -271,7 +270,6 @@ namespace ry {
             if(is("?"  )) return T::OP_TERNARY_TRUE;
             if(is(":"  )) return T::OP_TERNARY_FALSE;
             if(is("."  )) return T::OP_STRUCT_FIELD_ACCESS;
-            if(is(":"  )) return T::OP_SCOPE_ACCESS;
             if(is("="  )) return T::OP_ASSIGN;
             return {};
         };

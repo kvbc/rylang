@@ -75,8 +75,6 @@ namespace ry {
             OP_TERNARY_TRUE, OP_TERNARY_FALSE,
             // OP_ADDRESS,
             OP_STRUCT_FIELD_ACCESS,
-            OP_STRUCT_FIELD_IDX_ACCESS,
-            OP_SCOPE_ACCESS,
             OP_ASSIGN,
         };
 
@@ -122,8 +120,6 @@ namespace ry {
             "OP_TERNARY_TRUE", "OP_TERNARY_FALSE",
             // OP_ADDRESS,
             "OP_STRUCT_FIELD_ACCESS",
-            "OP_STRUCT_FIELD_IDX_ACCESS",
-            "OP_SCOPE_ACCESS",
             "OP_ASSIGN",
         };
         static constexpr std::size_t TYPE_STRINGS_LEN = sizeof(TYPE_STRINGS) / sizeof(*TYPE_STRINGS);

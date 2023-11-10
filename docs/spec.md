@@ -52,13 +52,13 @@ Table of Contents
 | &emsp; 1.6. [Tokens](#tokens)                                     |  N/A   |     N/A     |      N/A      |
 | &emsp; &emsp; &emsp; &nbsp;**Parsing and**                        |        |             |               | **Grouping tokens into untyped AST nodes**         |
 | &emsp; &emsp; **Semantic Analysis**                               |        |             |               | **Analyzing untyped AST nodes**                    |
-| 3. [Operators](#operators)                                        |   ❌   |     ❌      |      N/A      |
-| &emsp; 3.1. [Arithmetic Operators](#arithmetic-operators)         |   ❌   |     ❌      |      ❌       |
-| &emsp; 3.2. [Bitwise Operators](#bitwise-operators)               |   ❌   |     ❌      |      ❌       |
-| &emsp; 3.3. [Comparison Operators](#comparison-operators)         |   ❌   |     ❌      |      ❌       |
-| &emsp; 3.4. [Logical Operators](#logical-operators)               |   ❌   |     ❌      |      ❌       |
-| &emsp; 3.5. [Other Operators](#other-operators)                   |   ❌   |     ❌      |      ❌       |
-| 4. [Expressions](#expressions)                                    |   ❌   |     ❌      |      ❌       |
+| 3. [Operators](#operators)                                        |  N/A   |     N/A     |      N/A      |
+| &emsp; 3.1. [Arithmetic Operators](#arithmetic-operators)         |   ✔️   |     ❌      |      ❌       |
+| &emsp; 3.2. [Bitwise Operators](#bitwise-operators)               |   ✔️   |     ❌      |      ❌       |
+| &emsp; 3.3. [Comparison Operators](#comparison-operators)         |   ✔️   |     ❌      |      ❌       |
+| &emsp; 3.4. [Logical Operators](#logical-operators)               |   ✔️   |     ❌      |      ❌       |
+| &emsp; 3.5. [Other Operators](#other-operators)                   |   ✔️   |     ❌      |      ❌       |
+| 4. [Expressions](#expressions)                                    |  N/A   |     N/A     |      N/A      |
 | &emsp; 4.1. [Block](#block) (& `break`)                           |   ❌   |     ❌      |      ❌       |
 | &emsp; 4.2. [Control Flow](#control-flow)                         |   ❌   |     ❌      |      N/A      |
 | &emsp; &emsp; 4.2.1. [If / Elif / Else](#if-elif-else)            |   ❌   |     ❌      |      ❌       |
@@ -354,90 +354,78 @@ Tokens represent:
 
 ## 3.1. Arithmetic Operators {#arithmetic-operators}
 
-| Special | Type   | Operator | Name               | Syntax             | Parent   |
-| :-----: | ------ | -------- | ------------------ | ------------------ | -------- |
-|         | Unary  | `-`      | negation           | `- <expr>`         | `<expr>` |
-|         | Binary | `+`      | addition           | `<expr> + <expr>`  | `<expr>` |
-|         | Binary | `-`      | subtraction        | `<expr> - <expr>`  | `<expr>` |
-|         | Binary | `*`      | multiplication     | `<expr> * <expr>`  | `<expr>` |
-|   ⭐    | Binary | `**`     | power of           | `<expr> ** <expr>` | `<expr>` |
-|         | Binary | `/`      | division           | `<expr> / <expr>`  | `<expr>` |
-|         | Binary | `%`      | modulo (remainder) | `<expr> % <expr>`  | `<expr>` |
-
-<!--
-doesnt work because comments use the same syntax :facepalm:
-|   ⭐    | Binary | `//`     | floor division     | `<expr> // <expr>` | `<expr>` |
--->
+| Type   | Operator | Name               | Syntax             | Parent   |
+| ------ | -------- | ------------------ | ------------------ | -------- |
+| Unary  | `-`      | negation           | `- <expr>`         | `<expr>` |
+| Binary | `+`      | addition           | `<expr> + <expr>`  | `<expr>` |
+| Binary | `-`      | subtraction        | `<expr> - <expr>`  | `<expr>` |
+| Binary | `*`      | multiplication     | `<expr> * <expr>`  | `<expr>` |
+| Binary | `**`     | power of           | `<expr> ** <expr>` | `<expr>` |
+| Binary | `/`      | division           | `<expr> / <expr>`  | `<expr>` |
+| Binary | `%`      | modulo (remainder) | `<expr> % <expr>`  | `<expr>` |
 
 Assignment
 
-| Special | Type   | Operator | Name               | Syntax                | Parent   |
-| :-----: | ------ | -------- | ------------------ | --------------------- | -------- |
-|   ⭐    | Binary | `+=`     | addition           | `<name> += <expr> ;`  | `<stmt>` |
-|   ⭐    | Binary | `-=`     | subtraction        | `<name> -= <expr> ;`  | `<stmt>` |
-|   ⭐    | Binary | `*=`     | multiplication     | `<name> *= <expr> ;`  | `<stmt>` |
-|   ⭐    | Binary | `**=`    | power of           | `<name> **= <expr> ;` | `<stmt>` |
-|   ⭐    | Binary | `/=`     | division           | `<name> /= <expr> ;`  | `<stmt>` |
-|   ⭐    | Binary | `%=`     | modulo (remainder) | `<name> %= <expr> ;`  | `<stmt>` |
-
-<!--
-doesnt work because comments use the same syntax :facepalm:
-|   ⭐    | Binary | `//=`    | floor division     | `<name> //= <expr> ;` | `<stmt>` |
--->
+| Type   | Operator | Name               | Syntax                | Parent   |
+| ------ | -------- | ------------------ | --------------------- | -------- |
+| Binary | `+=`     | addition           | `<name> += <expr> ;`  | `<stmt>` |
+| Binary | `-=`     | subtraction        | `<name> -= <expr> ;`  | `<stmt>` |
+| Binary | `*=`     | multiplication     | `<name> *= <expr> ;`  | `<stmt>` |
+| Binary | `**=`    | power of           | `<name> **= <expr> ;` | `<stmt>` |
+| Binary | `/=`     | division           | `<name> /= <expr> ;`  | `<stmt>` |
+| Binary | `%=`     | modulo (remainder) | `<name> %= <expr> ;`  | `<stmt>` |
 
 ## 3.2. Bitwise Operators {#bitwise-operators}
 
-| Special | Type   | Operator | Name                | Syntax             | Parent   |
-| :-----: | ------ | -------- | ------------------- | ------------------ | -------- |
-|         | Unary  | `~`      | bitwise negation    | `~ <expr>`         | `<expr>` |
-|         | Binary | `\|`     | bitwise OR          | `<expr> \| <expr>` | `<expr>` |
-|         | Binary | `^`      | bitwise XOR         | `<expr> ^ <expr>`  | `<expr>` |
-|         | Binary | `&`      | bitwise AND         | `<expr> & <expr>`  | `<expr>` |
-|   ⭐    | Binary | `<<`     | bitwise left shift  | `<expr> << <expr>` | `<expr>` |
-|   ⭐    | Binary | `>>`     | bitwise right shift | `<expr> >> <expr>` | `<expr>` |
+| Type   | Operator | Name                | Syntax             | Parent   |
+| ------ | -------- | ------------------- | ------------------ | -------- |
+| Unary  | `~`      | bitwise negation    | `~ <expr>`         | `<expr>` |
+| Binary | `\|`     | bitwise OR          | `<expr> \| <expr>` | `<expr>` |
+| Binary | `^`      | bitwise XOR         | `<expr> ^ <expr>`  | `<expr>` |
+| Binary | `&`      | bitwise AND         | `<expr> & <expr>`  | `<expr>` |
+| Binary | `<<`     | bitwise left shift  | `<expr> << <expr>` | `<expr>` |
+| Binary | `>>`     | bitwise right shift | `<expr> >> <expr>` | `<expr>` |
 
 Assignment
 
-| Special | Type   | Operator | Name                | Syntax                | Parent   |
-| :-----: | ------ | -------- | ------------------- | --------------------- | -------- |
-|   ⭐    | Binary | `\|=`    | bitwise OR          | `<name> \|= <expr> ;` | `<stmt>` |
-|   ⭐    | Binary | `^=`     | bitwise XOR         | `<name> ^= <expr> ;`  | `<stmt>` |
-|   ⭐    | Binary | `&=`     | bitwise AND         | `<name> &= <expr> ;`  | `<stmt>` |
-|   ⭐    | Binary | `<<=`    | bitwise left shift  | `<name> <<= <expr> ;` | `<stmt>` |
-|   ⭐    | Binary | `>>=`    | bitwise right shift | `<name> >>= <expr> ;` | `<stmt>` |
+| Type   | Operator | Name                | Syntax                | Parent   |
+| ------ | -------- | ------------------- | --------------------- | -------- |
+| Binary | `\|=`    | bitwise OR          | `<name> \|= <expr> ;` | `<stmt>` |
+| Binary | `^=`     | bitwise XOR         | `<name> ^= <expr> ;`  | `<stmt>` |
+| Binary | `&=`     | bitwise AND         | `<name> &= <expr> ;`  | `<stmt>` |
+| Binary | `<<=`    | bitwise left shift  | `<name> <<= <expr> ;` | `<stmt>` |
+| Binary | `>>=`    | bitwise right shift | `<name> >>= <expr> ;` | `<stmt>` |
 
 ## 3.3. Comparison Operators {#comparison-operators}
 
-| Special | Type   | Operator | Name             | Syntax             | Parent   |
-| ------- | ------ | -------- | ---------------- | ------------------ | -------- |
-| ⭐      | Binary | `==`     | equals           | `<expr> == <expr>` | `<expr>` |
-| ⭐      | Binary | `!=`     | not equals       | `<expr> != <expr>` | `<expr>` |
-|         | Binary | `< `     | less             | `<expr> < <expr>`  | `<expr>` |
-| ⭐      | Binary | `<=`     | less or equal    | `<expr> <= <expr>` | `<expr>` |
-|         | Binary | `> `     | greater          | `<expr> > <expr>`  | `<expr>` |
-| ⭐      | Binary | `>=`     | greater or equal | `<expr> >= <expr>` | `<expr>` |
+| Type   | Operator | Name             | Syntax             | Parent   |
+| ------ | -------- | ---------------- | ------------------ | -------- |
+| Binary | `==`     | equals           | `<expr> == <expr>` | `<expr>` |
+| Binary | `!=`     | not equals       | `<expr> != <expr>` | `<expr>` |
+| Binary | `< `     | less             | `<expr> < <expr>`  | `<expr>` |
+| Binary | `<=`     | less or equal    | `<expr> <= <expr>` | `<expr>` |
+| Binary | `> `     | greater          | `<expr> > <expr>`  | `<expr>` |
+| Binary | `>=`     | greater or equal | `<expr> >= <expr>` | `<expr>` |
 
 ## 3.4. Logical Operators {#logical-operators}
 
-| Special | Type   | Operator | Name        | Syntax               | Parent   |
-| ------- | ------ | -------- | ----------- | -------------------- | -------- |
-|         | Unary  | `!`      | logical NOT | `! <expr>`           | `<expr>` |
-| ⭐      | Binary | `\|\|`   | logical OR  | `<expr> \|\| <expr>` | `<expr>` |
-| ⭐      | Binary | `&&`     | logical AND | `<expr> && <expr>`   | `<expr>` |
+| Type   | Operator | Name        | Syntax               | Parent   |
+| ------ | -------- | ----------- | -------------------- | -------- |
+| Unary  | `!`      | logical NOT | `! <expr>`           | `<expr>` |
+| Binary | `\|\|`   | logical OR  | `<expr> \|\| <expr>` | `<expr>` |
+| Binary | `&&`     | logical AND | `<expr> && <expr>`   | `<expr>` |
 
 ## 3.5. Other Operators {#other-operators}
 
 Ternary
 
-| Special | Type    | Operator | Name                      | Syntax                                                                                 | Description                                            | Parent   |
-| ------- | ------- | :------: | ------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------ | -------- |
-|         | Ternary |   `?:`   | Ternary                   | `<expr> ? <expr> : <expr>` where the first `<expr>` coerces into primitive type `bool` |                                                        | `<expr>` |
-|         | Unary   |   `&`    | address of                | `& <name>`                                                                             |                                                        | `<expr>` |
-| ⭐      | Binary  |   `as`   | as                        | `<expr> as <type>`                                                                     | See [Conversion](#types-conversion) in [Types](#types) | `<expr>` |
-|         | Binary  |   `.`    | Struct field access       | `<name> . <name>`                                                                      |                                                        | `<expr>` |
-| ⭐      | Binary  |   `..`   | Struct field index access | `<name> .. <name>`                                                                     |                                                        | `<expr>` |
-|         | Binary  |   `:`    | Scope access              | `<name> : <name>`                                                                      |                                                        | `<expr>` |
-|         | Binary  |   `=`    | Assignment                | `<name> = <expr>`                                                                      |                                                        | `<stmt>` |
+| Type    | Operator | Name                | Syntax                                                                                 | Description                                            | Parent   |
+| ------- | :------: | ------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------ | -------- |
+| Ternary |   `?:`   | Ternary             | `<expr> ? <expr> : <expr>` where the first `<expr>` coerces into primitive type `bool` |                                                        | `<expr>` |
+| Unary   |   `&`    | address of          | `& <name>`                                                                             |                                                        | `<expr>` |
+| Binary  |   `as`   | as                  | `<expr> as <type>`                                                                     | See [Conversion](#types-conversion) in [Types](#types) | `<expr>` |
+| Binary  |   `.`    | Struct field access | `<name> . (<name> \| <expr>)` where `<expr>` coerces into an integer type              |                                                        | `<expr>` |
+| Binary  |   `=`    | Assignment          | `<name> = <expr>`                                                                      |                                                        | `<stmt>` |
 
 **Associativity**
 **Precedence**
@@ -456,7 +444,7 @@ A block is a collection of statements.
 
 -   See `<stmt>` in [Statements](#statements) for the definition of a _statement_.
 
-A block can be "broke from" using the `break` statement.
+A block can be "broken from" using the `break` statement.
 
 **Syntax**
 
