@@ -66,10 +66,10 @@ namespace ry {
 
             OP_NOT, OP_OR, OP_AND,
 
-            OP_TERNARY_TRUE, OP_TERNARY_FALSE,
             // OP_ADDRESS,
-            OP_STRUCT_FIELD_ACCESS,
+            OP_BLOCK_ACCESS,
             OP_ASSIGN,
+            OP_DEFINE,
         };
 
         // must be in the same order as the Type enum
@@ -109,10 +109,10 @@ namespace ry {
 
             "OP_NOT", "OP_OR", "OP_AND",
 
-            "OP_TERNARY_TRUE", "OP_TERNARY_FALSE",
             // OP_ADDRESS,
-            "OP_STRUCT_FIELD_ACCESS",
+            "OP_BLOCK_ACCESS",
             "OP_ASSIGN",
+            "OP_DEFINE"
         };
         static constexpr std::size_t TYPE_STRINGS_LEN = sizeof(TYPE_STRINGS) / sizeof(*TYPE_STRINGS);
 
