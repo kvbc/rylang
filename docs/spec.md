@@ -99,8 +99,6 @@ Lexical analysis is the process of grouping source code characters into tokens.
 
 ## 1.1. Source Code {#source-code}
 
-**Syntax**
-
 | Tag         | Syntax                                                                                | Comment |
 | ----------- | ------------------------------------------------------------------------------------- | ------- |
 | \<new_line> | `\n \| \r \| \r\n` or `LF \| CR \| CRLF`                                              | |
