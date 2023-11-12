@@ -95,22 +95,17 @@ _(lets just ignore test coverage for now)_
 
 # 1. Lexical Analysis {#lexical-analysis}
 
+Lexical analysis is the process of grouping source code characters into tokens.
+
 ## 1.1. Source Code {#source-code}
 
 **Syntax**
 
-| Tag         | Syntax                                                                                |
-| ----------- | ------------------------------------------------------------------------------------- |
-| \<new_line> | `\n \| \r \| \r\n` or `LF \| CR \| CRLF`                                              |
-| \<src_char> | Any valid [UTF-8](https://en.wikipedia.org/wiki/UTF-8) character in range of <1, 127> |
-
-**Interpretation**
-
--   The only valid line encodings are:
-    -   LF
-    -   CR
-    -   CRLF
--   The source code is written in the UTF-8 character encoding.
+| Tag         | Syntax                                                                                | Comment |
+| ----------- | ------------------------------------------------------------------------------------- | ------- |
+| \<new_line> | `\n \| \r \| \r\n` or `LF \| CR \| CRLF`                                              | |
+| \<src_char> | Any valid [ASCII](https://www.asciitable.com/) character in range of <1, 127> and not `<new_line>` | The NUL `\0` character is not considered <br> a valid source code character |
+| \<whitespace> | `' ' \| \t \| \v \| \f \| <new_line>` | |
 
 ## 1.2. Names {#names}
 

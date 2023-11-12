@@ -597,12 +597,10 @@ namespace ry {
         for(size_t i = 0; i < count; i++) {
             char c1 = getChar(0);
             char c2 = getChar(1);
-            if(c1 == '\n' || c1 == '\r') {
+            if(c1 == '\n' || c1 == '\r') { // LF or CR
                 m_srcIdx++;
                 if(c1 == '\r' && c2 == '\n') // CRLF
                     m_srcIdx++;
-                else if(c1 == '\n' && c2 == '\r') // LFCR
-                    std::cerr << "Error: LFCR line encoding (?)" << std::endl;
                 m_col = 1;
                 m_ln++;
             } else {
