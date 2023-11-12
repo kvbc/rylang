@@ -53,16 +53,17 @@ _(lets just ignore test coverage for now)_
 
 | Chapter                                                                           | Syntax | Implemented | Error Handling | Test Coverage | Description                                                                |
 | --------------------------------------------------------------------------------- | :----: | :---------: | :------------: | :-----------: | -------------------------------------------------------------------------- |
+| 0. [Notation](#notation)                                                          |  N/A   |     N/A     |      N/A       |      N/A      |
 | <br >1. [Lexical Analysis](#lexical-analysis) <br> <br>                           |   👇   |     👇      |       👇       |      👇       | **Grouping characters into tokens**                                        |
 | &emsp; 1.1 [Source Code](#source-code)                                            |   ✔️   |     N/A     |      N/A       |      N/A      |                                                                            |
-| &emsp; 1.2. [Names](#names)                                                       |   ✔️   |     ✔️      |       ➖       |      ❌       |                                                                            |
-| &emsp; 1.3. [Comments](#comments)                                                 |   ✔️   |     ✔️      |       ➖       |      ❌       |                                                                            |
+| &emsp; 1.2. [Names](#names)                                                       |   ✔️   |     ✔️      |       ✔️       |      ❌       |                                                                            |
+| &emsp; 1.3. [Comments](#comments)                                                 |   ✔️   |     ✔️      |       ✔️       |      ❌       |                                                                            |
 | &emsp; 1.4. [Literals](#literals)                                                 |   ✔️   |     👇      |       👇       |      👇       |                                                                            |
-| &emsp; &emsp; 1.4.1. [Integer Literals](#integer-literals)                        |   ✔️   |     ✔️      |       ➖       |      ❌       |                                                                            |
-| &emsp; &emsp; 1.4.2. [Float Literals](#float-literals)                            |   ✔️   |     ✔️      |       ➖       |      ❌       |                                                                            |
-| &emsp; &emsp; 1.4.3. [String Literals](#string-literals)                          |   ✔️   |     ✔️      |       ➖       |      ❌       |                                                                            |
-| &emsp; &emsp; 1.4.4. [Character Literals](#char-literals)                         |   ✔️   |     ✔️      |       ➖       |      ❌       |                                                                            |
-| &emsp; 1.5. [Keywords](#keywords)                                                 |   ✔️   |     ✔️      |      N/A       |      ❌       |                                                                            |
+| &emsp; &emsp; 1.4.1. [Integer Literals](#integer-literals)                        |   ✔️   |     ✔️      |       ✔️       |      ❌       |                                                                            |
+| &emsp; &emsp; 1.4.2. [Float Literals](#float-literals)                            |   ✔️   |     ✔️      |       ✔️       |      ❌       |                                                                            |
+| &emsp; &emsp; 1.4.3. [String Literals](#string-literals)                          |   ✔️   |     ✔️      |       ✔️       |      ❌       |                                                                            |
+| &emsp; &emsp; 1.4.4. [Character Literals](#char-literals)                         |   ✔️   |     ✔️      |       ✔️       |      ❌       |                                                                            |
+| &emsp; 1.5. [Keywords](#keywords)                                                 |   ↪️   |     ✔️      |      N/A       |      ❌       |                                                                            |
 | &emsp; 1.6. [Operators](#lexical-operators)                                       |   ↪️   |     ✔️      |      N/A       |      ❌       |                                                                            |
 | &emsp; 1.7. [Tokens](#tokens)                                                     |   👆   |     👆      |       👆       |      👆       |                                                                            |
 | <br> 2. [Parsing and Semantic Analysis](#parsing-and-semantic-analysis) <br> <br> |   👇   |     👇      |       👇       |      👇       | **Grouping tokens into untyped AST nodes and analyzing untyped AST nodes** |
@@ -93,27 +94,46 @@ _(lets just ignore test coverage for now)_
 
 ---
 
+# 0. Notation {#notation}
+
+The syntax is specified using a variant of Extended Backus-Naur Form (EBNF)
+
+The notation has been extended by an negation or exclusion operator `~`.
+Symbols have been wrapped in arrow brackets `<>` and are now called tags.
+
+Example:
+
+```ebnf
+<number>       = 0-9;
+<alphanumeric> = a-z | A-Z | <number>
+<not_number>   = ~ <number>               (* anything but number    *)
+<alpha>        = <alphanumeric> ~ <alpha> (* this, excluding number *)
+```
+
 # 1. Lexical Analysis {#lexical-analysis}
 
 Lexical analysis is the process of grouping source code characters into tokens.
 
 ## 1.1. Source Code {#source-code}
 
-| Tag         | Syntax                                                                                | Comment |
-| ----------- | ------------------------------------------------------------------------------------- | ------- |
-| \<new_line> | `\n \| \r \| \r\n` or `LF \| CR \| CRLF`                                              | |
-| \<src_char> | Any valid [ASCII](https://www.asciitable.com/) character in range of <1, 127> and not `<new_line>` | The NUL `\0` character is not considered <br> a valid source code character |
-| \<whitespace> | `' ' \| \t \| \v \| \f \| <new_line>` | |
+| Tag           | Syntax                                                                                             | Comment                                                                     |
+| ------------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| \<new_line>   | `\n \| \r \| \r\n` or `LF \| CR \| CRLF`                                                           |                                                                             |
+| \<src_char>   | Any valid [ASCII](https://www.asciitable.com/) character in range of <1, 127> and not `<new_line>` | The NUL `\0` character is not considered <br> a valid source code character |
+| \<whitespace> | `' ' \| \t \| \v \| \f \| <new_line>`                                                              |                                                                             |
+| \<src_code>   | `<src_char> {<src_char>}`                                                                          | One or more source code characters                                          |
+| \<eof>        | NUL `\0`, end of the `<src_code>` stream.                                                          | End Of File                                                                 |
 
 ## 1.2. Names {#names}
 
 **Syntax**
 
-| Tag                | Syntax                                 |
-| ------------------ | -------------------------------------- |
-| \<name>            | `<name_start_char> {<name_char>}`      |
-| \<name_start_char> | <code>\_ \| a-z \| A-Z</code>          |
-| \<name_char>       | <code>\<name_start_char> \| 0-9</code> |
+| Tag                       | Syntax                                                              |
+| ------------------------- | ------------------------------------------------------------------- |
+| \<name>                   | `<name_start_char> {<name_char>}` where `<name>` is not `<keyword>` |
+| &emsp; \<name_start_char> | <code>\_ \| a-z \| A-Z</code>                                       |
+| &emsp; \<name_char>       | <code>\<name_start_char> \| 0-9</code>                              |
+| &emsp; \<keyword>         | See [Keywords](#keywords)                                           |
 
 **Interpretation**
 
@@ -141,17 +161,17 @@ __Big_Word__
 
 **Syntax**
 
-| Tag                                         | Syntax                                                                | Comment                                                                                       |
+| Tag(s)                                      | Syntax                                                                | Comment                                                                                       |
 | ------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | \<comment>                                  | `// {<src_char>} [<new_line>]` where `<src_char>` is not `<new_line>` | Single-line comment                                                                           |
-| \<comment>                                  | `/* {<src_char>} */` where `<src_char>` is not `*/`                   | Multi-line comment. <br> Multiple multi-line comments can NOT be nested inside of each other. |
-| &emsp; \<src_char>, <br> &emsp; \<new_line> | See [Lexical Analysis](#lexical-analysis)                             |
+| \<comment>, <br> \<multi_line_comment>      | `/* {<src_char>} */` where `<src_char>` is not `*/`                   | Multi-line comment. <br> Multiple multi-line comments can NOT be nested inside of each other. |
+| &emsp; \<src_char>, <br> &emsp; \<new_line> | See [Source Code](#source-code)                                       |
 
 **Errors**
 
-| Error                              | Example        |
-| ---------------------------------- | -------------- |
-| ❗ Unterminated multi-line comment | `/* ... <eof>` |
+| Tag                   | Error                              | Syntax                  | Comment                    |
+| --------------------- | ---------------------------------- | ----------------------- | -------------------------- |
+| \<multi_line_comment> | ❗ Unterminated multi-line comment | `/* {<src_char>} <eof>` | Terminating `*/` not found |
 
 **Examples**
 
@@ -171,33 +191,33 @@ comment
 
 ## 1.4. Literals {#literals}
 
-| Tag                      | Syntax                                                           | Comment                                                                                                        |
-| ------------------------ | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| \<literal>               | `<integer> \| <float> \| <string> \| <char> \| <struct_literal>` |                                                                                                                |
-| &emsp; \<integer>        | See [Integer Literals](#integer-literals)                        |                                                                                                                |
-| &emsp; \<float>          | See [Float Literals](#float-literals)                            |                                                                                                                |
-| &emsp; \<string>         | See [String Literals](#string-literals)                          |                                                                                                                |
-| &emsp; \<char>           | See [Character Literals](#char-literals)                         |                                                                                                                |
-| &emsp; \<struct_literal> | See [Struct Literals](#struct-literals)                          | Struct literals are not part of the lexical analysis process, <br> therefore are not mentioned in this chapter |
+| Tag                  | Syntax                                                                   | Comment                                                                                                           |
+| -------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| \<literal>           | `<int_lit> \| <float_lit> \| <string_lit> \| <char_lit> \| <struct_lit>` |                                                                                                                   |
+| &emsp; \<int_lit>    | See [Integer Literals](#integer-literals)                                |                                                                                                                   |
+| &emsp; \<float_lit>  | See [Float Literals](#float-literals)                                    |                                                                                                                   |
+| &emsp; \<string_lit> | See [String Literals](#string-literals)                                  |                                                                                                                   |
+| &emsp; \<char_lit>   | See [Character Literals](#char-literals)                                 |                                                                                                                   |
+| &emsp; \<struct_lit> | See [Struct Literals](#struct-literals)                                  | Struct literals are not part of the lexical analysis process, <br> therefore are not mentioned under this chapter |
 
 ### 1.4.1. Integer Literals {#integer-literals}
 
 **Syntax**
 
-| Tag(s)                      | Syntax                            | Comment                     |
-| --------------------------- | --------------------------------- | --------------------------- |
-| \<dec_int>, <br> \<integer> | `0-9 {[_]0-9}`                    | Decimal integer literal     |
-| \<integer>                  | `0b 0\|1 {[_]0 \| 1}`             | Binary integer literal      |
-| \<integer>                  | `0x <hex_digit> {[_]<hex_digit>}` | Hexadecimal integer literal |
-| &emsp; \<hex_digit>         | `(0 - 9) \| (a - f) \| (A - F)`   | Hexadecimal digit           |
-| \<integer>                  | `0o 0-7 {[_]0-7}`                 | Octal integer literal       |
+| Tag(s)                          | Syntax                                 | Comment                     |
+| ------------------------------- | -------------------------------------- | --------------------------- |
+| \<bin_int_lit>, <br> \<int_lit> | `0b 0\|1 {{_} 0\|1 {_}}`               | Binary integer literal      |
+| \<oct_int_lit>, <br> \<int_lit> | `0o 0-7 {{_} 0-7 {_}}`                 | Octal integer literal       |
+| \<dec_int_lit>, <br> \<int_lit> | `0-9 {{_} 0-9 {_}}`                    | Decimal integer literal     |
+| \<hex_int_lit>, <br> \<int_lit> | `0x <hex_digit> {{_} <hex_digit> {_}}` | Hexadecimal integer literal |
+| &emsp; \<hex_digit>             | `(0 - 9) \| (a - f) \| (A - F)`        | Hexadecimal digit           |
 
 **Errors**
 
-| Error                        | Example                           |
-| ---------------------------- | --------------------------------- |
-| ❗ Malformed integer literal | `0x<eof>`, `0o<eof>`, `0x<space>` |
-| ❗ Invalid digit             | `0xZ`, `0o99`, `0oAZ`             |
+| Tag        | Error                        | Syntax                                                                                                                                                                                                           | Comment |
+| ---------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| \<int_lit> | ❗ Malformed integer literal | `0(b\|o)(<src_char> ~ 0-9)` <br> `0x(<src_char> ~ <hex_digit>)` <br> <br> `(<bin_int_lit> \| <oct_int_lit>) <alpha>` <br> `(<hex_int_lit> (<alpha> ~ <hex_digit>))` <br> <li> where `<alpha> = a-z \| A-Z` </li> |         |
+| \<int_lit> | ❗ Invalid digit             | `(0b \| <bin_int_lit>) 0-9` or <br> `(0o \| <oct_int_lit>) 0-9` or <br> `(0x \| <hex_int_lit>) 0-9`                                                                                                              |
 
 **Examples**
 
@@ -234,19 +254,19 @@ _1_    // INVALID
 
 **Syntax**
 
-| Tag               | Syntax                                    | Comment  |
-| ----------------- | ----------------------------------------- | -------- |
-| \<float>          | `<dec_int> . <dec_int> [<float_exp>]`     |
-| \<float>          | `<dec_int> <float_exp>`                   |
-| \<float_exp>      | `e\|E +\|- <dec_int>`                     | Exponent |
-| &emsp; \<dec_int> | See [Integer Literals](#integer-literals) |
+| Tag                 | Syntax                                    | Comment  |
+| ------------------- | ----------------------------------------- | -------- |
+| \<float_lit>        | `<int_lit> . <int_lit> [<float_exp>]`     |
+| \<float_lit>        | `<int_lit> <float_exp>`                   |
+| &emsp; \<float_exp> | `e\|E [+\|-] <int_lit>`                   | Exponent |
+| &emsp; \<int_lit>   | See [Integer Literals](#integer-literals) |
 
 **Errors**
 
-| Error                       | Example            |
-| --------------------------- | ------------------ |
-| ❗ Unfinished float literal | `3.`, `5.`, `7.`   |
-| ❗ Unfinished exponent      | `3e`, `5e+`, `7e-` |
+| Tag          | Error                       | Syntax                                     |
+| ------------ | --------------------------- | ------------------------------------------ |
+| \<float_lit> | ❗ Unfinished float literal | `<dec_int_lit> . ~<dec_int_lit>`           |
+| \<float_lit> | ❗ Unfinished exponent      | `<dec_int_lit> e\|E [+\|-] ~<dec_int_lit>` |
 
 **Examples**
 
@@ -256,26 +276,27 @@ TODO
 
 **Syntax**
 
-| Tag                | Syntax                                                                     | Comment                              |
-| ------------------ | -------------------------------------------------------------------------- | ------------------------------------ |
-| \<string>          | `` ` {<src_char>} ` ``                                                     | Single-line raw string literal       |
-| \<string>          | <code>\`\`\` {<src_char>} \`\`\`</code>                                    | Multi-line raw string literal        |
-| \<string>          | `" {<src_char> \| \<string_esc_seq>} "` where `<src_char>` is not `\`      | Single-line escapable string literal |
-| \<string>          | `""" {<src_char> \| \<string_esc_seq>} """` where `<src_char>` is not `\`  | Multi-line escapable string literal  |
-| \<string_esc_seq>  | <code>a \| b \| e \| f \| n \| r \| t \| v \| ` \| \ \| <new_line> </code> |
-| \<string_esc_seq>  | `<integer>` in range of <1,127>                                            |
-| &emsp; \<src_char> | See [Lexical Analysis](#lexical-analysis)                                  |
-| &emsp; \<integer>  | See [Integer Literals](#integer-literals)                                  |
+| Tag(s)                                                                | Syntax                                                                                | Comment                              |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------ |
+| \<string_lit>, <br> \<single_line_string_lit>                         | `` ` {<src_char>} ` ``                                                                | Single-line raw string literal       |
+| \<string_lit>, <br> \<multi_line_string_lit>                          | <code>\`\`\` {<src_char> \| <new_line>} \`\`\`</code>                                 | Multi-line raw string literal        |
+| \<string_lit>, <br> \<esc_string_lit>, <br> \<single_line_string_lit> | `" {<esc_string_lit_char>} "`                                                         | Single-line escapable string literal |
+| \<string_lit>, <br> \<esc_string_lit>, <br> \<multi_line_string_lit>  | `""" {<esc_string_lit_char> \| <new_line>} """`                                       | Multi-line escapable string literal  |
+| &emsp; \<esc_string_lit_char>                                         | `(<src_char> ~ \) \| \<string_lit_esc_seq>`                                           |
+| \<string_lit_esc_seq>                                                 | <code>a \| b \| e \| f \| n \| r \| t \| v \| ' \| \` \| " \| \ \| <new_line> </code> |
+| \<string_lit_esc_seq>                                                 | `<int_lit>` which maps to `<src_char>`                                                |
+| &emsp; \<src_char>                                                    | See [Lexical Analysis](#lexical-analysis)                                             |
+| &emsp; \<int_lit>                                                     | See [Integer Literals](#integer-literals)                                             |
 
 **Errors**
 
-| Error                                                | Example                         |
-| ---------------------------------------------------- | ------------------------------- |
-| ❗ Unexpected new line in single-line string literal | `"abc <new_line>"`              |
-| ❗ Expected termination of multi-line string literal | `""" hello "`, `"""hello <eof>` |
-| ❗ Unterminated single-line string literal           | `"sup <eof>`                    |
-| ❗ Invalid escape sequence                           | `"string \x"`                   |
-| ❗ Escape sequence out of bounds                     | `"string \200"`                 |
+| Tag                       | Error                                                | Syntax                                                                                                                                                                      |
+| ------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| \<single_line_string_lit> | ❗ Unexpected new line in single-line string literal | <code>\` {<src_char>} <new_line> \`<code> <br> `" {<esc_string_lit_char>} <new_line> "`                                                                                     |
+| \<multi_line_string_lit>  | ❗ Expected termination of multi-line string literal | <code>\`\`\` {<src_char> \| <new_line>} \`\|\`\`\|\<eof></code> <br> `""" {<esc_string_lit_char> \| <new_line>} "\|""\|<eof>`                                               |
+| \<single_line_string_lit> | ❗ Unterminated single-line string literal           | <code>\` {<src_char>} \<eof></code> <br> `" {<esc_string_lit_char>} <eof>`                                                                                                  |
+| \<esc_string_lit>         | ❗ Invalid escape sequence                           | `<esc_string_lit>` containing `\<string_lit_esc_seq>` <br> where `<string_lit_esc_seq> = ~ <string_lit_esc_seq>`                                                            |
+| \<esc_string_lit>         | ❗ Escape sequence out of bounds                     | `<esc_string_lit>` containing `\<string_lit_esc_seq>` <br> where `<string_lit_esc_seq>` is `<int_lit>` <br> and `<string_lit_esc_seq>` does not map to a valid `<src_char>` |
 
 **Examples**
 
@@ -297,38 +318,37 @@ TODO
     one \
     line \
     multi \
-" == "onelinemulti"
+" == "one line multi"
 ```
 
 ### 1.4.4. Character Literals {#char-literals}
 
 **Syntax**
 
-| Tag                      | Syntax                                                                |
-| ------------------------ | --------------------------------------------------------------------- |
-| \<char>                  | `' {<src_char> \| \<string_esc_seq>} '` where `<src_char>` is not `\` |
-| &emsp; \<src_char>       | See [Lexical Analysis](#lexical-analysis)                             |
-| &emsp; \<string_esc_seq> | See [String Literals](#string-literals)                               |
+| Tag                          | Syntax                                      |
+| ---------------------------- | ------------------------------------------- |
+| \<char_lit>                  | `' {<char_lit_char>} '`                     |
+| &emsp; \<char_lit_char>      | `(<src_char> ~ \) \| \<string_lit_esc_seq>` |
+| &emsp; \<src_char>           | See [Lexical Analysis](#lexical-analysis)   |
+| &emsp; \<string_lit_esc_seq> | See [String Literals](#string-literals)     |
 
 **Errors**
 
-| Error                             | Example              |
-| --------------------------------- | -------------------- |
-| ❗ Unterminated character literal | `'c abc`, `'a <eof>` |
-| ❗ Invalid escape sequence        | `'\x'`               |
-| ❗ Escape sequence out of bounds  | `'\200'`             |
+| Tag         | Error                             | Syntax                                  | Comment                   |
+| ----------- | --------------------------------- | --------------------------------------- | ------------------------- |
+| \<char_lit> | ❗ Unterminated character literal | `' {<char_lit_char>} <eof>`             | Terminating `'` not found |
+| \<char_lit> | ❗ Invalid escape sequence        | See [String Literals](#string-literals) |
+| \<char_lit> | ❗ Escape sequence out of bounds  | See [String Literals](#string-literals) |
 
 **Examples**
 
-```rust
-ch u8 = 'x';
-```
+TODO
 
 ## 1.5. Keywords {#keywords}
 
 | Tag                 | Syntax                        |
 | ------------------- | ----------------------------- |
-| \<keyword>          | `<primitive>` or below        |
+| \<keyword>          | `<primitive>` or any of below |
 | &emsp; \<primitive> | See [Primitives](#primitives) |
 
 ```
@@ -350,7 +370,7 @@ Tokens represent:
 -   [Keywords](#keywords)
 -   [Operators](#operators)
 -   [Literals](#literals)
--   Characters `( ) ;`
+-   Characters: `( ) ;`
 
 # 2. Parsing and Semantic Analysis {#parsing-and-semantic-analysis}
 

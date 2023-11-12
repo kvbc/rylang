@@ -460,6 +460,9 @@ namespace ry {
                 case 'r':  eatChar(); return '\r';
                 case 't':  eatChar(); return '\t';
                 case 'v':  eatChar(); return '\v';
+                case '"':  eatChar(); return '"';
+                case '`':  eatChar(); return '`';
+                case '\'': eatChar(); return '\'';
                 case '\\': eatChar(); return '\\';
                 case '\r':
                 case '\n':
