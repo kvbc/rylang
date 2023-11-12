@@ -67,7 +67,7 @@ _(lets just ignore test coverage for now)_
 | &emsp; 1.6. [Operators](#lexical-operators)                                       |   ↪️   |     ✔️      |      N/A       |      ❌       | Arithmetic, bitwise, comparison, logical, other               |
 | &emsp; 1.7. [Tokens](#tokens)                                                     |   👆   |     👆      |       👆       |      👆       | Names, keywords, operators, literals, characters              |
 | <br> 2. [Parsing and Semantic Analysis](#parsing-and-semantic-analysis) <br> <br> |   👇   |     👇      |       👇       |      👇       | **Grouping tokens into untyped AST nodes and their analysis** |
-| &emsp; 2.1. [Types](#types)                                                       |   ✔️   |     👇      |       👇       |      👇       |                                                               |
+| &emsp; 2.1. [Types](#types)                                                       |   ✔️   |     ❌      |       👇       |      👇       |                                                               |
 | &emsp; &emsp; 2.1.1. [Primitive Types](#primitive-types)                          |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.1.2. [Function Type](#function-type)                              |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.1.3. [Struct Type](#struct-type)                                  |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
@@ -76,11 +76,12 @@ _(lets just ignore test coverage for now)_
 | &emsp; &emsp; &emsp; 2.1.4.2. [Type Mutability](#type-mutability)                 |   ➖   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; &emsp; 2.1.4.3. [Optional Types](#optional-types)                   |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; 2.2. [Operators](#operators)                                               |   👇   |     👇      |       👇       |      👇       |                                                               |
-| &emsp; &emsp; 2.2.1. [Arithmetic Operators](#arithmetic-operators)                |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.2.2. [Bitwise Operators](#bitwise-operators)                      |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.2.3. [Comparison Operators](#comparison-operators)                |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.2.4. [Logical Operators](#logical-operators)                      |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.2.5. [Other Operators](#other-operators)                          |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.2.1. [Arithmetic Operators](#arithmetic-operators)                |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.2.2. [Bitwise Operators](#bitwise-operators)                      |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.2.3. [Comparison Operators](#comparison-operators)                |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.2.4. [Logical Operators](#logical-operators)                      |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.2.5. [Other Operators](#other-operators)                          |   ➖   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.2.6. [Operator Precedence](#operator-precedence)                  |   ➖   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; 2.3. [Expressions](#expressions)                                           |   ❌   |     👇      |       👇       |      👇       |                                                               |
 | &emsp; &emsp; 2.3.1. [Block](#block) (& `break`)                                  |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.3.2. [Control Flow](#control-flow)                                |   👇   |     👇      |       👇       |      👇       |                                                               |
@@ -360,6 +361,7 @@ TODO
 if elif else
 loop continue break
 false true
+not or and
 as
 ```
 
@@ -471,88 +473,98 @@ tuple [i32, bool, f32] = [1, true, 2.3];
 | <expr_op> | See below | Operation resulting in an expression   |
 | <stmt_op> | See below | Standalone operation yielding no value |
 
-**Associativity**
-
-TODO
-
-**Precedence**
-
-TODO
-
 ### 2.2.1. Arithmetic Operators {#arithmetic-operators}
 
-| Tag       | Type   | Operator | Name               | Syntax             |
-| --------- | ------ | -------- | ------------------ | ------------------ |
-| <expr_op> | Unary  | `-`      | negation           | `- <expr>`         |
-| <expr_op> | Binary | `+`      | addition           | `<expr> + <expr>`  |
-| <expr_op> | Binary | `-`      | subtraction        | `<expr> - <expr>`  |
-| <expr_op> | Binary | `*`      | multiplication     | `<expr> * <expr>`  |
-| <expr_op> | Binary | `**`     | power of           | `<expr> ** <expr>` |
-| <expr_op> | Binary | `/`      | division           | `<expr> / <expr>`  |
-| <expr_op> | Binary | `%`      | modulo (remainder) | `<expr> % <expr>`  |
+| Tag       | Type   | Operator | Name               | Syntax             | Associativity | Precedence |
+| --------- | ------ | :------: | ------------------ | ------------------ | :-----------: | :--------: |
+| <expr_op> | Unary  |   `-`    | negation           | `- <expr>`         |     `<--`     |     4      |
+| <expr_op> | Binary |   `+`    | addition           | `<expr> + <expr>`  |     `-->`     |     7      |
+| <expr_op> | Binary |   `-`    | subtraction        | `<expr> - <expr>`  |     `-->`     |     7      |
+| <expr_op> | Binary |   `*`    | multiplication     | `<expr> * <expr>`  |     `-->`     |     6      |
+| <expr_op> | Binary |   `**`   | power of           | `<expr> ** <expr>` |     `-->`     |     5      |
+| <expr_op> | Binary |   `/`    | division           | `<expr> / <expr>`  |     `-->`     |     6      |
+| <expr_op> | Binary |   `%`    | modulo (remainder) | `<expr> % <expr>`  |     `-->`     |     6      |
 
 Assignment
 
-| Tag       | Type   | Operator | Name               | Syntax                |
-| --------- | ------ | -------- | ------------------ | --------------------- |
-| <stmt_op> | Binary | `+=`     | addition           | `<name> += <expr> ;`  |
-| <stmt_op> | Binary | `-=`     | subtraction        | `<name> -= <expr> ;`  |
-| <stmt_op> | Binary | `*=`     | multiplication     | `<name> *= <expr> ;`  |
-| <stmt_op> | Binary | `**=`    | power of           | `<name> **= <expr> ;` |
-| <stmt_op> | Binary | `/=`     | division           | `<name> /= <expr> ;`  |
-| <stmt_op> | Binary | `%=`     | modulo (remainder) | `<name> %= <expr> ;`  |
+| Tag       | Type   | Operator | Name               | Syntax              | Associativity | Precedence |
+| --------- | ------ | :------: | ------------------ | ------------------- | :-----------: | :--------: |
+| <stmt_op> | Binary |   `+=`   | addition           | `<name> += <expr>`  |      N/A      |    N/A     |
+| <stmt_op> | Binary |   `-=`   | subtraction        | `<name> -= <expr>`  |      N/A      |    N/A     |
+| <stmt_op> | Binary |   `*=`   | multiplication     | `<name> *= <expr>`  |      N/A      |    N/A     |
+| <stmt_op> | Binary |  `**=`   | power of           | `<name> **= <expr>` |      N/A      |    N/A     |
+| <stmt_op> | Binary |   `/=`   | division           | `<name> /= <expr>`  |      N/A      |    N/A     |
+| <stmt_op> | Binary |   `%=`   | modulo (remainder) | `<name> %= <expr>`  |      N/A      |    N/A     |
 
 ### 2.2.2. Bitwise Operators {#bitwise-operators}
 
-| Tag       | Type   | Operator | Name                | Syntax             |
-| --------- | ------ | -------- | ------------------- | ------------------ |
-| <expr_op> | Unary  | `~`      | bitwise negation    | `~ <expr>`         |
-| <expr_op> | Binary | `\|`     | bitwise OR          | `<expr> \| <expr>` |
-| <expr_op> | Binary | `^`      | bitwise XOR         | `<expr> ^ <expr>`  |
-| <expr_op> | Binary | `&`      | bitwise AND         | `<expr> & <expr>`  |
-| <expr_op> | Binary | `<<`     | bitwise left shift  | `<expr> << <expr>` |
-| <expr_op> | Binary | `>>`     | bitwise right shift | `<expr> >> <expr>` |
+| Tag       | Type   | Operator | Name                | Syntax             | Associativity | Precedence |
+| --------- | ------ | :------: | ------------------- | ------------------ | :-----------: | :--------: |
+| <expr_op> | Unary  |   `~`    | bitwise negation    | `~ <expr>`         |     `<--`     |     4      |
+| <expr_op> | Binary |   `\|`   | bitwise OR          | `<expr> \| <expr>` |     `-->`     |     13     |
+| <expr_op> | Binary |   `^`    | bitwise XOR         | `<expr> ^ <expr>`  |     `-->`     |     12     |
+| <expr_op> | Binary |   `&`    | bitwise AND         | `<expr> & <expr>`  |     `-->`     |     11     |
+| <expr_op> | Binary |   `<<`   | bitwise left shift  | `<expr> << <expr>` |     `-->`     |     8      |
+| <expr_op> | Binary |   `>>`   | bitwise right shift | `<expr> >> <expr>` |     `-->`     |     8      |
 
 Assignment
 
-| Tag       | Type   | Operator | Name                | Syntax                |
-| --------- | ------ | -------- | ------------------- | --------------------- |
-| <stmt_op> | Binary | `\|=`    | bitwise OR          | `<name> \|= <expr> ;` |
-| <stmt_op> | Binary | `^=`     | bitwise XOR         | `<name> ^= <expr> ;`  |
-| <stmt_op> | Binary | `&=`     | bitwise AND         | `<name> &= <expr> ;`  |
-| <stmt_op> | Binary | `<<=`    | bitwise left shift  | `<name> <<= <expr> ;` |
-| <stmt_op> | Binary | `>>=`    | bitwise right shift | `<name> >>= <expr> ;` |
+| Tag       | Type   | Operator | Name                | Syntax              | Associativity | Precedence |
+| --------- | ------ | :------: | ------------------- | ------------------- | :-----------: | :--------: |
+| <stmt_op> | Binary |  `\|=`   | bitwise OR          | `<name> \|= <expr>` |      N/A      |    N/A     |
+| <stmt_op> | Binary |   `^=`   | bitwise XOR         | `<name> ^= <expr>`  |      N/A      |    N/A     |
+| <stmt_op> | Binary |   `&=`   | bitwise AND         | `<name> &= <expr>`  |      N/A      |    N/A     |
+| <stmt_op> | Binary |  `>>=`   | bitwise right shift | `<name> >>= <expr>` |      N/A      |    N/A     |
+| <stmt_op> | Binary |  `<<=`   | bitwise left shift  | `<name> <<= <expr>` |      N/A      |    N/A     |
 
 ### 2.2.3. Comparison Operators {#comparison-operators}
 
-| Tag       | Type   | Operator | Name             | Syntax             |
-| --------- | ------ | -------- | ---------------- | ------------------ |
-| <expr_op> | Binary | `==`     | equals           | `<expr> == <expr>` |
-| <expr_op> | Binary | `!=`     | not equals       | `<expr> != <expr>` |
-| <expr_op> | Binary | `< `     | less             | `<expr> < <expr>`  |
-| <expr_op> | Binary | `<=`     | less or equal    | `<expr> <= <expr>` |
-| <expr_op> | Binary | `> `     | greater          | `<expr> > <expr>`  |
-| <expr_op> | Binary | `>=`     | greater or equal | `<expr> >= <expr>` |
+| Tag       | Type   | Operator | Name             | Syntax             | Associativity | Precedence |
+| --------- | ------ | :------: | ---------------- | ------------------ | :-----------: | :--------: |
+| <expr_op> | Binary |   `==`   | equals           | `<expr> == <expr>` |     `-->`     |     10     |
+| <expr_op> | Binary |   `!=`   | not equals       | `<expr> != <expr>` |     `-->`     |     10     |
+| <expr_op> | Binary |   `< `   | less             | `<expr> < <expr>`  |     `-->`     |     9      |
+| <expr_op> | Binary |   `<=`   | less or equal    | `<expr> <= <expr>` |     `-->`     |     9      |
+| <expr_op> | Binary |   `> `   | greater          | `<expr> > <expr>`  |     `-->`     |     9      |
+| <expr_op> | Binary |   `>=`   | greater or equal | `<expr> >= <expr>` |     `-->`     |     9      |
 
 ### 2.2.4. Logical Operators {#logical-operators}
 
-| Tag       | Type   | Operator | Name        | Syntax               |
-| --------- | ------ | -------- | ----------- | -------------------- |
-| <expr_op> | Unary  | `!`      | logical NOT | `! <expr>`           |
-| <expr_op> | Binary | `\|\|`   | logical OR  | `<expr> \|\| <expr>` |
-| <expr_op> | Binary | `&&`     | logical AND | `<expr> && <expr>`   |
+| Tag       | Type   | Operator | Name        | Syntax              | Associativity | Precedence |
+| --------- | ------ | :------: | ----------- | ------------------- | :-----------: | :--------: |
+| <expr_op> | Unary  |  `not`   | logical NOT | `not <expr>`        |     `<--`     |     4      |
+| <expr_op> | Binary |   `or`   | logical OR  | `<expr> or <expr>`  |     `-->`     |     15     |
+| <expr_op> | Binary |  `and`   | logical AND | `<expr> and <expr>` |     `-->`     |     14     |
 
 ### 2.2.5. Other Operators {#other-operators}
 
-Ternary
+| Tag       | Type   | Operator | Name         | Syntax                                                          | Associativity | Precedence | Description                                            |
+| --------- | ------ | :------: | ------------ | --------------------------------------------------------------- | :-----------: | :--------: | ------------------------------------------------------ |
+| <expr_op> | Unary  |   `&`    | address of   | `& <name>`                                                      |     `<--`     |     3      |                                                        |
+| <expr_op> | Binary |   `as`   | as           | `<expr> as <type>`                                              |     `-->`     |     2      | See [Conversion](#types-conversion) in [Types](#types) |
+| <expr_op> | Binary |   `.`    | Block access | `<name> . (<name> \| <expr>)` where `<expr>` coerces into `u32` |     `-->`     |     1      |                                                        |
+| <stmt_op> | Binary |   `=`    | Assignment   | `<name> = <expr>`                                               |      N/A      |    N/A     |                                                        |
+| <stmt_op> | Binary |   `:=`   | Definition   | `<name> := <expr>`                                              |      N/A      |    N/A     |                                                        |
 
-| Tag       | Type   | Operator | Name         | Syntax                                                                    | Description                                            |
-| --------- | ------ | :------: | ------------ | ------------------------------------------------------------------------- | ------------------------------------------------------ |
-| <expr_op> | Unary  |   `&`    | address of   | `& <name>`                                                                |                                                        |
-| <expr_op> | Binary |   `as`   | as           | `<expr> as <type>`                                                        | See [Conversion](#types-conversion) in [Types](#types) |
-| <expr_op> | Binary |   `.`    | Block access | `<name> . (<name> \| <expr>)` where `<expr>` coerces into an integer type |                                                        |
-| <stmt_op> | Binary |   `=`    | Assignment   | `<name> = <expr>`                                                         |                                                        |
-| <stmt_op> | Binary |   `:=`   | Definition   | `<name> := <expr>`                                                        |                                                        |
+### 2.2.6. Operator Precedence {#operator-precedence}
+
+| Level | Operators         |
+| :---: | :---------------- |
+|   1   | `.`               |
+|   2   | `as`              |
+|   3   | `&`               |
+|   4   | `-a` `~a` `!a`    |
+|   5   | `**`              |
+|   6   | `*` `/` `%`       |
+|   7   | `a+b` `a-b`       |
+|   8   | `<<` `>>`         |
+|   9   | `<` `<=` `>` `>=` |
+|  10   | `==` `!=`         |
+|  11   | `a&b`             |
+|  12   | `^`               |
+|  13   | `\|`              |
+|  14   | `and`             |
+|  15   | `or`              |
 
 ## 2.3. Expressions {#expressions}
 

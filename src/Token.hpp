@@ -18,6 +18,7 @@ namespace ry {
             "if",    "elif",     "else",
             "loop",  "continue", "break",
             "false", "true",
+            "not", "or", "and",
             "as",
 
             "char",
@@ -44,6 +45,7 @@ namespace ry {
             KW_IF,    KW_ELIF,     KW_ELSE,
             KW_LOOP,  KW_CONTINUE, KW_BREAK,
             KW_FALSE, KW_TRUE,
+            KW_NOT, KW_OR, KW_AND,
             KW_AS,
             // 
             KW_CHAR,
@@ -88,6 +90,7 @@ namespace ry {
             "KW_IF",    "KW_ELIF",     "KW_ELSE",
             "KW_LOOP",  "KW_CONTINUE", "KW_BREAK",
             "KW_FALSE", "KW_TRUE",
+            "KW_NOT", "KW_OR", "KW_AND",
             "KW_AS",
             // 
             "KW_CHAR",
