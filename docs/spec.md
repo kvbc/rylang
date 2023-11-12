@@ -548,6 +548,8 @@ Assignment
 
 ### 2.2.6. Operator Precedence {#operator-precedence}
 
+TODO: Verify
+
 | Level | Operators         |
 | :---: | :---------------- |
 |   1   | `.`               |
