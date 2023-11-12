@@ -26,3 +26,10 @@ main[] => [] = (import "std"):print["Hello, World!"];
 
 // 
 
+main[] => [] = {
+    x := 3;
+    x = 5; // error! x is immutable by default
+
+    y $*i32 = 6;
+    y = 1;
+};

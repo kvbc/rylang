@@ -67,14 +67,14 @@ _(lets just ignore test coverage for now)_
 | &emsp; 1.6. [Operators](#lexical-operators)                                       |   ↪️   |     ✔️      |      N/A       |      ❌       | Arithmetic, bitwise, comparison, logical, other               |
 | &emsp; 1.7. [Tokens](#tokens)                                                     |   👆   |     👆      |       👆       |      👆       | Names, keywords, operators, literals, characters              |
 | <br> 2. [Parsing and Semantic Analysis](#parsing-and-semantic-analysis) <br> <br> |   👇   |     👇      |       👇       |      👇       | **Grouping tokens into untyped AST nodes and their analysis** |
-| &emsp; 2.1. [Types](#types)                                                       |   ❌   |     👇      |       👇       |      👇       |                                                               |
+| &emsp; 2.1. [Types](#types)                                                       |   ✔️   |     👇      |       👇       |      👇       |                                                               |
 | &emsp; &emsp; 2.1.1. [Primitive Types](#primitive-types)                          |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.1.2. [Function Type](#function-type)                              |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.1.3. [Struct Type](#struct-type)                                  |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.1.4. [Type Attributes](#type-attribs)                             |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; &emsp; 2.1.4.1. [Pointer Types](#pointer-types)                     |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; &emsp; 2.1.4.2. [Type Immutability](#type-immutability)             |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; &emsp; 2.1.4.3. [Optional Types](#optional-types)                   |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.1.3. [Struct Type](#struct-type)                                  |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.1.4. [Type Attributes](#type-attribs)                             |   👇   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; &emsp; 2.1.4.1. [Pointer Types](#pointer-types)                     |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; &emsp; 2.1.4.2. [Type Mutability](#type-mutability)                 |   ➖   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; &emsp; 2.1.4.3. [Optional Types](#optional-types)                   |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; 2.2. [Operators](#operators)                                               |   👇   |     👇      |       👇       |      👇       |                                                               |
 | &emsp; &emsp; 2.2.1. [Arithmetic Operators](#arithmetic-operators)                |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.2.2. [Bitwise Operators](#bitwise-operators)                      |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
@@ -381,9 +381,17 @@ Tokens represent:
 
 ## 2.1. Types {#types}
 
-| Tag     | Syntax                            |
-| ------- | --------------------------------- |
-| \<type> | `<primitive_type> \| <func_type>` |
+| Tag                              | Syntax                                                                                                                                                                                                                   |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| \<type>                          | `[<type_attribs>] (<primitive_type> \| <func_type> \| <struct_type>)`                                                                                                                                                    |
+| &emsp; \<type_attribs>           | `<type_attribs_1> = (<opt_type_attrib> \| <ptr_type_attrib>) <type_attrib> [<type_attribs>]` <br> `<type_attribs_2> = <mut_type_attrib> [<type_attribs_1>]` <br> `<type_attribs> = <type_attribs_1> \| <type_attribs_2>` |
+| &emsp; &emsp; \<type_attrib>     | See [Type Attributes](#type-attribs)                                                                                                                                                                                     |
+| &emsp; &emsp; \<ptr_type_attrib> | See [Pointer Types](#pointer-types)                                                                                                                                                                                      |
+| &emsp; &emsp; \<mut_type_attrib> | See [Type Mutability](#type-mutability)                                                                                                                                                                                  |
+| &emsp; &emsp; \<opt_type_attrib> | See [Optional Types](#optional-types)                                                                                                                                                                                    |
+| &emsp; \<primitive_type>         | See [Primitive Types](#primitive-types)                                                                                                                                                                                  |
+| &emsp; \<func_type>              | See [Function Type](#function-type)                                                                                                                                                                                      |
+| &emsp; \<struct_type>            | See [Struct Type](#struct-type)                                                                                                                                                                                          |
 
 ### 2.1.1. Primitive Types {#primitive-types}
 
@@ -411,19 +419,53 @@ add[a i32; b i32] => i32 = a + b;
 
 ### 2.1.3. Struct Type {#struct-type}
 
-| Tag                 | Syntax                                                                                                 |
-| ------------------- | ------------------------------------------------------------------------------------------------------ |
-| \<struct_type>      | `[ {<struct_field>} ]`                                                                                 |
-| \<struct_field>     | `<name> <type> [= <comp_expr>] [;]` where the semicolon `;` can only be omitted if it's the last field |
-| &emsp; \<name>      | See [Names](#names)                                                                                    |
-| &emsp; \<type>      | See [Types](#types)                                                                                    |
-| &emsp; \<comp_expr> | See [Compile-time expressions](#compile-time-expressions)                                              |
+| Tag                    | Syntax                                                                                                                                                                                                                  |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| \<struct_type>         | `'[' [{<struct_field> ,\|;} <struct_field>] ']'`                                                                                                                                                                        |
+| &emsp; \<struct_field> | `[<name> {,<name>}] <type> [= <comp_expr>]` where `<comp_expr>` coerces into `<type>` <br> `<type> [* <comp_expr>] [= <comp_expr>]` where the first `<comp_expr>` is of type `u32` and the second coerces into `<type>` |
+| &emsp; \<name>         | See [Names](#names)                                                                                                                                                                                                     |
+| &emsp; \<type>         | See [Types](#types)                                                                                                                                                                                                     |
+| &emsp; \<comp_expr>    | See [Compile-time expressions](#compile-time-expressions)                                                                                                                                                               |
 
 **Examples**
 
 ```rust
-pos [x i32; y i32] = [3; 5];
+pos [x i32, y i32 = 9] = [3, 5];
+
+list [i32 * 3] = [1, 2, 3];
+
+tuple [i32, bool, f32] = [1, true, 2.3];
 ```
+
+### 2.1.4. Type Attributes {#type-attribs}
+
+| Tag                       | Syntax                                                        |
+| ------------------------- | ------------------------------------------------------------- |
+| \<type_attrib>            | `<ptr_type_attrib> \| <mut_type_attrib> \| <opt_type_attrib>` |
+| &emsp; \<ptr_type_attrib> | See [Pointer Types](#pointer-types)                           |
+| &emsp; \<mut_type_attrib> | See [Type Mutability](#type-mutability)                       |
+| &emsp; \<opt_type_attrib> | See [Optional Types](#optional-types)                         |
+
+#### 2.1.4.1. Pointer Types {#pointer-types}
+
+| Tag                | Syntax              |
+| ------------------ | ------------------- |
+| \<ptr_type_attrib> | `* <type>`          |
+| &emsp; \<type>     | See [Types](#types) |
+
+#### 2.1.4.2. Type Mutability {#type-mutability}
+
+| Tag                | Syntax              |
+| ------------------ | ------------------- |
+| \<mut_type_attrib> | `$ <type>`          |
+| &emsp; \<type>     | See [Types](#types) |
+
+#### 2.1.4.3. Optional Types {#optional-types}
+
+| Tag                | Syntax              |
+| ------------------ | ------------------- |
+| \<opt_type_attrib> | `? <type>`          |
+| &emsp; \<type>     | See [Types](#types) |
 
 ## 2.2. Operators {#operators}
 
