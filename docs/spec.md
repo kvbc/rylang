@@ -83,20 +83,21 @@ _(lets just ignore test coverage for now)_
 | &emsp; &emsp; 2.2.3. [Comparison Operators](#comparison-operators)                |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.2.4. [Logical Operators](#logical-operators)                      |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.2.5. [Other Operators](#other-operators)                          |   ↪️   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.2.6. [Operator Precedence](#operator-precedence)                  |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.2.7. [Operator Associativity](#operator-associativity)            |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.2.6. [Operator Precedence](#operator-precedence)                  |  ✔️👆  |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.2.7. [Operator Associativity](#operator-associativity)            |  ✔️👆  |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; 2.3. [Expressions](#expressions)                                           |   ✔️   |     👇      |       👇       |      👇       |                                                               |
 | &emsp; &emsp; 2.3.1. [L-Values](#l-values)                                        |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; &emsp; 2.3.1.1. [Pointer Dereference](#pointer-dereference)         |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; &emsp; 2.3.1.2. [Struct Member Access](#struct-member-access)       |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.3.2. [Function Call](#function-call)                              |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.3.3. [Address Of](#address-of)                                    |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.3.4. [Block](#block)                                              |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.3.5. [Control Flow](#control-flow)                                |   👇   |     👇      |       👇       |      👇       |                                                               |
-| &emsp; &emsp; &emsp; 2.3.5.1. [If / Else](#if-else)                               |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; &emsp; 2.3.5.2. [Loop](#loop)                                       |   ➖   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.3.6. [Struct Literals](#struct-literals)                          |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.3.7. [Compile-time Expressions](#compile-time-expressions)        |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.3.4. [Type Cast](#type-cast)                                      |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.3.5. [Block](#block)                                              |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.3.6. [Control Flow](#control-flow)                                |   👇   |     👇      |       👇       |      👇       |                                                               |
+| &emsp; &emsp; &emsp; 2.3.6.1. [If / Else](#if-else)                               |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; &emsp; 2.3.6.2. [Loop](#loop)                                       |   ➖   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.3.7. [Struct Literals](#struct-literals)                          |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.3.8. [Compile-time Expressions](#compile-time-expressions)        |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; 2.4. [Statements](#statements)                                             |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.4.1. [Variables](#variables)                                      |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; 2.5. [Metadata](#metadata)                                                 |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
@@ -557,36 +558,32 @@ Assignment
 
 ### 2.2.5. Other Operators {#other-operators}
 
-|    Tag    | Type   | Operator | Name                 | Syntax                                            | Description                                            |
-| :-------: | ------ | :------: | -------------------- | ------------------------------------------------- | ------------------------------------------------------ |
-|     -     | Unary  |   `&`    | Address of           | See [Address Of](#address-of)                     |                                                        |
-|     -     | Unary  |   `*`    | Pointer Dereference  | See [Pointer Dereference](#pointer-dereference)   |                                                        |
-| <expr_op> | Binary |   `as`   | as                   | `<expr> as <type>`                                | See [Conversion](#types-conversion) in [Types](#types) |
-|     -     | Binary |   `.`    | Struct Member Access | See [Struct Member Access](#struct-member-access) |                                                        |
-| <stmt_op> | Binary |   `=`    | Assignment           | `<name> = <expr>`                                 |                                                        |
-| <stmt_op> | Binary |   `:=`   | Definition           | `<name> := <expr>`                                |                                                        |
+| Type   | Operator | Name                 | Syntax                                            |
+| ------ | :------: | -------------------- | ------------------------------------------------- |
+| Unary  |   `&`    | Address Of           | See [Address Of](#address-of)                     |
+| Unary  |   `*`    | Pointer Dereference  | See [Pointer Dereference](#pointer-dereference)   |
+| Binary |   `as`   | Type Cast            | See [Type Cast](#type-cast)                       |
+| Binary |   `.`    | Struct Member Access | See [Struct Member Access](#struct-member-access) |
+| Binary |   `=`    | Assignment           | See ... TODO                                      |
+| Binary |   `:=`   | Variable Definition  | See ... TODO                                      |
 
 ### 2.2.6. Operator Precedence {#operator-precedence}
 
-TODO: Verify
-
-| Level | Operators         |
-| :---: | :---------------- |
-|   1   | `.`               |
-|   2   | `as`              |
-|   3   | `&`               |
-|   4   | `-a` `~a` `not`   |
-|   5   | `**`              |
-|   6   | `*` `/` `%`       |
-|   7   | `a+b` `a-b`       |
-|   8   | `<<` `>>`         |
-|   9   | `<` `<=` `>` `>=` |
-|  10   | `==` `!=`         |
-|  11   | `a&b`             |
-|  12   | `^`               |
-|  13   | `\|`              |
-|  14   | `and`             |
-|  15   | `or`              |
+| Level | Operators                   |
+| :---: | :-------------------------- |
+|   1   | `.`                         |
+|   2   | `-a` `~` `not` `&a` `*a`    |
+|   3   | `as`                        |
+|   4   | `**`                        |
+|   5   | `a*b` `/` `%`               |
+|   6   | `a+b` `a-b`                 |
+|   7   | `<<` `>>`                   |
+|   8   | `a&b`                       |
+|   9   | `\|`                        |
+|  10   | `^`                         |
+|  11   | `==` `!=` `<` `<=` `>` `>=` |
+|  12   | `and`                       |
+|  13   | `or`                        |
 
 ### 2.2.7. Operator Associativity {#operator-associativity}
 
@@ -599,14 +596,14 @@ TODO: Verify
 
 **Syntax**
 
-| Tag               | Syntax                                                                                         |
-| ----------------- | ---------------------------------------------------------------------------------------------- |
-| \<expr>           | `['(']  <literal> \| <block> \| <if> \| <loop> \| <expr_op> \| <lvalue> \| <address_of> [')']` |
-| &emsp; \<literal> | See [Literals](#literals)                                                                      |
-| &emsp; \<block>   | See [Block](#block)                                                                            |
-| &emsp; \<if>      | See [If / Elif / Else](#if-elif-else)                                                          |
-| &emsp; \<loop>    | See [Loop](#loop)                                                                              |
-| &emsp; \<expr_op> | See [Operators](#operators)                                                                    |
+| Tag               | Syntax                                                                                                        |
+| ----------------- | ------------------------------------------------------------------------------------------------------------- |
+| \<expr>           | `['(']  <literal> \| <block> \| <if> \| <loop> \| <expr_op> \| <lvalue> \| <address_of> \| <type_cast> [')']` |
+| &emsp; \<literal> | See [Literals](#literals)                                                                                     |
+| &emsp; \<block>   | See [Block](#block)                                                                                           |
+| &emsp; \<if>      | See [If / Elif / Else](#if-elif-else)                                                                         |
+| &emsp; \<loop>    | See [Loop](#loop)                                                                                             |
+| &emsp; \<expr_op> | See [Operators](#operators)                                                                                   |
 
 ### 2.3.1. L-Values {#l-values}
 
@@ -638,7 +635,13 @@ TODO: Verify
 | ------------- | ---------- |
 | \<address_of> | `& <expr>` |
 
-### 2.3.4. Block {#block}
+### 2.3.4. Type Cast {#type-cast}
+
+| Tag          | Syntax             |
+| ------------ | ------------------ |
+| \<type_cast> | `<expr> as <type>` |
+
+### 2.3.5. Block {#block}
 
 A block is a collection of statements.
 
@@ -699,9 +702,9 @@ for( x usize = 0;; x < 10; x += 1 ) "x" {
 | &emsp; \<expr>       | See [Expressions](#expressions) |
 --->
 
-### 2.3.5. Control Flow {#control-flow}
+### 2.3.6. Control Flow {#control-flow}
 
-#### 2.3.5.1. If / Else {#if-else}
+#### 2.3.6.1. If / Else {#if-else}
 
 **Syntax**
 
@@ -725,7 +728,7 @@ b i32 = if( a == 1 ) {
 }
 ```
 
-#### 2.3.5.2. Loop {#loop}
+#### 2.3.6.2. Loop {#loop}
 
 **Syntax**
 
@@ -754,7 +757,7 @@ loop( u32 i = 0; i < 10; i < 10; i++ ) {}
 | \<continue> | `continue` |
 -->
 
-### 2.3.6. Struct Literals {#struct-literals}
+### 2.3.7. Struct Literals {#struct-literals}
 
 **Syntax**
 
@@ -775,7 +778,7 @@ TODO
 pos [x i32; y i32] = [3; 5];
 ```
 
-### 2.3.7. Compile-time expressions {#compile-time-expressions}
+### 2.3.8. Compile-time expressions {#compile-time-expressions}
 
 **Syntax**
 
