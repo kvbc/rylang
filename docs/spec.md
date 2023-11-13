@@ -1129,10 +1129,10 @@ main ()void = {
 
 **Syntax**
 
-| Tag                                                  | Syntax                      |
-| ---------------------------------------------------- | --------------------------- | ---------------------- |
-| \<use>                                               | `use (<namespace_entity>    | <namespace_access>) ;` |
-| &emsp; \<namespace_entity>, <br> \<namespace_access> | See [Namespace](#namespace) |
+| Tag                                                  | Syntax                                             |
+| ---------------------------------------------------- | -------------------------------------------------- |
+| \<use>                                               | `use (<namespace_entity> \| <namespace_access>) ;` |
+| &emsp; \<namespace_entity>, <br> \<namespace_access> | See [Namespace](#namespace)                        |
 
 **Interpretation**
 
