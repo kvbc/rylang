@@ -4,29 +4,29 @@
 
 Table of Contents
 
-Feature | Exists
-------- | ------
-1. [Metaprogramming](#metaprogramming)                                         | ✔️
-&emsp; 1.1. [Generics](#generics)                                              | ✔️
-&emsp; 1.2. [Macros](#macros)                                                  | ✔️
-2. [Namespaces](#namespaces)                                                   | ✔️
-3. [Types](#types)                                                             | 
-&emsp; 3.1. [Type Constraints](#type-constraints)                              | ✔️
-&emsp; 3.2. [Structs / Classes](#structs-or-classes)                           | ✔️
-&emsp; &emsp; 3.2.1. [Access specifiers](#access-specifiers)                   | ✔️
-&emsp; &emsp; 3.2.2. [Inheritance](#inheritance)                               | ❌
-&emsp; &emsp; 3.2.3. [Constructors & Destructors](#constructors-n-destructors) | ❌
-&emsp; &emsp; 3.2.4. [Methods](#methods)                                       | ✔️
-&emsp; &emsp; 3.2.5. [Operator Overloading](#operator-overloading)             | ❌
-&emsp; 3.3. [Unions](#unions)                                                  | ✔️
-&emsp; 3.4. [Enums](#enums)                                                    | ✔️
-&emsp; 3.5. [Arrays](#arrays)                                                  | ✔️
-4. [Variables](#variables)                                                     | ✔️
-&emsp; 4.1. [Functions](#functions)                                            | ✔️
-5. [Language-level Error Handling](#language-level-error-handling)             | ❌
-6. [Metadata](#metadata)                                                       | ✔️
-7. [Interfaces](#interfaces)                                                   | ✔️
-8. [Modules / Imports](#modules-or-imports)                                    | ✔️
+| Feature                                                                        | Exists |
+| ------------------------------------------------------------------------------ | ------ |
+| 1. [Metaprogramming](#metaprogramming)                                         | ✔️     |
+| &emsp; 1.1. [Generics](#generics)                                              | ✔️     |
+| &emsp; 1.2. [Macros](#macros)                                                  | ✔️     |
+| 2. [Namespaces](#namespaces)                                                   | ✔️     |
+| 3. [Types](#types)                                                             |
+| &emsp; 3.1. [Type Constraints](#type-constraints)                              | ✔️     |
+| &emsp; 3.2. [Structs / Classes](#structs-or-classes)                           | ✔️     |
+| &emsp; &emsp; 3.2.1. [Access specifiers](#access-specifiers)                   | ✔️     |
+| &emsp; &emsp; 3.2.2. [Inheritance](#inheritance)                               | ❌     |
+| &emsp; &emsp; 3.2.3. [Constructors & Destructors](#constructors-n-destructors) | ❌     |
+| &emsp; &emsp; 3.2.4. [Methods](#methods)                                       | ✔️     |
+| &emsp; &emsp; 3.2.5. [Operator Overloading](#operator-overloading)             | ❌     |
+| &emsp; 3.3. [Unions](#unions)                                                  | ✔️     |
+| &emsp; 3.4. [Enums](#enums)                                                    | ✔️     |
+| &emsp; 3.5. [Arrays](#arrays)                                                  | ✔️     |
+| 4. [Variables](#variables)                                                     | ✔️     |
+| &emsp; 4.1. [Functions](#functions)                                            | ✔️     |
+| 5. [Language-level Error Handling](#language-level-error-handling)             | ❌     |
+| 6. [Metadata](#metadata)                                                       | ✔️     |
+| 7. [Interfaces](#interfaces)                                                   | ✔️     |
+| 8. [Modules / Imports](#modules-or-imports)                                    | ✔️     |
 
 ---
 

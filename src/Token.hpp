@@ -17,7 +17,7 @@ namespace ry {
         static constexpr const char * const KEYWORDS[] = {
             "if",    "elif",     "else",
             "loop",  "continue", "break",
-            "false", "true",
+            "false", "true", "null",
             "not", "or", "and",
             "as",
 
@@ -44,7 +44,7 @@ namespace ry {
             _KW_FIRST,
             KW_IF,    KW_ELIF,     KW_ELSE,
             KW_LOOP,  KW_CONTINUE, KW_BREAK,
-            KW_FALSE, KW_TRUE,
+            KW_FALSE, KW_TRUE, KW_NULL,
             KW_NOT, KW_OR, KW_AND,
             KW_AS,
             // 
@@ -55,8 +55,9 @@ namespace ry {
             KW_BOOL,
             _KW_LAST,
 
-            OP_SUB,    OP_ADD,    OP_MUL,    OP_DIV,    OP_MOD,    OP_POWER,
-            OP_SUB_EQ, OP_ADD_EQ, OP_MUL_EQ, OP_DIV_EQ, OP_MOD_EQ, OP_POWER_EQ,
+            OP_SUB_EQ, OP_ADD_EQ, OP_DIV_EQ, OP_MOD_EQ, OP_POWER_EQ, OP_MUL_EQ, 
+            OP_SUB,    OP_ADD,    OP_DIV,    OP_MOD,    OP_POWER,    OP_MUL,
+            /**/ OP_PTR_DEREF = OP_MUL, /**/
 
             OP_BIT_NEG,
             OP_BIT_OR_EQ, OP_BIT_XOR_EQ, OP_BIT_LSHIFT_EQ, OP_BIT_RSHIFT_EQ, OP_BIT_AND_EQ,        
@@ -89,7 +90,7 @@ namespace ry {
             "_KW_FIRST",
             "KW_IF",    "KW_ELIF",     "KW_ELSE",
             "KW_LOOP",  "KW_CONTINUE", "KW_BREAK",
-            "KW_FALSE", "KW_TRUE",
+            "KW_FALSE", "KW_TRUE", "KW_NULL",
             "KW_NOT", "KW_OR", "KW_AND",
             "KW_AS",
             // 
@@ -100,8 +101,8 @@ namespace ry {
             "KW_BOOL",
             "_KW_LAST",
 
-            "OP_SUB",    "OP_ADD",    "OP_MUL",    "OP_DIV",    "OP_MOD",    "OP_POWER",
-            "OP_SUB_EQ", "OP_ADD_EQ", "OP_MUL_EQ", "OP_DIV_EQ", "OP_MOD_EQ", "OP_POWER_EQ",
+            "OP_SUB_EQ", "OP_ADD_EQ", "OP_DIV_EQ", "OP_MOD_EQ", "OP_POWER_EQ", "OP_MUL_EQ", 
+            "OP_SUB",    "OP_ADD",    "OP_DIV",    "OP_MOD",    "OP_POWER",    "OP_MUL/OP_PTR_DEREF",    
 
             "OP_BIT_NEG",
             "OP_BIT_OR_EQ", "OP_BIT_XOR_EQ", "OP_BIT_LSHIFT_EQ", "OP_BIT_RSHIFT_EQ", "OP_BIT_AND_EQ",        
