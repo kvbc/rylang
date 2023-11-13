@@ -51,7 +51,7 @@ Note to self: press `CTRL K` + `Z` to leave zen mode
 
 _(lets just ignore test coverage for now)_
 
-| Chapter                                                                           | Syntax | Implemented | Error Handling | Test Coverage | Description                                                   |
+| Chapter                                                                           | Syntax | Implemented | Error Handling | Test Coverage | Comment                                                       |
 | --------------------------------------------------------------------------------- | :----: | :---------: | :------------: | :-----------: | ------------------------------------------------------------- |
 | 0. [Notation](#notation)                                                          |  N/A   |     N/A     |      N/A       |      N/A      |
 | <br >1. [Lexical Analysis](#lexical-analysis) <br> <br>                           |   👇   |     👇      |       👇       |      👇       | **Grouping characters into tokens**                           |
@@ -72,10 +72,10 @@ _(lets just ignore test coverage for now)_
 | &emsp; 2.1. [Types](#types)                                                       |   ✔️   |     ❌      |       👇       |      👇       |                                                               |
 | &emsp; &emsp; 2.1.1. [Primitive Types](#primitive-types)                          |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.1.2. [Function Type](#function-type)                              |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.1.3. [Struct Type](#struct-type)                                  |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.1.3. [Struct Type](#struct-type)                                  |   ➖   |     ❌      |       ❌       |      ❌       | // feel like it can still be improved                         |
 | &emsp; &emsp; 2.1.4. [Type Attributes](#type-attribs)                             |   👇   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; &emsp; 2.1.4.1. [Pointer Types](#pointer-types)                     |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; &emsp; 2.1.4.2. [Type Mutability](#type-mutability)                 |   ➖   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; &emsp; 2.1.4.2. [Type Mutability](#type-mutability)                 |   ➖   |     ❌      |       ❌       |      ❌       | // dont like the character being used (perhaps `~` ?)         |
 | &emsp; &emsp; &emsp; 2.1.4.3. [Optional Types](#optional-types)                   |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; 2.2. [Operators](#operators)                                               |   👇   |     👇      |       👇       |      👇       |                                                               |
 | &emsp; &emsp; 2.2.1. [Arithmetic Operators](#arithmetic-operators)                |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
