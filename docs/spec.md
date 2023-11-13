@@ -738,15 +738,6 @@ b i32 = if( a == 1 ) {
 | &emsp; \<stmt> | See [Statements](#statements)                                                                 |
 | &emsp; \<expr> | See [Expressions](#expressions)                                                               |
 
-**Examples**
-
-```rust
-loop( u32 i = 0;; i++ ) {}
-loop( u32 i = 0; i < 10;; i++ ) {}
-loop( u32 i = 0;; i < 10; i++ ) {}
-loop( u32 i = 0; i < 10; i < 10; i++ ) {}
-```
-
 <!--
 ##### 2.3.5.2.1. Continue {#continue}
 
