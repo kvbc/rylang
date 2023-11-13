@@ -984,127 +984,7 @@ TODO
 
 ---
 
-## 2.3. Struct {#struct}
-
-A _struct_ (Structure) is a collection of variables (fields).
-
-**Syntax**
-
-| Tag                      | Syntax                                                                          | Comment                                                                                                                                                           |
-| ------------------------ | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| \<struct>                | `$ <name> = <struct_block> ;`                                                   |
-| \<struct_block>          | `{ <struct_stmt> {<struct_stmt>} }`                                             |
-| \<struct_stmt>           | `<struct_field> \| <namespace_stmt>`                                            |
-| \<struct_field>          | `<name> <type> [= <compexpr>] ;` where `<type>` isn't the defined struct itself | <li>The semicolon `;` might be omitted if it's the last field in a struct.</li> <li>Struct fields follow the same rules as regular [variables](#1-variables)</li> |
-| &emsp; \<name>           | See [Names](#names)                                                             |
-| &emsp; \<var>            | See [Variables](#variables)                                                     |
-| &emsp; \<var_type>       | See [Types](#types)                                                             |
-| &emsp; \<namespace_stmt> | See [Namespace](#namespace)                                                     |
-| &emsp; \<compexpr>       | See [Expressions](#expressions)                                                 |
-| &emsp; \<struct_literal> | See [Literals](#literals)                                                       |
-
-**Parentship**
-
-| Tag       | Parent       | Comment                     |
-| --------- | ------------ | --------------------------- |
-| \<struct> | \<namespace> | See [Namespace](#namespace) |
-
-**Context**
-
-TODO
-
-**Interpretation**
-
-- A _struct_ is also a namespace.
-  - See [Namespace](#namespace).
-  ```rust
-    $Vector2 = {
-      ^int = i32;
-      x ^int;
-      y ^int;
-    };
-  ```
-- Structs can only be defined inside of namespaces.
-  - See [Namespace](#namespace).
-- A _struct_ cannot be empty.
-  ```rust
-  $Vector2 = {} // ERROR
-  ```
-- See `<struct_type>` in [Types](#types) for anonymous structs.
-- A _struct_ field cannot be of the same type as the defined struct.
-  ```rust
-  $A = {
-    a $A; // ERROR
-  };
-  ```
-- _Struct_ fields follow the same rules as regular variables.
-  - See [Variables](#variables).
-- _Struct_ fields can be assigned default values.
-  ```rust
-  $Vector2 = {
-    x i32 = 0;
-    y i32 = 0;
-  };
-  ```
-- _Struct_ fields can be accessed using the dot `.` operator.
-  - See [Operators](#operators) for the _struct_ field access operator
-  ```rust
-  pos $Vector2;
-  pos.x = 0;
-  pos.y = 0;
-  x i32 = pos.x;
-  ```
-- Functions declared inside of a _struct_, with their first parameter being of the defined _struct_ type, are called _methods_. \
-  You can call them on a struct instance using the colon `:` operator.
-
-  - See [Operators](#operators) for the _struct_ _method_ access operator.
-
-  The first "self" argument is excluded from a _method_ call. \
-  This _struct_ _method_ syntax is nothing but syntactic sugar for plain-old _namespace_ access.
-
-  ```rust
-  $Vector2 = {
-      x i32;
-      y i32;
-
-      add( self !*$Vector2, other !*!$Vector2 ) !*$Vector2 = {
-          self.x += other.x;
-          self.y += other.y;
-          break self;
-      }
-  };
-
-  main() void {
-      a $Vector2 = { .x = 1; .y = 1; };
-      b $Vector2 = { .x = 2; .y = 2; };
-
-      a:add(b);
-
-      // is the same as
-
-      $Vector2:add(&a, b);
-  }
-  ```
-
-- Examples:
-  ```rust
-  $Vector2 = {
-      x i32;
-      y i32;
-      new (x i32, y i32) $Vector2 = {
-          v $Vector2 = {
-            .x = x,
-            .y = y
-          };
-          break v;
-      }
-  };
-  main ()void = {
-    pos $Vector2 = $Vector2:new(0, 0);
-  }
-  ```
-
-## 2.3.1. Union {#union}
+# Union
 
 **Syntax**
 
@@ -1132,7 +1012,7 @@ main ${} -> void = {
 };
 ```
 
-## 2.4. Enum {#enum}
+# Enum
 
 An Enum (Enumeration) is a collection of scoped, named & unique integer values (fields)
 
@@ -1217,60 +1097,7 @@ TODO
 c #Color = #Color:RED;
 ```
 
-## 2.5. Namespace {#namespace}
-
-A namespace is a scoped collection of:
-
-- [Functions](#functions),
-- [Structs](#struct),
-- [Enums](#enum),
-- [Aliases](#alias), and
-- Other namespaces
-
-**Syntax**
-
-| Tag                 | Syntax                                                           | Comment                              |
-| ------------------- | ---------------------------------------------------------------- | ------------------------------------ |
-| \<namespace>        | `: <name> = <namespace_block> ;`                                 |
-| \<namespace>        | `: <name> = <string> ;`                                          | Module import                        |
-| \<namespace_block>  | `{ <namespace_stmt> {<namespace_stmt>} }`                        |
-| \<namespace_stmt>   | `<func> \| <struct>      \| <enum> \| <namespace>`               |
-| \<namespace_entity> | `<struct_type> \| <enum_type>   \| <name> \| <name>()`           | Struct / Enum / Namespace / Function |
-| \<namespace_access> | `<namespace_entity> : <namespace_entity> {: <namespace_entity>}` |
-| &emsp; \<name>      | See [Names](#names)                                              |
-| &emsp; \<string>    | See [Literals](#literals)                                        |
-| &emsp; \<func>      | See [Functions](#functions)                                      |
-| &emsp; \<struct>    | See [Struct](#struct)                                            |
-| &emsp; \<enum>      | See [Enum](#enum)                                                |
-| &emsp; \<alias>     | See [Alias](#alias)                                              |
-
-**Parentship**
-
-| Tag          | Parent       | Comment         |
-| ------------ | ------------ | --------------- |
-| \<namespace> | \<namespace> | See **Context** |
-
-**Context**
-
-- The global scope is also considered a namespace.
-
-**Interpretation**
-
-- Namespaces can be imported from other files. This concept forms the basis of [Modules](#modules).
-- [Functions](#functions), [Structs](#struct) and [Enums](#enum) are all namespaces.
-- To access a namespace member, you can use the colon `:` operator
-  - ```rust
-    :math = {
-        $Vector2 = { x i32; y i32; };
-    };
-    pos :math:$Vector2;
-    ```
-
-**Examples**
-
-TODO
-
-### 2.5.1. Modules {#modules}
+# Modules
 
 ```rust
 // main.ry
@@ -1298,7 +1125,7 @@ main ()void = {
 }
 ```
 
-### 2.5.2. Use {#use}
+# Use
 
 **Syntax**
 
