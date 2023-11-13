@@ -15,7 +15,7 @@ namespace ry {
 
         // must be in same order as in the Type enum
         static constexpr const char * const KEYWORDS[] = {
-            "if",    "elif",     "else",
+            "if",    "else",
             "loop",  "continue", "break",
             "false", "true", "null",
             "not", "or", "and",
@@ -42,7 +42,7 @@ namespace ry {
             RPAREN,
 
             _KW_FIRST,
-            KW_IF,    KW_ELIF,     KW_ELSE,
+            KW_IF,    KW_ELSE,
             KW_LOOP,  KW_CONTINUE, KW_BREAK,
             KW_FALSE, KW_TRUE, KW_NULL,
             KW_NOT, KW_OR, KW_AND,
@@ -88,7 +88,7 @@ namespace ry {
             "RPAREN",
 
             "_KW_FIRST",
-            "KW_IF",    "KW_ELIF",     "KW_ELSE",
+            "KW_IF",   "KW_ELSE",
             "KW_LOOP",  "KW_CONTINUE", "KW_BREAK",
             "KW_FALSE", "KW_TRUE", "KW_NULL",
             "KW_NOT", "KW_OR", "KW_AND",
