@@ -6,35 +6,35 @@ Note to self: press `CTRL K` + `Z` to leave zen mode
 
 **Other Languages**
 
-- [ ] [Go](https://go.dev/ref/spec)
-- [x] [Zig](https://ziglang.org/documentation/master/)
-- [x] [Haxe](https://haxe.org/manual/introduction.html)
-- [ ] [Nim](https://nim-lang.org/docs/manual.html)
-- [x] [Odin](https://odin-lang.org/docs/overview/) - no spec
-- [x] [Rust](https://doc.rust-lang.org/reference/index.html)
-- [ ] [D](https://dlang.org/spec/spec.html)
-- [ ] [R](https://cran.r-project.org/doc/manuals/r-release/R-lang.pdf)
+-   [ ] [Go](https://go.dev/ref/spec)
+-   [x] [Zig](https://ziglang.org/documentation/master/)
+-   [x] [Haxe](https://haxe.org/manual/introduction.html)
+-   [ ] [Nim](https://nim-lang.org/docs/manual.html)
+-   [x] [Odin](https://odin-lang.org/docs/overview/) - no spec
+-   [x] [Rust](https://doc.rust-lang.org/reference/index.html)
+-   [ ] [D](https://dlang.org/spec/spec.html)
+-   [ ] [R](https://cran.r-project.org/doc/manuals/r-release/R-lang.pdf)
 
 ---
 
 **Useful**
 
-- rustc dev guide - https://rustc-dev-guide.rust-lang.org/part-2-intro.html
-- Advanced R - https://adv-r.hadley.nz/
+-   rustc dev guide - https://rustc-dev-guide.rust-lang.org/part-2-intro.html
+-   Advanced R - https://adv-r.hadley.nz/
 
 ---
 
 **Consider**
 
-- pointer arrays - `Types`
-- function parameters immutable - `<func_type>`
-- anon struct types - `<struct_type>` (see notes/notes4.rs)
-- type constraints - see [notes/playground/main.rs](../notes/playground/main.rs)
-- static
-- extern
-- struct-based, see [notes/all_struct.rs](../notes/all_struct.rs)
-- closures
-- variadic funtion arguments (struct fields)
+-   pointer arrays - `Types`
+-   function parameters immutable - `<func_type>`
+-   anon struct types - `<struct_type>` (see notes/notes4.rs)
+-   type constraints - see [notes/playground/main.rs](../notes/playground/main.rs)
+-   static
+-   extern
+-   struct-based, see [notes/all_struct.rs](../notes/all_struct.rs)
+-   closures
+-   variadic funtion arguments (struct fields)
 
 ---
 
@@ -89,14 +89,13 @@ _(lets just ignore test coverage for now)_
 | &emsp; &emsp; &emsp; 2.3.1.1. [Pointer Dereference](#pointer-dereference)         |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; &emsp; 2.3.1.2. [Struct Member Access](#struct-member-access)       |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.3.2. [Function Call](#function-call)                              |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.3.3. [Address of](#address-of)                                    |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.3.4. [Block](#block) (& `break`)                                  |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.3.3. [Address Of](#address-of)                                    |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.3.4. [Block](#block)                                              |   ➖   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.3.5. [Control Flow](#control-flow)                                |   👇   |     👇      |       👇       |      👇       |                                                               |
-| &emsp; &emsp; &emsp; 2.3.5.1. [If / Elif / Else](#if-elif-else)                   |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; &emsp; 2.3.5.2. [Loop](#loop)                                       |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; &emsp; &emsp; 2.3.5.2.1. [Continue](#continue)                      |   ❌   |     ❌      |       ❌       |      ❌       | // This indent is crazy                                       |
-| &emsp; &emsp; 2.3.6. [Compile-time Expressions](#compile-time-expressions)        |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.3.7. [Struct Literals](#parsing-struct-literals)                  |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; &emsp; 2.3.5.1. [If / Else](#if-else)                               |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; &emsp; 2.3.5.2. [Loop](#loop)                                       |   ➖   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.3.6. [Struct Literals](#struct-literals)                          |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.3.7. [Compile-time Expressions](#compile-time-expressions)        |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; 2.4. [Statements](#statements)                                             |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.4.1. [Variables](#variables)                                      |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; 2.5. [Metadata](#metadata)                                                 |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
@@ -150,11 +149,11 @@ Lexical analysis is the process of grouping source code characters into tokens.
 
 **Interpretation**
 
-- A name cannot start with a digit.
-- Names (identifiers) can only consist of:
-  - underscores `_`,
-  - lowercase and uppercase letters from `aA` to `zZ`,
-  - digits from `0` to `9`
+-   A name cannot start with a digit.
+-   Names (identifiers) can only consist of:
+    -   underscores `_`,
+    -   lowercase and uppercase letters from `aA` to `zZ`,
+    -   digits from `0` to `9`
 
 **Examples**
 
@@ -377,7 +376,7 @@ TODO
 | &emsp; \<primitive> | See [Primitives](#primitives) |
 
 ```
-if elif else
+if else
 loop continue break
 false true null
 not or and
@@ -392,11 +391,11 @@ Refer to [Operators](#operators)
 
 Tokens represent:
 
-- [Names](#names)
-- [Keywords](#keywords)
-- [Operators](#operators)
-- [Literals](#literals)
-- Characters: `( ) ;`
+-   [Names](#names)
+-   [Keywords](#keywords)
+-   [Operators](#operators)
+-   [Literals](#literals)
+-   Characters: `( ) ;`
 
 # 2. Parsing and Semantic Analysis {#parsing-and-semantic-analysis}
 
@@ -625,7 +624,7 @@ TODO: Verify
 | ------------ | --------------------- | ---------------------------------- |
 | \<func_call> | `<expr> <struct_lit>` | where `<expr>` is of function type |
 
-### 2.3.3. Address of {#address-of}
+### 2.3.3. Address Of {#address-of}
 
 | Tag           | Syntax     |
 | ------------- | ---------- |
@@ -635,19 +634,18 @@ TODO: Verify
 
 A block is a collection of statements.
 
-- See `<stmt>` in [Statements](#statements) for the definition of a _statement_.
+-   See `<stmt>` in [Statements](#statements) for the definition of a _statement_.
 
 A block can be "broken from" using the `break` statement.
 
 **Syntax**
 
-| Tag              | Syntax                           |
-| ---------------- | -------------------------------- |
-| \<block>         | `[<string>] { <stmt> {<stmt>} }` |
-| \<break>         | `break [<string>] [<expr>] ;`    |
-| &emsp; \<string> | See [Literals](#literals)        |
-| &emsp; \<stmt>   | See [Statements](#statements)    |
-| &emsp; \<expr>   | See [Expressions](#expressions)  |
+| Tag              | Syntax                               |
+| ---------------- | ------------------------------------ |
+| \<block>         | `[<string_lit>] { <stmt> {<stmt>} }` |
+| &emsp; \<string> | See [Literals](#literals)            |
+| &emsp; \<stmt>   | See [Statements](#statements)        |
+| &emsp; \<expr>   | See [Expressions](#expressions)      |
 
 **Context**
 
@@ -655,21 +653,21 @@ TODO
 
 **Interpretation**
 
-- All blocks can be labeled with a preceding string literal.
-- Break statements can be optionally provided the block label to break from (as a string literal) and an expression to return from a block
-  ```rust
-    max usize = 10;
-    x isize = "x" {
-        for( a usize = max;; a > 0; a -= 1 ) {
-            for( b usize = max;; b > 0; b -= 1 ) {
-                if( a + b == a * b ) {
-                    break "x" (a + b);
-                }
-            }
-        }
-        break -1;
-    }
-  ```
+-   All blocks can be labeled with a preceding string literal.
+-   Break statements can be optionally provided the block label to break from (as a string literal) and an expression to return from a block
+    ```rust
+      max usize = 10;
+      x isize = "x" {
+          for( a usize = max;; a > 0; a -= 1 ) {
+              for( b usize = max;; b > 0; b -= 1 ) {
+                  if( a + b == a * b ) {
+                      break "x" (a + b);
+                  }
+              }
+          }
+          break -1;
+      }
+    ```
 
 **Examples**
 
@@ -683,31 +681,26 @@ for( x usize = 0;; x < 10; x += 1 ) "x" {
 }
 ```
 
+<!--
+#### 2.3.4.1. Break
+
+| Tag                  | Syntax                          |
+| -------------------- | ------------------------------- |
+| \<break>             | `break [<string_lit>] [<expr>]` |
+| &emsp; \<string_lit> | See [Literals](#literals)       |
+| &emsp; \<expr>       | See [Expressions](#expressions) |
+--->
+
 ### 2.3.5. Control Flow {#control-flow}
 
-#### 2.3.5.1. If / Elif / Else {#if-elif-else}
+#### 2.3.5.1. If / Else {#if-else}
 
 **Syntax**
 
-| Tag             | Syntax                                    |
-| --------------- | ----------------------------------------- |
-| \<if>           | `if ( <expr> ) <block> {<elif>} [<else>]` |
-| \<elif>         | `elif ( <expr> ) <block>`                 |
-| \<else>         | `else <block>`                            |
-| &emsp; \<expr>  | See [Expressions](#expressions)           |
-| &emsp; \<block> | See [Block](#6-block)                     |
-
-**Parentship**
-
-| Tag   | Parent  | Comment                                              |
-| ----- | ------- | ---------------------------------------------------- |
-| \<if> | \<expr> | See **Interpretation** & [Expressions](#expressions) |
-
-**Context**
-
-TODO
-
-**Interpretation**
+| Tag            | Syntax                                |
+| -------------- | ------------------------------------- |
+| \<if>          | `if <expr> then <expr> [else <expr>]` |
+| &emsp; \<expr> | See [Expressions](#expressions)       |
 
 **Examples**
 
@@ -728,26 +721,11 @@ b i32 = if( a == 1 ) {
 
 **Syntax**
 
-| Tag            | Syntax                                                                            | Comment                                                                             |
-| -------------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| \<loop>        | `loop ( <stmt> ; <expr> ; <expr> ; <stmt> )` where both `<expr>` result in `bool` | start statement `;` start break condition `;` end break condition `;` end statement |
-| &emsp; \<stmt> | See [Statements](#statements)                                                     |
-| &emsp; \<expr> | See [Expressions](#expressions)                                                   |
-| &emsp; `bool`  | See `<primitive>` in [Types](#types)                                              |
-
-**Parentship**
-
-| Tag     | Parent  | Comment                                              |
-| ------- | ------- | ---------------------------------------------------- |
-| \<loop> | \<expr> | See **Interpretation** & [Expressions](#expressions) |
-
-**Context**
-
-TODO
-
-**Interpretation**
-
-TODO
+| Tag            | Syntax                                                                                             | Comment                                                                             |
+| -------------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| \<loop>        | `loop ( <stmt> ;\|, <expr> ;\|, <expr> ;\|, <stmt> )` where both `<expr>` result in a boolean type | start statement `;` start break condition `;` end break condition `;` end statement |
+| &emsp; \<stmt> | See [Statements](#statements)                                                                      |
+| &emsp; \<expr> | See [Expressions](#expressions)                                                                    |
 
 **Examples**
 
@@ -758,17 +736,26 @@ loop( u32 i = 0;; i < 10; i++ ) {}
 loop( u32 i = 0; i < 10; i < 10; i++ ) {}
 ```
 
+<!--
 ##### 2.3.5.2.1. Continue {#continue}
 
 **Syntax**
 
-| Tag         | Syntax       |
-| ----------- | ------------ |
-| \<continue> | `continue ;` |
+| Tag         | Syntax     |
+| ----------- | ---------- |
+| \<continue> | `continue` |
+-->
 
-**Context**
+### 2.3.6. Struct Literals {#struct-literals}
 
-TODO
+**Syntax**
+
+| Tag                        | Syntax                          | Comment |
+| -------------------------- | ------------------------------- | ------- |
+| \<struct_lit>              | `'[' {<struct_lit_field>} ']'`  |
+| &emsp; \<struct_lit_field> | `[<name> =] <expr> [;]`         |
+| &emsp; \<name>             | See [Names](#names)             |
+| &emsp; \<expr>             | See [Expressions](#expressions) |
 
 **Interpretation**
 
@@ -776,9 +763,11 @@ TODO
 
 **Examples**
 
-TODO
+```rust
+pos [x i32; y i32] = [3; 5];
+```
 
-### 2.3.6. Compile-time expressions {#compile-time-expressions}
+### 2.3.7. Compile-time expressions {#compile-time-expressions}
 
 **Syntax**
 
@@ -789,7 +778,7 @@ TODO
 
 **Context**
 
-- Metadata `@comp` can be used to mark [struct](#struct) fields and [variables](#variables) as being compile-time known.
+-   Metadata `@comp` can be used to mark [struct](#struct) fields and [variables](#variables) as being compile-time known.
 
 **Interpretation**
 
@@ -830,27 +819,6 @@ main ${} => ${} = {
 };
 ```
 
-### 2.3.7. Struct Literals {#struct-literals}
-
-**Syntax**
-
-| Tag                     | Syntax                                  | Comment                                                       |
-| ----------------------- | --------------------------------------- | ------------------------------------------------------------- |
-| \<struct_literal>       | `[ {<struct_literal_field>} ]`          |
-| \<struct_literal_field> | `[<name> =] <expr> [;]` see **Comment** | The semicolon `;` can only be omitted if it's the last field. |
-| &emsp; \<name>          | See [Names](#names)                     |
-| &emsp; \<expr>          | See [Expressions](#expressions)         |
-
-**Interpretation**
-
-TODO
-
-**Examples**
-
-```rust
-pos [x i32; y i32] = [3; 5];
-```
-
 ## 2.4. Statements {#statements}
 
 **Syntax**
@@ -870,15 +838,15 @@ pos [x i32; y i32] = [3; 5];
 | &emsp; \<expr> | See [Expressions](#expressions)                                 |
 | &emsp; \<type> | See [Types](#types)                                             |
 
-- See `<name>` in [Names](#names) for the rules behind a valid variable name (identifier).
-- See `<expr>` in [Expressions](#expressions) for what a variable can be assigned.
-- The variable's value must be able to coerce into the variable's type.
-  - See [Type Coercion](#type-coercion)
-- All variables must be initialized.
-- Variables of type `<type>` being `<func_type>` are knows as functions.
-  - See `<func_type>` in [Types](#types)
-- Variables of type `<type>` being `<struct_type>` are known as structs.
-  - See `<struct_type>` in [Types](#types)
+-   See `<name>` in [Names](#names) for the rules behind a valid variable name (identifier).
+-   See `<expr>` in [Expressions](#expressions) for what a variable can be assigned.
+-   The variable's value must be able to coerce into the variable's type.
+    -   See [Type Coercion](#type-coercion)
+-   All variables must be initialized.
+-   Variables of type `<type>` being `<func_type>` are knows as functions.
+    -   See `<func_type>` in [Types](#types)
+-   Variables of type `<type>` being `<struct_type>` are known as structs.
+    -   See `<struct_type>` in [Types](#types)
 
 **Context**
 
@@ -887,7 +855,7 @@ pos [x i32; y i32] = [3; 5];
 | \<var>          | `<block>`             |
 | &emsp; \<block> | See [Blocks](#blocks) |
 
-- Variables can only exist inside of blocks.
+-   Variables can only exist inside of blocks.
 
 **Examples**
 
@@ -1045,94 +1013,94 @@ TODO
 
 **Interpretation**
 
-- A _struct_ is also a namespace.
-  - See [Namespace](#namespace).
-  ```rust
-    $Vector2 = {
-      ^int = i32;
-      x ^int;
-      y ^int;
+-   A _struct_ is also a namespace.
+    -   See [Namespace](#namespace).
+    ```rust
+      $Vector2 = {
+        ^int = i32;
+        x ^int;
+        y ^int;
+      };
+    ```
+-   Structs can only be defined inside of namespaces.
+    -   See [Namespace](#namespace).
+-   A _struct_ cannot be empty.
+    ```rust
+    $Vector2 = {} // ERROR
+    ```
+-   See `<struct_type>` in [Types](#types) for anonymous structs.
+-   A _struct_ field cannot be of the same type as the defined struct.
+    ```rust
+    $A = {
+      a $A; // ERROR
     };
-  ```
-- Structs can only be defined inside of namespaces.
-  - See [Namespace](#namespace).
-- A _struct_ cannot be empty.
-  ```rust
-  $Vector2 = {} // ERROR
-  ```
-- See `<struct_type>` in [Types](#types) for anonymous structs.
-- A _struct_ field cannot be of the same type as the defined struct.
-  ```rust
-  $A = {
-    a $A; // ERROR
-  };
-  ```
-- _Struct_ fields follow the same rules as regular variables.
-  - See [Variables](#variables).
-- _Struct_ fields can be assigned default values.
-  ```rust
-  $Vector2 = {
-    x i32 = 0;
-    y i32 = 0;
-  };
-  ```
-- _Struct_ fields can be accessed using the dot `.` operator.
-  - See [Operators](#operators) for the _struct_ field access operator
-  ```rust
-  pos $Vector2;
-  pos.x = 0;
-  pos.y = 0;
-  x i32 = pos.x;
-  ```
-- Functions declared inside of a _struct_, with their first parameter being of the defined _struct_ type, are called _methods_. \
-  You can call them on a struct instance using the colon `:` operator.
+    ```
+-   _Struct_ fields follow the same rules as regular variables.
+    -   See [Variables](#variables).
+-   _Struct_ fields can be assigned default values.
+    ```rust
+    $Vector2 = {
+      x i32 = 0;
+      y i32 = 0;
+    };
+    ```
+-   _Struct_ fields can be accessed using the dot `.` operator.
+    -   See [Operators](#operators) for the _struct_ field access operator
+    ```rust
+    pos $Vector2;
+    pos.x = 0;
+    pos.y = 0;
+    x i32 = pos.x;
+    ```
+-   Functions declared inside of a _struct_, with their first parameter being of the defined _struct_ type, are called _methods_. \
+    You can call them on a struct instance using the colon `:` operator.
 
-  - See [Operators](#operators) for the _struct_ _method_ access operator.
+    -   See [Operators](#operators) for the _struct_ _method_ access operator.
 
-  The first "self" argument is excluded from a _method_ call. \
-  This _struct_ _method_ syntax is nothing but syntactic sugar for plain-old _namespace_ access.
+    The first "self" argument is excluded from a _method_ call. \
+    This _struct_ _method_ syntax is nothing but syntactic sugar for plain-old _namespace_ access.
 
-  ```rust
-  $Vector2 = {
-      x i32;
-      y i32;
+    ```rust
+    $Vector2 = {
+        x i32;
+        y i32;
 
-      add( self !*$Vector2, other !*!$Vector2 ) !*$Vector2 = {
-          self.x += other.x;
-          self.y += other.y;
-          break self;
-      }
-  };
+        add( self !*$Vector2, other !*!$Vector2 ) !*$Vector2 = {
+            self.x += other.x;
+            self.y += other.y;
+            break self;
+        }
+    };
 
-  main() void {
-      a $Vector2 = { .x = 1; .y = 1; };
-      b $Vector2 = { .x = 2; .y = 2; };
+    main() void {
+        a $Vector2 = { .x = 1; .y = 1; };
+        b $Vector2 = { .x = 2; .y = 2; };
 
-      a:add(b);
+        a:add(b);
 
-      // is the same as
+        // is the same as
 
-      $Vector2:add(&a, b);
-  }
-  ```
+        $Vector2:add(&a, b);
+    }
+    ```
 
-- Examples:
-  ```rust
-  $Vector2 = {
-      x i32;
-      y i32;
-      new (x i32, y i32) $Vector2 = {
-          v $Vector2 = {
-            .x = x,
-            .y = y
-          };
-          break v;
-      }
-  };
-  main ()void = {
-    pos $Vector2 = $Vector2:new(0, 0);
-  }
-  ```
+-   Examples:
+    ```rust
+    $Vector2 = {
+        x i32;
+        y i32;
+        new (x i32, y i32) $Vector2 = {
+            v $Vector2 = {
+              .x = x,
+              .y = y
+            };
+            break v;
+        }
+    };
+    main ()void = {
+      pos $Vector2 = $Vector2:new(0, 0);
+    }
+    ```
 
 ## 2.3.1. Union {#union}
 
@@ -1190,51 +1158,51 @@ An Enum (Enumeration) is a collection of scoped, named & unique integer values (
 
 TODO
 
-- The first enum field, if not explicitely set, is equal to 0.
-- Each next enum field, if not explicitely set, is 1 higher than the previous value.
+-   The first enum field, if not explicitely set, is equal to 0.
+-   Each next enum field, if not explicitely set, is 1 higher than the previous value.
 
 **Interpretation**
 
-- Enum fields are of type `i32`
-  - See `<primitive>` in [Types](#types) for the type of `i32`.
-- Enums can only be defined inside of namespaces.
-  - See [Namespace](#namespace)
-    Enums are also namespaces.
-  - See [Namespace](#namespace).
-- Enum fields can be accessed using the colon `:` operator
-  - See [Operators](#operators) for the _enum field access_ operator.
-  ```rust
-  var #Enum = #Enum:FIELD;
-  ```
-- _Enum_ fields can be explicitely set.
-  - The set value must be a _compile-time_ expression resulting in a value of type `i32`.
-    - See [Expressions](#expressions) for the definition of a _compile-time_ expression `compexpr`.
+-   Enum fields are of type `i32`
+    -   See `<primitive>` in [Types](#types) for the type of `i32`.
+-   Enums can only be defined inside of namespaces.
+    -   See [Namespace](#namespace)
+        Enums are also namespaces.
+    -   See [Namespace](#namespace).
+-   Enum fields can be accessed using the colon `:` operator
+    -   See [Operators](#operators) for the _enum field access_ operator.
     ```rust
-    x i32 = 10;
-    #Color = {
-        RED = x, // ERROR
-        GREEN = 0.5, // ERROR
-    };
+    var #Enum = #Enum:FIELD;
     ```
-  - The set value must be higher than the previous values.
-    ```rust
-    #Color = {
-        RED, // 0
-        GREEN, // 1
-        BLUE = 1 // ERROR
-    }
-    ```
-  - The fields can be set even multiple times
-    ```rust
-    #Animal = {
-        DOG, // 0
-        CAT = 10,
-        WOLF, // 11
-        LION, // 12
-        SQUID = 100,
-        HORSE // 101
-    }
-    ```
+-   _Enum_ fields can be explicitely set.
+    -   The set value must be a _compile-time_ expression resulting in a value of type `i32`.
+        -   See [Expressions](#expressions) for the definition of a _compile-time_ expression `compexpr`.
+        ```rust
+        x i32 = 10;
+        #Color = {
+            RED = x, // ERROR
+            GREEN = 0.5, // ERROR
+        };
+        ```
+    -   The set value must be higher than the previous values.
+        ```rust
+        #Color = {
+            RED, // 0
+            GREEN, // 1
+            BLUE = 1 // ERROR
+        }
+        ```
+    -   The fields can be set even multiple times
+        ```rust
+        #Animal = {
+            DOG, // 0
+            CAT = 10,
+            WOLF, // 11
+            LION, // 12
+            SQUID = 100,
+            HORSE // 101
+        }
+        ```
 
 **Examples**
 
@@ -1251,11 +1219,11 @@ c #Color = #Color:RED;
 
 A namespace is a scoped collection of:
 
-- [Functions](#functions),
-- [Structs](#struct),
-- [Enums](#enum),
-- [Aliases](#alias), and
-- Other namespaces
+-   [Functions](#functions),
+-   [Structs](#struct),
+-   [Enums](#enum),
+-   [Aliases](#alias), and
+-   Other namespaces
 
 **Syntax**
 
@@ -1282,19 +1250,19 @@ A namespace is a scoped collection of:
 
 **Context**
 
-- The global scope is also considered a namespace.
+-   The global scope is also considered a namespace.
 
 **Interpretation**
 
-- Namespaces can be imported from other files. This concept forms the basis of [Modules](#modules).
-- [Functions](#functions), [Structs](#struct) and [Enums](#enum) are all namespaces.
-- To access a namespace member, you can use the colon `:` operator
-  - ```rust
-    :math = {
-        $Vector2 = { x i32; y i32; };
-    };
-    pos :math:$Vector2;
-    ```
+-   Namespaces can be imported from other files. This concept forms the basis of [Modules](#modules).
+-   [Functions](#functions), [Structs](#struct) and [Enums](#enum) are all namespaces.
+-   To access a namespace member, you can use the colon `:` operator
+    -   ```rust
+        :math = {
+            $Vector2 = { x i32; y i32; };
+        };
+        pos :math:$Vector2;
+        ```
 
 **Examples**
 
