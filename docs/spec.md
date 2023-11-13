@@ -95,7 +95,7 @@ _(lets just ignore test coverage for now)_
 | &emsp; &emsp; 2.3.5. [Block](#block)                                              |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.3.6. [Control Flow](#control-flow)                                |   👇   |     👇      |       👇       |      👇       |                                                               |
 | &emsp; &emsp; &emsp; 2.3.6.1. [If / Else](#if-else)                               |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; &emsp; 2.3.6.2. [Loop](#loop)                                       |   ➖   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; &emsp; 2.3.6.2. [Loop](#loop)                                       |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.3.7. [Struct Literals](#struct-literals)                          |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.3.8. [Compile-time Expressions](#compile-time-expressions)        |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; 2.4. [Statements](#statements)                                             |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
@@ -379,7 +379,7 @@ TODO
 
 ```
 if else
-loop continue break
+loop do continue break
 false true null
 not or and
 as
@@ -441,13 +441,13 @@ add[a i32; b i32] => i32 = a + b;
 
 ### 2.1.3. Struct Type {#struct-type}
 
-| Tag                    | Syntax                                                                                                                                                                                                                  |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| \<struct_type>         | `'[' [{<struct_field> ,\|;} <struct_field>] ']'`                                                                                                                                                                        |
-| &emsp; \<struct_field> | `[<name> {,<name>}] <type> [= <comp_expr>]` where `<comp_expr>` coerces into `<type>` <br> `<type> [* <comp_expr>] [= <comp_expr>]` where the first `<comp_expr>` is of type `u32` and the second coerces into `<type>` |
-| &emsp; \<name>         | See [Names](#names)                                                                                                                                                                                                     |
-| &emsp; \<type>         | See [Types](#types)                                                                                                                                                                                                     |
-| &emsp; \<comp_expr>    | See [Compile-time expressions](#compile-time-expressions)                                                                                                                                                               |
+| Tag                    | Syntax                                                                                                                                                                                                                                                                                                                                                    |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| \<struct_type>         | `'[' [{<struct_field> ,\|;} <struct_field>] ']'`                                                                                                                                                                                                                                                                                                          |
+| &emsp; \<struct_field> | `[<name> {,<name>}] <type> [= <comp_expr>]` where `<comp_expr>` coerces into `<type>` <br> `<type> [* <comp_expr>] [= <comp_expr>]` where the first `<comp_expr>` is of type `u32` and the second coerces into `<type>` <br> `[<comp_expr> *] <type> [= <comp_expr>]` where the first `<comp_expr>` is of type `u32` and the second coerces into `<type>` |
+| &emsp; \<name>         | See [Names](#names)                                                                                                                                                                                                                                                                                                                                       |
+| &emsp; \<type>         | See [Types](#types)                                                                                                                                                                                                                                                                                                                                       |
+| &emsp; \<comp_expr>    | See [Compile-time expressions](#compile-time-expressions)                                                                                                                                                                                                                                                                                                 |
 
 **Examples**
 
@@ -601,7 +601,7 @@ Assignment
 | \<expr>           | `['(']  <literal> \| <block> \| <if> \| <loop> \| <expr_op> \| <lvalue> \| <address_of> \| <type_cast> [')']` |
 | &emsp; \<literal> | See [Literals](#literals)                                                                                     |
 | &emsp; \<block>   | See [Block](#block)                                                                                           |
-| &emsp; \<if>      | See [If / Elif / Else](#if-elif-else)                                                                         |
+| &emsp; \<if>      | See [If / Else](#if-else)                                                                                     |
 | &emsp; \<loop>    | See [Loop](#loop)                                                                                             |
 | &emsp; \<expr_op> | See [Operators](#operators)                                                                                   |
 
@@ -732,11 +732,11 @@ b i32 = if( a == 1 ) {
 
 **Syntax**
 
-| Tag            | Syntax                                                                                             | Comment                                                                             |
-| -------------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| \<loop>        | `loop ( <stmt> ;\|, <expr> ;\|, <expr> ;\|, <stmt> )` where both `<expr>` result in a boolean type | start statement `;` start break condition `;` end break condition `;` end statement |
-| &emsp; \<stmt> | See [Statements](#statements)                                                                      |
-| &emsp; \<expr> | See [Expressions](#expressions)                                                                    |
+| Tag            | Syntax                                                                                        | Comment                                                         |
+| -------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| \<loop>        | `loop [<stmt> [;\|, <expr> [;\|, <stmt>]] do] <stmt>` where `<expr>` result in a boolean type | init statement `;` break condition `;` post iteration statement |
+| &emsp; \<stmt> | See [Statements](#statements)                                                                 |
+| &emsp; \<expr> | See [Expressions](#expressions)                                                               |
 
 **Examples**
 
