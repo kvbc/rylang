@@ -10,67 +10,14 @@
 
 namespace ry {
 
-    using Info = ry::Lexer::Info;
-
-    Info::Info(
-        Lexer::Info::Level level, std::string_view msg,
-        std::size_t startLn, std::size_t startCol
-    ):
-        m_level(level), m_msg(msg),
-        m_startLn(startLn), m_startCol(startCol),
-        m_endLn(startLn), m_endCol(startCol)
-    {}
-
-    Info::Info(
-        Lexer::Info::Level level, std::string_view msg,
-        std::size_t startLn, std::size_t startCol,
-        std::size_t endLn, std::size_t endCol
-    ):
-        m_level(level), m_msg(msg),
-        m_startLn(startLn), m_startCol(startCol),
-        m_endLn(endLn), m_endCol(endCol)
-    {}
-
-    Info::Level Info::GetLevel() const {
-        return m_level;
-    }
-
-    std::string_view Info::GetMessage() const {
-        return m_msg;
-    }
-
-    std::size_t Info::GetStartLineNumber() const { return m_startLn;  }
-    std::size_t Info::GetStartColumn    () const { return m_startCol; }
-    std::size_t Info::GetEndLineNumber  () const { return m_endLn;    }
-    std::size_t Info::GetEndColumn      () const { return m_endCol;   }
-
-    // 
-
     Lexer::Lexer(std::string_view id, std::string_view src):
         m_src(src),
         m_id(id),
         m_srcIdx(0),
         m_col(1),
-        m_ln(1)
-    {
-        m_lineStartIndices.push_back(0);
-        for(std::size_t i = 0; i < m_src.length();) {
-            char c1 = m_src.at(i);
-            char c2 = (i + 1 < m_src.length()) ? m_src.at(i + 1) : '\0';
-            if(c1 == '\n' || c1 == '\r') {
-                m_lineEndIndices.push_back(i);
-                i++;
-                if(c1 == '\r' && c2 == '\n')
-                    i++;
-                m_lineStartIndices.push_back(i);
-            }
-            else {
-                if(c2 == '\0')
-                    m_lineEndIndices.push_back(i + 1);
-                i++;
-            }
-        }
-    }
+        m_ln(1),
+        m_infos(id, src)
+    {}
 
     std::vector<Token> Lexer::Lex() {
         std::vector<Token> tokens;
@@ -100,11 +47,11 @@ namespace ry {
                 case CHAR_EOF:
                     break;
                 default:
-                    m_infos.push_back(Info(
-                        Info::Level::WARN,
+                    m_infos.Push({
+                        Infos::Info::Level::WARN,
                         std::format("Unexpected character '{}'", getChar()),
                         m_ln, m_col
-                    ));
+                });
             }
 
             eatChar();
@@ -117,38 +64,8 @@ namespace ry {
         return m_src;
     }
 
-    std::vector<Info> Lexer::GetInfos() const {
+    const Infos& Lexer::GetInfos() const {
         return m_infos;
-    }
-
-    std::string Lexer::StringifyInfo(const Info& info) const {  
-        std::size_t startLn = info.GetStartLineNumber();
-        std::size_t startCol = info.GetStartColumn();
-        std::size_t endLn = info.GetEndLineNumber();
-        std::size_t endCol = info.GetEndColumn();
-
-        auto startPtr = m_src.data() + m_lineStartIndices[startLn - 1];
-        auto endPtr = m_src.data() + m_lineEndIndices[startLn - 1];
-        std::string_view line(startPtr, endPtr);
-        
-        std::size_t lnLen = std::floor(std::log10(startLn)) + 1;
-        std::size_t leftBarLen = std::max(lnLen, m_id.length());
-
-        std::string underLine =
-            std::string(startCol - 1, ' ')
-            + '^'
-            + std::string(endCol - startCol, '~');
-        std::string msg =
-            std::string(startCol - 1, ' ')
-            + std::string(info.GetMessage());
-
-        return std::format(
-            " {:>{}} |\n {:>{}} | {}\n {:>{}} | {}\n {:>{}} | {}",
-            m_id, leftBarLen,
-            startLn, leftBarLen, line,
-            "", leftBarLen, underLine,
-            "", leftBarLen, msg
-        );
     }
 
     // 
@@ -202,12 +119,12 @@ namespace ry {
                     c1 = getChar(0);
                     c2 = getChar(1);
                     if(c1 == CHAR_EOF) {
-                        m_infos.push_back(Info(
-                            Info::Level::ERROR,
+                        m_infos.Push({
+                            Infos::Info::Level::ERROR,
                             "Unterminated multi-line comment",
                             startLn, startCol,
                             startLn, startCol + 1
-                        ));
+                        });
                         break;
                     }
                     if(c1 == '*' && c2 == '/') {// "*/" end
@@ -304,11 +221,11 @@ namespace ry {
                 static bool hasErrored = false;
                 if(!hasErrored) {
                     hasErrored = true;
-                    m_infos.push_back(Info(
-                        Info::Level::ERROR,
+                    m_infos.Push({
+                        Infos::Info::Level::ERROR,
                         std::format("Invalid digit '{}' in {} integer literal", c, baseName),
                         m_ln, m_col
-                    ));
+                    });
                 }
                 return true;
             }
@@ -326,11 +243,11 @@ namespace ry {
                 char c3 = getChar();
                 if(c3!='_' && !isValidDigit(c3, base)) {
                     if(!tryErrorInvalidDigit(c3, base, baseName))
-                        m_infos.push_back(Info(
-                        Info::Level::ERROR,
+                        m_infos.Push({
+                        Infos::Info::Level::ERROR,
                         "Malformed integer literal",
                         m_ln, m_col
-                        ));
+                        });
                 }
             }
 
@@ -349,11 +266,11 @@ namespace ry {
                     else {
                         if((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
                             if(allowedSuffixChars.find(c) == std::string_view::npos)
-                                m_infos.push_back(Info(
-                                Info::Level::ERROR,
+                                m_infos.Push({
+                                Infos::Info::Level::ERROR,
                                 "Malformed integer literal",
                                 m_ln, m_col
-                                ));
+                                });
                         break;
                     }
                 }
@@ -394,11 +311,11 @@ namespace ry {
                 if(posE.has_value())
                     e = std::pow(10.0, e * posE.value());
                 else
-                    m_infos.push_back(Info(
-                        Info::Level::ERROR,
+                    m_infos.Push({
+                        Infos::Info::Level::ERROR,
                         "Unfinished exponent",
                         m_ln, m_col
-                    ));
+                    });
                 return e;
             }
             return {};
@@ -413,11 +330,11 @@ namespace ry {
                     std::size_t int2len = std::floor(std::log10(floatlit_t(int2.value()))) + 1;
                     num += floatlit_t(int2.value()) / std::pow(10, int2len);
                 } else {
-                     m_infos.push_back(Info(
-                        Info::Level::ERROR,
+                     m_infos.Push({
+                        Infos::Info::Level::ERROR,
                         "Unfinished float literal",
                         m_ln, m_col
-                     ));
+                     });
                 }
                 num *= tryLexExponent().value_or(1);
                 return Token(Token::Type::FLOAT_LIT, num);
@@ -443,11 +360,11 @@ namespace ry {
                     if(numOpt.has_value()) {
                         intlit_t num = numOpt.value();
                         if(num < 1 || num > 127)
-                            m_infos.push_back(Info(
-                                Info::Level::ERROR,
+                            m_infos.Push({
+                                Infos::Info::Level::ERROR,
                                 "Escape sequence out of bounds <1,127>",
                                 m_ln, m_col
-                            ));
+                            });
                         return char(num);
                     }
                     return {};
@@ -472,11 +389,11 @@ namespace ry {
                     }
                     // else fallback
                 default:
-                    m_infos.push_back(Info(
-                        Info::Level::ERROR,
+                    m_infos.Push({
+                        Infos::Info::Level::ERROR,
                         std::format("Invalid escape sequence '\\{}'", c2),
                         m_ln, m_col
-                    ));
+                    });
                     eatChar();
                     return {};
             }
@@ -496,11 +413,11 @@ namespace ry {
                 eatChar();
 
             if(getChar() != '\'')
-                m_infos.push_back(Info(
-                    Info::Level::ERROR,
+                m_infos.Push({
+                    Infos::Info::Level::ERROR,
                     "Unterminated character literal",
                     m_ln, m_col
-                ));
+                });
             eatChar();
 
             return Token(Token::Type::CHAR_LIT, ch);
@@ -523,12 +440,12 @@ namespace ry {
             for(;;) {
                 char c = getChar();
                 if(!isMultiline && ln != m_ln) {
-                    std::size_t prevCol = m_lineEndIndices[ln - 1] - m_lineStartIndices[ln - 1];
-                    m_infos.push_back(Info(
-                        Info::Level::ERROR,
+                    std::size_t prevCol = m_infos.GetLineEndIndex(ln) - m_infos.GetLineStartIndex(ln);
+                    m_infos.Push({
+                        Infos::Info::Level::ERROR,
                         "Unexpected new line in single-line string literal",
                         ln, prevCol + 1
-                    ));
+                    });
                     ln = m_ln;
                 }
                 if(c == c1) {
@@ -536,11 +453,11 @@ namespace ry {
                         char c2 = getChar(1);
                         char c3 = getChar(2);
                         if(c2 != c1 || c3 != c1)
-                            m_infos.push_back(Info(
-                                Info::Level::ERROR,
+                            m_infos.Push({
+                                Infos::Info::Level::ERROR,
                                 "Expected termination of multi-line string literal",
                                 m_ln, m_col
-                            ));
+                            });
                         eatChar(3);
                     }
                     else
@@ -548,11 +465,11 @@ namespace ry {
                     break;
                 }
                 if(c == CHAR_EOF) {
-                    m_infos.push_back(Info(
-                        Info::Level::ERROR,
+                    m_infos.Push({
+                        Infos::Info::Level::ERROR,
                         "Unterminated single-line string literal",
                         m_ln, m_col
-                    ));
+                    });
                     break;
                 }
                 if(isRaw) {

@@ -139,6 +139,12 @@ namespace ry {
 
     using ExpressionBlock = ASTNode::ExpressionBlock;
 
+    ExpressionBlock::ExpressionBlock() {}
+
+    ExpressionBlock::ExpressionBlock(const Statements& statements):
+        m_statements(statements)
+    {}
+
     ExpressionBlock::ExpressionBlock(const Label& label, const Statements& statements):
         m_label(label),
         m_statements(statements)

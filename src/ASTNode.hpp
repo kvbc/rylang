@@ -180,6 +180,8 @@ namespace ry {
             using Label = std::optional<ExpressionLiteral::String>;
             using Statements = std::vector<Statement>;
 
+            ExpressionBlock();
+            ExpressionBlock(const Statements& statements);
             ExpressionBlock(const Label& label, const Statements& statements);
 
             const Label      & GetLabel      () const;

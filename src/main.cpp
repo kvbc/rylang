@@ -27,6 +27,5 @@ int main() {
         std::cout << token.Stringify() << std::endl;
 
     std::cout << header << " Info" << std::endl;
-    for(const ry::Lexer::Info& info : lexer.GetInfos())
-        std::cout << lexer.StringifyInfo(info) << std::endl << std::endl;
+    std::cout << lexer.GetInfos().Stringify() << std::endl;
 }
