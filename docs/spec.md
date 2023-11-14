@@ -85,7 +85,7 @@ _(lets just ignore test coverage for now)_
 | &emsp; &emsp; 2.2.5. [Other Operators](#other-operators)                          |   ↪️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.2.6. [Operator Precedence](#operator-precedence)                  |  ✔️👆  |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.2.7. [Operator Associativity](#operator-associativity)            |  ✔️👆  |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; 2.3. [Expressions](#expressions)                                           |   ✔️   |     👇      |       👇       |      👇       |                                                               |
+| &emsp; 2.3. [Expressions](#expressions)                                           |  ✔️👇  |     👇      |       👇       |      👇       |                                                               |
 | &emsp; &emsp; 2.3.1. [L-Values](#l-values)                                        |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; &emsp; 2.3.1.1. [Pointer Dereference](#pointer-dereference)         |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; &emsp; 2.3.1.2. [Struct Member Access](#struct-member-access)       |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
@@ -96,11 +96,14 @@ _(lets just ignore test coverage for now)_
 | &emsp; &emsp; 2.3.6. [Control Flow](#control-flow)                                |   👇   |     👇      |       👇       |      👇       |                                                               |
 | &emsp; &emsp; &emsp; 2.3.6.1. [If / Else](#if-else)                               |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; &emsp; 2.3.6.2. [Loop](#loop)                                       |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.3.7. [Struct Literals](#struct-literals)                          |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.3.8. [Compile-time Expressions](#compile-time-expressions)        |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; 2.4. [Statements](#statements)                                             |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.4.1. [Variables](#variables)                                      |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
-| &emsp; 2.5. [Metadata](#metadata)                                                 |   ❌   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.3.7. [Struct Literals](#struct-literals)                          |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.3.8. [Compile-time Expressions](#compile-time-expressions)        |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; 2.4. [Statements](#statements)                                             |  ✔️👇  |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.4.1. [Variable Definition](#variable-definition)                  |   ➖   |     ❌      |       ❌       |      ❌       | // possibly add struct destructuring                          |
+| &emsp; &emsp; 2.4.2. [Assignment](#assignment)                                    |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.4.3. [Continue Statement](#continue-statement)                    |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.4.4. [Break Statement](#break-statement)                          |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
+| &emsp; 2.5. [Metadata](#metadata)                                                 |   ✔️   |     ❌      |       ❌       |      ❌       |                                                               |
 | <br> 3. [Typing](#typing) <br> <br>                                               |   👇   |     👇      |       👇       |      👇       | **"Typing" the untyped AST nodes**                            |
 | <br> 4. [Transpilation](#transpilation) <br> <br>                                 |   👇   |     👇      |       👇       |      👇       | **Transpiling typed AST nodes into C source code**            |
 | <br> 5. [Compile-time Evaluation](#compile-time-evaluation) <br> <br>             |   👇   |     👇      |       👇       |      👇       | **JIT compile-time expression evaluation**                    |
@@ -559,52 +562,53 @@ Assignment
 
 ### 2.2.5. Other Operators {#other-operators}
 
-| Type   | Operator | Name                 | Syntax                                            |
-| ------ | :------: | -------------------- | ------------------------------------------------- |
-| Unary  |   `&`    | Address Of           | See [Address Of](#address-of)                     |
-| Unary  |   `*`    | Pointer Dereference  | See [Pointer Dereference](#pointer-dereference)   |
-| Binary |   `as`   | Type Cast            | See [Type Cast](#type-cast)                       |
-| Binary |   `.`    | Struct Member Access | See [Struct Member Access](#struct-member-access) |
-| Binary |   `=`    | Assignment           | See ... TODO                                      |
-| Binary |   `:=`   | Variable Definition  | See ... TODO                                      |
+| Type   | Operator | Name                 | Syntax                                                    |
+| ------ | :------: | -------------------- | --------------------------------------------------------- |
+| Unary  |  `comp`  | Compile-time         | See [Compile-time expressions](#compile-time-expressions) |
+| Unary  |   `&`    | Address Of           | See [Address Of](#address-of)                             |
+| Unary  |   `*`    | Pointer Dereference  | See [Pointer Dereference](#pointer-dereference)           |
+| Binary |   `as`   | Type Cast            | See [Type Cast](#type-cast)                               |
+| Binary |   `.`    | Struct Member Access | See [Struct Member Access](#struct-member-access)         |
+| Binary |   `=`    | Assignment           | See ... TODO                                              |
+| Binary |   `:=`   | Variable Definition  | See ... TODO                                              |
 
 ### 2.2.6. Operator Precedence {#operator-precedence}
 
-| Level | Operators                   |
-| :---: | :-------------------------- |
-|   1   | `.`                         |
-|   2   | `-a` `~` `not` `&a` `*a`    |
-|   3   | `as`                        |
-|   4   | `**`                        |
-|   5   | `a*b` `/` `%`               |
-|   6   | `a+b` `a-b`                 |
-|   7   | `<<` `>>`                   |
-|   8   | `a&b`                       |
-|   9   | `\|`                        |
-|  10   | `^`                         |
-|  11   | `==` `!=` `<` `<=` `>` `>=` |
-|  12   | `and`                       |
-|  13   | `or`                        |
+| Level | Operators                       |
+| :---: | :------------------------------ |
+|   1   | `.`                             |
+|   2   | `-a` `~` `not` `&a` `*a` `comp` |
+|   3   | `as`                            |
+|   4   | `**`                            |
+|   5   | `a*b` `/` `%`                   |
+|   6   | `a+b` `a-b`                     |
+|   7   | `<<` `>>`                       |
+|   8   | `a&b`                           |
+|   9   | `\|`                            |
+|  10   | `^`                             |
+|  11   | `==` `!=` `<` `<=` `>` `>=`     |
+|  12   | `and`                           |
+|  13   | `or`                            |
 
 ### 2.2.7. Operator Associativity {#operator-associativity}
 
 | Associativity | Operators                                                                                   |
 | :-----------: | ------------------------------------------------------------------------------------------- |
-|     `<--`     | `-a ~ not &a *a`                                                                            |
+|     `<--`     | `-a ~ not &a *a comp`                                                                       |
 |     `-->`     | `a+b a-b a*b ** / %` <br> `\| ^ a&b << >>` <br> `== != < <= > >=` <br> `or and` <br> `as .` |
 
 ## 2.3. Expressions {#expressions}
 
 **Syntax**
 
-| Tag               | Syntax                                                                                                        |
-| ----------------- | ------------------------------------------------------------------------------------------------------------- |
-| \<expr>           | `['(']  <literal> \| <block> \| <if> \| <loop> \| <expr_op> \| <lvalue> \| <address_of> \| <type_cast> [')']` |
-| &emsp; \<literal> | See [Literals](#literals)                                                                                     |
-| &emsp; \<block>   | See [Block](#block)                                                                                           |
-| &emsp; \<if>      | See [If / Else](#if-else)                                                                                     |
-| &emsp; \<loop>    | See [Loop](#loop)                                                                                             |
-| &emsp; \<expr_op> | See [Operators](#operators)                                                                                   |
+| Tag               | Syntax                                                                                                                                |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| \<expr>           | `['(']  <literal> \| <block> \| <if> \| <loop> \| <expr_op> \| <lvalue> \| <address_of> \| <type_cast> \| <explicit_comp_expr> [')']` |
+| &emsp; \<literal> | See [Literals](#literals)                                                                                                             |
+| &emsp; \<block>   | See [Block](#block)                                                                                                                   |
+| &emsp; \<if>      | See [If / Else](#if-else)                                                                                                             |
+| &emsp; \<loop>    | See [Loop](#loop)                                                                                                                     |
+| &emsp; \<expr_op> | See [Operators](#operators)                                                                                                           |
 
 ### 2.3.1. L-Values {#l-values}
 
@@ -753,12 +757,12 @@ b i32 = if( a == 1 ) {
 
 **Syntax**
 
-| Tag                        | Syntax                          | Comment |
-| -------------------------- | ------------------------------- | ------- |
-| \<struct_lit>              | `'[' {<struct_lit_field>} ']'`  |
-| &emsp; \<struct_lit_field> | `[<name> =] <expr> [;]`         |
-| &emsp; \<name>             | See [Names](#names)             |
-| &emsp; \<expr>             | See [Expressions](#expressions) |
+| Tag                        | Syntax                                                   | Comment |
+| -------------------------- | -------------------------------------------------------- | ------- |
+| \<struct_lit>              | `'[' [{<struct_lit_field> ;\|,} <struct_lit_field>] ']'` |
+| &emsp; \<struct_lit_field> | `[<name> =] <expr>`                                      |
+| &emsp; \<name>             | See [Names](#names)                                      |
+| &emsp; \<expr>             | See [Expressions](#expressions)                          |
 
 **Interpretation**
 
@@ -774,154 +778,56 @@ pos [x i32; y i32] = [3; 5];
 
 **Syntax**
 
-| Tag          | Syntax            |
-| ------------ | ----------------- |
-| \<comp_expr> | `comp ( <expr> )` |
-| \<comp_expr> | `comp <block>`    |
-
-**Context**
-
-- Metadata `@comp` can be used to mark [struct](#struct) fields and [variables](#variables) as being compile-time known.
-
-**Interpretation**
-
-TODO
-
-**Examples**
-
-```rust
-add ${ a f32; b f32 } => f32 = {
-    break a + b;
-};
-sub ${ @comp a f32; b f32 } => f32 = {
-    break a - b;
-};
-mul ${ a f32; @comp b f32 } => f32 = {
-    break a * b;
-};
-div ${ @comp a f32; @comp b f32 } => f32 = {
-    break a / b;
-};
-main ${} => ${} = {
-    @comp a f32 = 3;
-    @comp b f32 = 5;
-
-    @comp c f32 = add{a; b}; // ERROR
-    c f32 = add{a; b}; // ok
-
-    @comp c f32 = sub{a; b}; // ERROR
-    c f32 = sub{a; b}; // ok
-
-    @comp c f32 = mul{a; b}; // ERROR
-    c f32 = mul{a; b}; // ok
-
-    @comp c f32 = div{a; b}; // ok
-    c f32 = div{a; b}; // ok
-
-    break {};
-};
-```
+| Tag                   | Syntax        |
+| --------------------- | ------------- |
+| \<comp_expr>          | `<expr>`      |
+| \<explicit_comp_expr> | `comp <expr>` |
 
 ## 2.4. Statements {#statements}
 
 **Syntax**
 
-| Tag     | Syntax                                |
-| ------- | ------------------------------------- |
-| \<stmt> | `<var> \| <expr> \| <namespace_stmt>` |
+| Tag      | Syntax                                                                                |
+| -------- | ------------------------------------------------------------------------------------- |
+| `<stmt>` | `<expr> \| <stmt_op> \| <var_def> \| <assignment> \| <continue_stmt> \| <break_stmt>` |
 
-### 2.4.1. Variables {#variables}
+### 2.4.1. Variable Definition {#variable-definition}
 
 **Syntax**
 
-| Tag            | Syntax                                                          | Comment             |
-| -------------- | --------------------------------------------------------------- | ------------------- |
-| \<var>         | `<name> <type> = <expr> ;` where `<expr>` coerces into `<type>` | Non-struct variable |
-| &emsp; \<name> | See [Names](#names)                                             |
-| &emsp; \<expr> | See [Expressions](#expressions)                                 |
-| &emsp; \<type> | See [Types](#types)                                             |
+| Tag            | Syntax                                             | Comment         |
+| -------------- | -------------------------------------------------- | --------------- |
+| \<var_def>     | `<name> <type> [= <expr>]` <br> `<name> := <expr>` | <br> Infer type |
+| &emsp; \<name> | See [Names](#names)                                |
+| &emsp; \<expr> | See [Expressions](#expressions)                    |
+| &emsp; \<type> | See [Types](#types)                                |
 
-- See `<name>` in [Names](#names) for the rules behind a valid variable name (identifier).
-- See `<expr>` in [Expressions](#expressions) for what a variable can be assigned.
-- The variable's value must be able to coerce into the variable's type.
-  - See [Type Coercion](#type-coercion)
-- All variables must be initialized.
-- Variables of type `<type>` being `<func_type>` are knows as functions.
-  - See `<func_type>` in [Types](#types)
-- Variables of type `<type>` being `<struct_type>` are known as structs.
-  - See `<struct_type>` in [Types](#types)
+### 2.4.2. Assignment {#assignment}
 
-**Context**
+| Tag           | Syntax              | Comment |
+| ------------- | ------------------- | ------- |
+| \<assignment> | `<lvalue> = <expr>` |         |
 
-| Tag             | Parent                |
-| --------------- | --------------------- |
-| \<var>          | `<block>`             |
-| &emsp; \<block> | See [Blocks](#blocks) |
+### 2.4.3. Continue Statement {#continue-statement}
 
-- Variables can only exist inside of blocks.
+| Tag              | Syntax     | Comment |
+| ---------------- | ---------- | ------- |
+| \<continue_stmt> | `continue` |         |
 
-**Examples**
+### 2.4.4. Break Statement {#break-statement}
 
-```rust
-x i32 = 3; // int var
-
-add [a i32; b i32]=>i32 = a + b;
-
-Vec2 var = [ // comp-time variable, type alias
-    x i32;
-    y i32;
-]
-```
-
-<!--
-- Variables of type *struct* `<struct_type>` must be initialized either by copy or by using the struct literal.
-  - See [Struct](#struct).
-  - See `<struct_type>` in [Types](#types).
-  - See [Literals](#literals) for the definition of a *struct literal*.
-  ```rust
-  main ()void = {
-    $Vector2 = { x i32; y i32 };
-    a $Vector2 = { // literal
-        .x = 0,
-        .y = 0
-    };
-    // or
-    b $Vector2 = a; // copy
-    c $Vector2 = { // copy
-        break b;
-    };
-  };
-  ```
-  This supposed copy might not always result in an actual copy of the data. \
-  The compiler is expected to, where applicable, prefer "moving" the data instead of actually copying it. \
-  One such example can be observed below.
-  ```rust
-  $Vector2 = {
-    x i32;
-    y i32;
-    new( x i32, y i32 ) $Vector2 = {
-        v $Vector2 = {
-            .x = x,
-            .y = y
-        };
-        break v;
-    }
-  };
-  main() void = {
-    pos $Vector2 = :$Vector2:new(0, 0);
-  }
-  ```
-  TODO: Talk about how it's done in C - returning a struct by value in C (implicit return pointer)
--->
+| Tag           | Syntax                        | Comment |
+| ------------- | ----------------------------- | ------- |
+| \<break_stmt> | `break [<string_lit>] <expr>` |         |
 
 ## 2.5. Metadata {#metadata}
 
 **Syntax**
 
-| Tag            | Syntax                                                           |
-| -------------- | ---------------------------------------------------------------- |
-| \<meta>        | `@ <name>` where `<name>` is one of the listed in **Parentship** |
-| &emsp; \<name> | See [Names](#names)                                              |
+| Tag            | Syntax              |
+| -------------- | ------------------- |
+| \<meta>        | `# <name>`          |
+| &emsp; \<name> | See [Names](#names) |
 
 **Parentship**
 
