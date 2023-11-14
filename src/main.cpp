@@ -1,4 +1,5 @@
 #include "Lexer.hpp"
+#include "Parser.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -26,6 +27,12 @@ int main() {
     for(const ry::Token& token : tokens)
         std::cout << token.Stringify() << std::endl;
 
-    std::cout << header << " Info" << std::endl;
+    std::cout << header << " Lexer Info" << std::endl;
     std::cout << lexer.GetInfos().Stringify() << std::endl;
+
+    ry::Parser parser(tokens, lexer.GetInfos());
+    parser.Parse();
+
+    std::cout << header << " Parser Info" << std::endl;
+    std::cout << parser.GetInfos().Stringify() << std::endl;
 }

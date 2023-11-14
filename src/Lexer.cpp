@@ -41,9 +41,9 @@ namespace ry {
 
             char c = getChar();
             switch(getChar()) {
-                case ';': tokens.push_back(Token(Token::Type::SEMICOLON)); break;
-                case '(': tokens.push_back(Token(Token::Type::LPAREN)); break;
-                case ')': tokens.push_back(Token(Token::Type::RPAREN)); break;
+                case ';': tokens.push_back(createToken(Token::Type::SEMICOLON)); break;
+                case '(': tokens.push_back(createToken(Token::Type::LPAREN)); break;
+                case ')': tokens.push_back(createToken(Token::Type::RPAREN)); break;
                 case CHAR_EOF:
                     break;
                 default:
@@ -70,9 +70,19 @@ namespace ry {
 
     // 
 
+    template<typename ...Args>
+    Token Lexer::createToken(Args&&... args) const {
+        return Token(
+            SourcePosition(m_ln, m_col),
+            std::forward<Args>(args)...
+        );
+    }
+
     std::string_view::const_pointer Lexer::getSourcePointer(int offset) {
         return m_src.data() + m_srcIdx + offset;
     }
+
+    // 
 
     std::optional<Token> Lexer::tryLexNameOrKeyword() {
         auto isValidStartChar = [](char c) -> bool {
@@ -95,8 +105,8 @@ namespace ry {
             std::string_view str(srcStartPtr, len);
             std::optional<Token::Type> type = Token::GetStringToKeywordType(str);
             if(type.has_value())
-                return Token(type.value());
-            return Token(Token::Type::NAME, str);
+                return createToken(type.value());
+            return createToken(Token::Type::NAME, str);
         }
 
         return {};
@@ -191,7 +201,7 @@ namespace ry {
         };
         std::optional<Token::Type> tkType = getType();
         if(tkType.has_value())
-            return Token(tkType.value());
+            return createToken(tkType.value());
         return {};
     }
 
@@ -337,14 +347,14 @@ namespace ry {
                      });
                 }
                 num *= tryLexExponent().value_or(1);
-                return Token(Token::Type::FLOAT_LIT, num);
+                return createToken(Token::Type::FLOAT_LIT, num);
             }
 
             std::optional<floatlit_t> exp = tryLexExponent();
             if(exp.has_value())
-                return Token(Token::Type::FLOAT_LIT, floatlit_t(int1.value()) * exp.value());
+                return createToken(Token::Type::FLOAT_LIT, floatlit_t(int1.value()) * exp.value());
 
-            return Token(Token::Type::INT_LIT, int1.value());
+            return createToken(Token::Type::INT_LIT, int1.value());
         }
         return {};
     }
@@ -420,7 +430,7 @@ namespace ry {
                 });
             eatChar();
 
-            return Token(Token::Type::CHAR_LIT, ch);
+            return createToken(Token::Type::CHAR_LIT, ch);
         }
         return {};
     }
@@ -490,11 +500,11 @@ namespace ry {
             }
             auto srcEndPos = getSourcePointer();
             if(isRaw)
-                return Token(
+                return createToken(
                     Token::Type::STRING_LIT,
                     std::string_view(srcStartPos, srcEndPos - numQuotes)
                 );
-            return Token(
+            return createToken(
                 Token::Type::STRING_LIT,
                 escapedStr
             );

@@ -15,8 +15,7 @@ namespace ry {
         std::size_t startLn, std::size_t startCol
     ):
         m_level(level), m_msg(msg),
-        m_startLn(startLn), m_startCol(startCol),
-        m_endLn(startLn), m_endCol(startCol)
+        m_srcPos(startLn, startCol)
     {}
 
     Info::Info(
@@ -25,8 +24,15 @@ namespace ry {
         std::size_t endLn, std::size_t endCol
     ):
         m_level(level), m_msg(msg),
-        m_startLn(startLn), m_startCol(startCol),
-        m_endLn(endLn), m_endCol(endCol)
+        m_srcPos(startLn, startCol, endLn, endCol)
+    {}
+
+    Info::Info(
+        Level level, std::string_view msg,
+        const SourcePosition& srcPos
+    ):
+        m_level(level), m_msg(msg),
+        m_srcPos(srcPos)
     {}
 
     Info::Level Info::GetLevel() const {
@@ -37,10 +43,9 @@ namespace ry {
         return m_msg;
     }
 
-    std::size_t Info::GetStartLineNumber() const { return m_startLn;  }
-    std::size_t Info::GetStartColumn    () const { return m_startCol; }
-    std::size_t Info::GetEndLineNumber  () const { return m_endLn;    }
-    std::size_t Info::GetEndColumn      () const { return m_endCol;   }
+    const SourcePosition& Info::GetSourcePosition() const {
+        return m_srcPos;
+    }
 
     // 
 
@@ -82,10 +87,11 @@ namespace ry {
     std::string Infos::Stringify() const {  
         std::string str;
         for(const Info& info : m_infos) {
-            std::size_t startLn = info.GetStartLineNumber();
-            std::size_t startCol = info.GetStartColumn();
-            std::size_t endLn = info.GetEndLineNumber();
-            std::size_t endCol = info.GetEndColumn();
+            const SourcePosition& srcPos = info.GetSourcePosition();
+            std::size_t startLn = srcPos.startLine;
+            std::size_t startCol = srcPos.startColumn;
+            std::size_t endLn = srcPos.endLine;
+            std::size_t endCol = srcPos.endColumn;
 
             auto startPtr = m_src.data() + m_lineStartIndices[startLn - 1];
             auto endPtr = m_src.data() + m_lineEndIndices[startLn - 1];

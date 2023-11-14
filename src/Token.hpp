@@ -1,5 +1,7 @@
 #pragma once
 
+#include "SourcePosition.hpp"
+
 #include <limits.h>
 #include <optional>
 #include <string_view>
@@ -123,19 +125,23 @@ namespace ry {
         };
         static constexpr std::size_t TYPE_STRINGS_LEN = sizeof(TYPE_STRINGS) / sizeof(*TYPE_STRINGS);
 
-        Token(Type type);
-        Token(Type type, std::string_view value);
-        Token(Type type, intlit_t value);
-        Token(Type type, floatlit_t value);
-        Token(Type type, char value);
+        Token(const SourcePosition& srcPos, Type type);
+        Token(const SourcePosition& srcPos, Type type, std::string_view value);
+        Token(const SourcePosition& srcPos, Type type, intlit_t value);
+        Token(const SourcePosition& srcPos, Type type, floatlit_t value);
+        Token(const SourcePosition& srcPos, Type type, char value);
 
         static std::optional<Type> GetStringToKeywordType(std::string_view str);
+
+        const SourcePosition& GetSourcePosition() const;
 
         Type GetType() const;
         std::string_view GetStringValue() const;
         intlit_t   GetIntValue  () const;
         floatlit_t GetFloatValue() const;
         char       GetCharValue () const;
+
+        static const char * Stringify(Token::Type type);
 
         std::string Stringify() const;
 
@@ -146,6 +152,7 @@ namespace ry {
             char charv;
         };
 
+        SourcePosition m_srcPos;
         Type m_type;
         std::string m_stringValue;
         std::optional<IntValue> m_intValue;

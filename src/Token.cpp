@@ -7,35 +7,40 @@
 
 namespace ry {                                                      
 
-    Token::Token(Token::Type type):
-        m_type(type)
+    Token::Token(const SourcePosition& srcPos, Token::Type type):
+        m_type(type),
+        m_srcPos(srcPos)
     {}
 
-    Token::Token(Token::Type type, std::string_view value):
+    Token::Token(const SourcePosition& srcPos, Token::Type type, std::string_view value):
         m_type(type),
-        m_stringValue(value)
+        m_stringValue(value),
+        m_srcPos(srcPos)
     {
         assert(m_type == Token::Type::STRING_LIT
             || m_type == Token::Type::NAME);
     }
 
-    Token::Token(Token::Type type, intlit_t value):
+    Token::Token(const SourcePosition& srcPos, Token::Type type, intlit_t value):
         m_type(type),
-        m_intValue({ .intv = value })
+        m_intValue({ .intv = value }),
+        m_srcPos(srcPos)
     {
         assert(m_type == Token::Type::INT_LIT);
     }
 
-    Token::Token(Token::Type type, floatlit_t value):
+    Token::Token(const SourcePosition& srcPos, Token::Type type, floatlit_t value):
         m_type(type),
-        m_intValue({ .floatv = value })
+        m_intValue({ .floatv = value }),
+        m_srcPos(srcPos)
     {
         assert(m_type == Token::Type::FLOAT_LIT);
     }
 
-    Token::Token(Token::Type type, char value):
+    Token::Token(const SourcePosition& srcPos, Token::Type type, char value):
         m_type(type),
-        m_intValue({ .charv = value })
+        m_intValue({ .charv = value }),
+        m_srcPos(srcPos)
     {
         assert(m_type == Token::Type::CHAR_LIT);
     }
@@ -47,6 +52,10 @@ namespace ry {
             if(strncmp(KEYWORDS[i], str.data(), str.length()) == 0)
                 return Type(int(Type::_KW_FIRST) + 1 + i);
         return {};
+    }
+
+    const SourcePosition& Token::GetSourcePosition() const {
+        return m_srcPos;
     }
 
     // 
@@ -78,11 +87,15 @@ namespace ry {
 
     // 
 
-    std::string Token::Stringify() const {
-        int stringsIdx = int(m_type);
+    const char * Token::Stringify(Token::Type type) {
+        int stringsIdx = int(type);
         assert(stringsIdx >= 0
             && stringsIdx < TYPE_STRINGS_LEN);
-        const char * cstr = TYPE_STRINGS[stringsIdx];
+        return TYPE_STRINGS[stringsIdx];
+    }
+
+    std::string Token::Stringify() const {
+        const char * cstr = Token::Stringify(m_type);
         if(m_type == Type::STRING_LIT || m_type == Type::NAME)
             return std::string(cstr) + '(' + std::string(GetStringValue()) + ')';
         if(m_type == Type::INT_LIT) {

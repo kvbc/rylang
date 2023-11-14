@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Infos.hpp"
 #include "Token.hpp"
 #include "ASTNode.hpp"
 
@@ -10,20 +11,23 @@ namespace ry {
 
     class Parser {
     public:
-        Parser(const std::vector<Token>& tokens);
+        Parser(const std::vector<Token>& tokens, const Infos& infos);
 
-        ASTNode Parse() const;
+        const Infos& GetInfos() const;
+
+        ASTNode Parse();
 
     private:
-        void assertToken(Token::Type type, int offset = 0) const;
+        bool assertToken(Token::Type type, int offset = 0);
         const Token * getToken(int offset = 0) const;
         void eatToken();
 
-        ASTNode::Statement parseStatement() const;
-        ASTNode::ExpressionBlock parseBlock() const;
+        ASTNode::Statement parseStatement();
+        ASTNode::ExpressionBlock parseBlock();
 
         int m_tokenIdx;
         const std::vector<Token>& m_tokens;
+        Infos m_infos;
     };
 
 }

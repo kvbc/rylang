@@ -1,5 +1,7 @@
 #pragma once
 
+#include "SourcePosition.hpp"
+
 #include <initializer_list>
 #include <string_view>
 #include <string>
@@ -24,20 +26,17 @@ namespace ry {
                 std::size_t startLn, std::size_t startCol,
                 std::size_t endLn, std::size_t endCol
             );
+            Info(
+                Level lvl, std::string_view msg,
+                const SourcePosition& srcPos
+            );
 
             std::string_view GetMessage() const;
             Level GetLevel() const;
-
-            std::size_t GetStartLineNumber() const;
-            std::size_t GetStartColumn() const;
-            std::size_t GetEndLineNumber() const;
-            std::size_t GetEndColumn() const;
+            const SourcePosition& GetSourcePosition() const;
 
         private:
-            std::size_t m_startLn;
-            std::size_t m_startCol;
-            std::size_t m_endLn;
-            std::size_t m_endCol;
+            SourcePosition m_srcPos;
             std::string m_msg;
             Level m_level;
         };

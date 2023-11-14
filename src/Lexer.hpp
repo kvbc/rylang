@@ -25,6 +25,9 @@ namespace ry {
         const Infos& GetInfos() const;
 
     private:
+        template<typename ...Args>
+        Token createToken(Args&&... args) const;
+
         std::string_view::const_pointer getSourcePointer(int offset = 0);
 
         std::optional<Token> tryLexNameOrKeyword();

@@ -1,19 +1,43 @@
 #include "Parser.hpp"
 
+#include <format>
+
 namespace ry {
 
-    Parser::Parser(const std::vector<Token>& tokens):
-        m_tokens(tokens)
+    Parser::Parser(
+        const std::vector<Token>& tokens,
+        const Infos& infos
+    ):
+        m_tokens(tokens),
+        m_infos(infos),
+        m_tokenIdx(0)
     {}
 
-    ASTNode Parser::Parse() const {
+    const Infos& Parser::GetInfos() const {
+        return m_infos;
+    }
+
+    ASTNode Parser::Parse() {
         return ASTNode(ASTNode::Expression(parseBlock()));
     }
 
     // 
 
-    void Parser::assertToken(Token::Type type, int offset) const {
+    bool Parser::assertToken(Token::Type type, int offset) {
         const Token * token = getToken(offset);
+        if(token == nullptr || token->GetType() != type) {
+            m_infos.Push(Infos::Info(
+                Infos::Info::Level::ERROR,
+                std::format(
+                    "Unexpected token: Expected \"{}\", got \"{}\"",
+                    Token::Stringify(type),
+                    (token == nullptr) ? "EOF" : Token::Stringify(token->GetType())
+                ),
+                token->GetSourcePosition()
+            ));
+            return false;
+        }
+        return true;
     }
 
     const Token * Parser::getToken(int offset) const {
@@ -30,12 +54,13 @@ namespace ry {
 
     // 
 
-    ASTNode::Statement Parser::parseStatement() const {
+    ASTNode::Statement Parser::parseStatement() {
         
     }
 
-    ASTNode::ExpressionBlock Parser::parseBlock() const {
-        
+    ASTNode::ExpressionBlock Parser::parseBlock() {
+        assertToken(Token::Type::OP_POWER_EQ);
+        return ASTNode::ExpressionBlock();
     }
 
 }
