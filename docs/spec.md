@@ -378,8 +378,9 @@ TODO
 | &emsp; \<primitive> | See [Primitives](#primitives) |
 
 ```
+do
 if else
-loop do continue break
+loop continue break
 false true null
 not or and
 as
@@ -708,10 +709,10 @@ for( x usize = 0;; x < 10; x += 1 ) "x" {
 
 **Syntax**
 
-| Tag            | Syntax                                |
-| -------------- | ------------------------------------- |
-| \<if>          | `if <expr> then <expr> [else <expr>]` |
-| &emsp; \<expr> | See [Expressions](#expressions)       |
+| Tag            | Syntax                              |
+| -------------- | ----------------------------------- |
+| \<if>          | `if <expr> do <expr> [else <expr>]` |
+| &emsp; \<expr> | See [Expressions](#expressions)     |
 
 **Examples**
 
