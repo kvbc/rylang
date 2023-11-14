@@ -64,7 +64,7 @@ _(lets just ignore test coverage for now)_
 | &emsp; &emsp; 1.4.3. [String Literals](#string-literals)                          |   ✔️   |     ✔️      |       ✔️       |      ❌       | Raw, escapable, single-line, multi-line                       |
 | &emsp; &emsp; 1.4.4. [Character Literals](#char-literals)                         |   ✔️   |     ✔️      |       ✔️       |      ❌       | Escapable                                                     |
 | &emsp; &emsp; 1.4.5. [Boolean Literals](#bool-literals)                           |   ✔️   |     ✔️      |      N/A       |      ❌       | true, false                                                   |
-| &emsp; &emsp; 1.4.6. [Null Literal](#null-literal)                                |   ✔️   |     ✔️      |      N/A       |      ❌       | true, false                                                   |
+| &emsp; &emsp; 1.4.6. [Null Literal](#null-literal)                                |   ✔️   |     ✔️      |      N/A       |      ❌       | null                                                          |
 | &emsp; 1.5. [Keywords](#keywords)                                                 |   ↪️   |     ✔️      |      N/A       |      ❌       | Special, reserved names (identifiers)                         |
 | &emsp; 1.6. [Operators](#lexical-operators)                                       |   ↪️   |     ✔️      |      N/A       |      ❌       | Arithmetic, bitwise, comparison, logical, other               |
 | &emsp; 1.7. [Tokens](#tokens)                                                     |   👆   |     👆      |       👆       |      👆       | Names, keywords, operators, literals, characters              |
