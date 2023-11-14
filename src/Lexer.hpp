@@ -14,6 +14,9 @@ namespace ry {
     public:
         static constexpr char CHAR_EOF = 0;
 
+        using intlit_t = Token::intlit_t;
+        using floatlit_t = Token::floatlit_t;
+
         class Info {
         public:
             enum class Level {
@@ -56,9 +59,6 @@ namespace ry {
         std::string StringifyInfo(const Info& info) const;
 
     private:
-        using intlit_t = Token::intlit_t;
-        using floatlit_t = Token::floatlit_t;
-
         std::string_view::const_pointer getSourcePointer(int offset = 0);
 
         std::optional<Token> tryLexNameOrKeyword();
