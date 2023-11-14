@@ -11,8 +11,6 @@ namespace ry {
     public:
         Parser(const std::vector<Token>& tokens);
 
-        ASTNode Parse();
-
     private:
         const std::vector<Token>& m_tokens;
     };

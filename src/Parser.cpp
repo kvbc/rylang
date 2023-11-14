@@ -6,10 +6,4 @@ namespace ry {
         m_tokens(tokens)
     {}
 
-    ASTNode Parser::Parse() {
-        //asdasdoijasdioajs idk
-        // i gotta figure out the spec brah
-        return ASTNode();
-    }
-
 }

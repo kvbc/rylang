@@ -5,6 +5,7 @@
 #include <memory>
 #include <optional>
 #include <string_view>
+#include <variant>
 
 namespace ry {
     
@@ -36,8 +37,8 @@ namespace ry {
         public:
             class Field {
             public:
-                using FieldType = std::unique_ptr<Type>;
-                using Names = std::vector<Name>;
+                using FieldType = std::shared_ptr<Type>;
+                using Names = std::optional<std::vector<Name>>;
 
                 Field(const FieldType& type);
                 Field(const FieldType& type, const Names& names);
@@ -49,7 +50,7 @@ namespace ry {
                 Names m_names;
                 FieldType m_type;
             };
-            using Fields = std::vector<Field>;
+            using Fields = std::optional<std::vector<Field>>;
 
             TypeStruct();
             TypeStruct(const Fields& fields);
@@ -65,60 +66,40 @@ namespace ry {
         class TypeFunction {
         public:
             using ArgumentsType = TypeStruct;
-            using ReturnType = std::unique_ptr<Type>;
+            using ReturnType = std::shared_ptr<Type>;
 
-            TypeFunction(const ArgumentsType& argumentsType, ReturnType returnType);
+            TypeFunction(const ArgumentsType& argumentsType, const ReturnType& returnType);
 
             const ArgumentsType & GetArgumentsType () const;
             const ReturnType    & GetReturnType    () const;
 
         private:
-            ArgumentsType argumentsType;
-            ReturnType returnType;
+            ArgumentsType m_argumentsType;
+            ReturnType m_returnType;
         };
 
         // 
 
-        using TypePointer = std::unique_ptr<Type>;
+        using TypePointer = std::shared_ptr<Type>;
 
         // 
 
         class Type {
         public:
             struct Attribs {
-                bool isMutable;
-                bool isOptional;
+                bool isMutable = false;
+                bool isOptional = false;
             };
+            using Data = std::variant<TypePrimitive, TypeFunction, TypeStruct, TypePointer>;
 
-            enum class Kind {
-                Primitive,
-                Function,
-                Struct,
-                Pointer
-            };
+            Type(const Data& data, const std::optional<Attribs>& attribs);
 
-            Type(const TypePrimitive & primitive);
-            Type(const TypeFunction  & function);
-            Type(const TypeStruct    & structType);
-            Type(const TypePointer   & pointer);
-
-            Kind GetKind() const;
             const Attribs& GetAttribs() const;
-            
-            const TypePrimitive & GetPrimitive () const;
-            const TypeFunction  & GetFunction  () const;
-            const TypeStruct    & GetStruct    () const;
-            const TypePointer   & GetPointer   () const;
+            const Data& GetData() const;
 
         private:
-            Kind m_kind;
-            Attribs m_attribs;
-            union {
-                TypePrimitive primitive;
-                TypeFunction  function;
-                TypeStruct    structType;
-                TypePointer   pointer;
-            } m_data;
+            const Attribs m_attribs;
+            Data m_data;
         };
 
         /*
@@ -132,10 +113,6 @@ namespace ry {
 
         class ExpressionLiteral {
         public:
-            enum class Kind {
-                Int, Float, String, Char, Bool, Null
-            };
-
             using Int = Lexer::intlit_t;
             using Float = Lexer::floatlit_t;
             using String = std::string_view;
@@ -146,7 +123,7 @@ namespace ry {
                 class Field {
                 public:
                     using FieldName = std::optional<Name>;
-                    using Value = std::unique_ptr<Expression>;
+                    using Value = std::shared_ptr<Expression>;
 
                     Field(const Value& value);
                     Field(const Value& value, const FieldName& name);
@@ -162,47 +139,31 @@ namespace ry {
 
                 Struct(const Fields& fields);
 
+                const Fields& GetFields() const;
+
             private:
                 Fields m_fields;
             };
 
-            ExpressionLiteral(const Int    & intv   );
-            ExpressionLiteral(const Float  & floatv );
-            ExpressionLiteral(const String & stringv);
-            ExpressionLiteral(const Char   & charv  );
-            ExpressionLiteral(const Bool   & boolv  );
-            ExpressionLiteral(const Struct & structv);
+            using Data = std::optional<std::variant<Int, Float, String, Char, Bool, Struct>>;
+
             ExpressionLiteral();
+            ExpressionLiteral(const Data& data);
 
-            Kind GetKind() const;
-
-            const Int    & GetInt    () const;
-            const Float  & GetFloat  () const;
-            const String & GetString () const;
-            const Char   & GetChar   () const;
-            const Bool   & GetBool   () const;
-            const Struct & GetStruct () const;
+            const Data& GetData() const;
 
         private:
-            Kind m_kind;
-            union {
-                Int intv;
-                Float floatv;
-                String stringv;
-                Char charv;
-                Bool boolv;
-                Struct structv;
-            } m_data;
+            Data m_data;
         };
 
         // 
 
         class ExpressionFunctionCall {
         public:
-            using Function = std::unique_ptr<Expression>;
+            using Function = std::shared_ptr<Expression>;
             using Parameters = ExpressionLiteral::Struct;
 
-            ExpressionFunctionCall(Function function, const Parameters& parameters);
+            ExpressionFunctionCall(const Function& function, const Parameters& parameters);
 
             const Function   & GetFunction   () const;
             const Parameters & GetParameters () const;
@@ -219,7 +180,7 @@ namespace ry {
             using Label = std::optional<ExpressionLiteral::String>;
             using Statements = std::vector<Statement>;
 
-            ExpressionBlock(Label label, const Statements& statements);
+            ExpressionBlock(const Label& label, const Statements& statements);
 
             const Label      & GetLabel      () const;
             const Statements & GetStatements () const;
@@ -233,11 +194,15 @@ namespace ry {
 
         class ExpressionIf {
         public:
-            using Condition = std::unique_ptr<Expression>;
-            using SuccessExpression = std::unique_ptr<Expression>;
-            using FailExpression = std::optional<std::unique_ptr<Expression>>;
+            using Condition = std::shared_ptr<Expression>;
+            using SuccessExpression = std::shared_ptr<Expression>;
+            using FailExpression = std::optional<std::shared_ptr<Expression>>;
 
-            ExpressionIf(Condition condition, SuccessExpression successExpression, FailExpression failExpression);
+            ExpressionIf(
+                const Condition& condition,
+                const SuccessExpression& successExpression,
+                const FailExpression& failExpression
+            );
 
             const Condition         & GetCondition         () const;
             const SuccessExpression & GetSuccessExpression () const;
@@ -253,13 +218,13 @@ namespace ry {
 
         class ExpressionLoop {
         public:
-            using InitStatement = std::optional<std::unique_ptr<Statement>>;
-            using Condition = std::optional<std::unique_ptr<Expression>>;
+            using InitStatement = std::optional<std::shared_ptr<Statement>>;
+            using Condition = std::optional<std::shared_ptr<Expression>>;
             using PostStatement = InitStatement;
 
-            ExpressionLoop(InitStatement initStatement);
-            ExpressionLoop(InitStatement initStatement, Condition condition);
-            ExpressionLoop(InitStatement initStatement, Condition condition, PostStatement postStatement);
+            ExpressionLoop(const InitStatement& initStatement);
+            ExpressionLoop(const InitStatement& initStatement, const Condition& condition);
+            ExpressionLoop(const InitStatement& initStatement, const Condition& condition, const PostStatement& postStatement);
 
             const InitStatement & GetInitStatement () const;
             const Condition     & GetCondition     () const;
@@ -275,7 +240,7 @@ namespace ry {
 
         class ExpressionUnaryOperation {
         public:
-            using Operand = std::unique_ptr<Expression>;
+            using Operand = std::shared_ptr<Expression>;
 
             enum class Kind {
                 ArithmeticNegation,
@@ -286,14 +251,14 @@ namespace ry {
                 PointerDereference
             };
 
-            ExpressionUnaryOperation(Kind kind, Operand operand);
+            ExpressionUnaryOperation(Kind kind, const Operand& operand);
 
             Kind GetKind() const;
             const Operand& GetOperand() const;
 
         private:
             Kind m_kind;
-            Operand operand;
+            Operand m_operand;
         };
 
         // 
@@ -311,7 +276,7 @@ namespace ry {
                 TypeCast, StructMemberAccess
             };
 
-            ExpressionBinaryOperation(Kind kind, Operand firstOperand, Operand secondOperand);
+            ExpressionBinaryOperation(Kind kind, const Operand& firstOperand, const Operand& secondOperand);
 
             Kind GetKind() const;
             const Operands& GetOperands() const;
@@ -335,76 +300,36 @@ namespace ry {
                 using PointerDereference = ExpressionUnaryOperation;
                 using StructMemberAccess = ExpressionBinaryOperation;
 
-                enum class Kind {
-                    Name,
-                    PointerDereference,
-                    StructMemberAccess
-                };
+                using Data = std::variant<Name, PointerDereference, StructMemberAccess>;
 
-                LValue(const Name               & name);
-                LValue(const PointerDereference & pointerDereference);
-                LValue(const StructMemberAccess & structMemberAccess);
+                LValue(const Data& data);
 
-                Kind GetKind() const;
-
-                const Name               & GetName               () const;
-                const PointerDereference & GetPointerDereference () const;
-                const StructMemberAccess & GetStructMemberAccess () const;
+                const Data& GetData() const;
 
             private:
-                Kind m_kind;
-                union {
-                    Name               name;
-                    PointerDereference pointerDereference;
-                    StructMemberAccess structMemberAccess;
-                } m_data;
+                Data m_data;
             };
 
-            enum class Kind {
-                Literal,
-                FunctionCall,
-                Block,
-                If,
-                Loop,
-                UnaryOperation,
-                BinaryOperation,
-                Name
-            };
+            using Data = std::variant<
+                ExpressionLiteral,
+                ExpressionFunctionCall,
+                ExpressionBlock,
+                ExpressionIf,
+                ExpressionLoop,
+                ExpressionUnaryOperation,
+                ExpressionBinaryOperation,
+                ExpressionName
+            >;
 
-            Expression(const ExpressionLiteral         & literal        );
-            Expression(const ExpressionFunctionCall    & functionCall   );
-            Expression(const ExpressionBlock           & block          );
-            Expression(const ExpressionIf              & ifStatement    );
-            Expression(const ExpressionLoop            & loop           );
-            Expression(const ExpressionUnaryOperation  & unaryOperation );
-            Expression(const ExpressionBinaryOperation & binaryOperation);
-            Expression(const ExpressionName            & name           );
+            Expression(const Data& data);
 
-            Kind GetKind() const;
-
-            const ExpressionLiteral         & GetLiteral         () const;
-            const ExpressionFunctionCall    & GetFunctionCall    () const;
-            const ExpressionBlock           & GetBlock           () const;
-            const ExpressionIf              & GetIf              () const;
-            const ExpressionLoop            & GetLoop            () const;
-            const ExpressionUnaryOperation  & GetUnaryOperation  () const;
-            const ExpressionBinaryOperation & GetBinaryOperation () const;
-            const ExpressionName            & GetName            () const;
+            const Data& GetData() const;
             
             bool IsLValue() const;
             LValue ToLValue() const;
 
         private:
-            union {
-                ExpressionLiteral         literal;
-                ExpressionFunctionCall    functionCall;
-                ExpressionBlock           block;
-                ExpressionIf              ifStatement;
-                ExpressionLoop            loop;
-                ExpressionUnaryOperation  unaryOperation;
-                ExpressionBinaryOperation binaryOperation;
-                ExpressionName            name;
-            } m_data;
+            Data m_data;
         };
 
         /*
@@ -441,12 +366,12 @@ namespace ry {
         class StatementVariableDefinition {
         public:
             using VarName  = ExpressionName;
-            using VarType  = std::optional<std::unique_ptr<Type>>;
-            using VarValue = std::optional<std::unique_ptr<Expression>>;
+            using VarType  = std::optional<std::shared_ptr<Type>>;
+            using VarValue = std::optional<std::shared_ptr<Expression>>;
 
-            StatementVariableDefinition(const VarName& varName, VarType varType); // an optional type
-            StatementVariableDefinition(const VarName& varName, VarValue varValue); // infer type
-            StatementVariableDefinition(const VarName& varName, VarType varType, VarValue varValue);
+            StatementVariableDefinition(const VarName& varName, const VarType& varType); // an optional type
+            StatementVariableDefinition(const VarName& varName, const VarValue& varValue); // infer type
+            StatementVariableDefinition(const VarName& varName, const VarType& varType, const VarValue& varValue);
 
             const VarName  & GetName () const;
             const VarType  & GetType () const;
@@ -477,6 +402,10 @@ namespace ry {
 
         // 
 
+        using StatementContinue = struct {};
+
+        // 
+
         class StatementBreak {
         public:
             using Label = ExpressionBlock::Label;
@@ -496,39 +425,21 @@ namespace ry {
 
         class Statement {
         public:
-            enum class Kind {
-                Expression,
-                BinaryOperation,
-                VariableDefinition,
-                Assignment,
-                Continue,
-                Break
-            };
+            using Data = std::variant<
+                StatementExpression,
+                StatementBinaryOperation,
+                StatementVariableDefinition,
+                StatementAssignment,
+                StatementContinue,
+                StatementBreak
+            >;
 
-            Statement(Kind kind);
-            Statement(const StatementExpression         & expression        );
-            Statement(const StatementBinaryOperation    & binaryOperation   );
-            Statement(const StatementVariableDefinition & variableDefinition);
-            Statement(const StatementAssignment         & assignment        );
-            Statement(const StatementBreak              & breakStatement    );
+            Statement(const Data& data);
 
-            Kind GetKind() const;
-
-            const StatementExpression         & GetExpression        () const;
-            const StatementBinaryOperation    & GetBinaryOperation   () const;
-            const StatementVariableDefinition & GetVariableDefintion () const;
-            const StatementAssignment         & GetAssignment        () const;
-            const StatementBreak              & GetBreak             () const;
-
+            const Data& GetData() const;
+    
         private:
-            Kind m_kind;
-            union {
-                StatementExpression         expression;
-                StatementBinaryOperation    binaryOperation;
-                StatementVariableDefinition variableDefinition;
-                StatementAssignment         assignment;
-                StatementBreak              breakStatement;
-            } m_data;
+            Data m_data;
         };
 
         /*
@@ -538,29 +449,14 @@ namespace ry {
          */
         
     public:
-        enum class Kind {
-            Type,
-            Expression,
-            Statement
-        };
+        using Data = std::variant<Type, Expression, Statement>;
 
-        ASTNode(const Type       & type      );
-        ASTNode(const Expression & expression);
-        ASTNode(const Statement  & statement );
+        ASTNode(const Data& data);
 
-        Kind GetKind() const;
-
-        const Type       & GetType       () const;
-        const Expression & GetExpression () const;
-        const Statement  & GetStatement  () const;
+        const Data& GetData() const;
 
     private:
-        Kind m_kind;
-        union {
-            Type       type;
-            Expression expression;
-            Statement  statement;
-        } m_data;
+        Data m_data;
     };
 
 }
