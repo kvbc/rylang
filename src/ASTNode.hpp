@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ry.hpp"
 #include "Lexer.hpp"
 
 #include <memory>
@@ -14,6 +15,7 @@ namespace ry {
         using Name = std::string_view;
 
     public:
+        class Expression;
 
         /*
          *
@@ -23,39 +25,66 @@ namespace ry {
 
         class Type;
 
+        #define RY_TYPE_PRIMITIVES(WRAP) \
+            WRAP(Char)                                        \
+            WRAP(I8) WRAP(I16) WRAP(I32) WRAP(I64) WRAP(I128) \
+            WRAP(U8) WRAP(U16) WRAP(U32) WRAP(U64) WRAP(U128) \
+            WRAP(F32) WRAP(F64)                               \
+            WRAP(Bool)
         enum class TypePrimitive {
-            Char,
-            I8, I16, I32, I64, I128,
-            U8, U16, U32, U64, U128,
-            F32, F64,
-            Bool
+            RY_TYPE_PRIMITIVES(RY_WRAP_ENUM)
         };
+        static constexpr const char * const TYPE_PRIMITIVE_STRING[] = {
+            RY_TYPE_PRIMITIVES(RY_WRAP_STR)
+        };
+        #undef RY_TYPE_PRIMITIVES
 
         // 
 
         class TypeStruct {
         public:
-            class Field {
+            using FieldType = std::shared_ptr<Type>;
+            using FieldDefaultValue = std::optional<std::shared_ptr<Expression>>;
+            class NamedField {
             public:
-                using FieldType = std::shared_ptr<Type>;
-                using Names = std::optional<std::vector<Name>>;
+                using Names = std::vector<Name>;
 
-                Field(const FieldType& type);
-                Field(const FieldType& type, const Names& names);
+                NamedField(const Names& names, const FieldType& type, const FieldDefaultValue& defaultValue = {});
 
-                const FieldType & GetType  () const;
-                const Names     & GetNames () const;
+                const FieldType         & GetType         () const;
+                const Names             & GetNames        () const;
+                const FieldDefaultValue & GetDefaultValue () const;
 
             private:
                 Names m_names;
                 FieldType m_type;
+                FieldDefaultValue m_defaultValue;
             };
-            using Fields = std::optional<std::vector<Field>>;
+            class UnnamedField {
+            public:
+                using TypeReps = std::optional<std::shared_ptr<Expression>>;
+
+                UnnamedField(const FieldType& type, const TypeReps& typeReps = {}, const FieldDefaultValue& defaultValue = {});
+
+                const FieldType         & GetType         () const;
+                const TypeReps          & GetTypeReps     () const;
+                const FieldDefaultValue & GetDefaultValue () const;
+
+            private:
+                FieldType m_type;
+                TypeReps m_typeReps;
+                FieldDefaultValue m_defaultValue;
+            };
+
+            using Field = std::variant<NamedField, UnnamedField>;
+            using Fields = std::vector<Field>;
 
             TypeStruct();
             TypeStruct(const Fields& fields);
 
             const Fields& GetFields() const;
+
+            std::string Stringify() const;
 
         private:
             Fields m_fields;
@@ -72,6 +101,8 @@ namespace ry {
 
             const ArgumentsType & GetArgumentsType () const;
             const ReturnType    & GetReturnType    () const;
+
+            std::string Stringify() const;
 
         private:
             ArgumentsType m_argumentsType;
@@ -95,7 +126,9 @@ namespace ry {
             Type(const Data& data, const std::optional<Attribs>& attribs = {});
 
             const Attribs& GetAttribs() const;
-            const Data& GetData() const;
+            const Data& Get() const;
+
+            std::string Stringify() const;
 
         private:
             const Attribs m_attribs;
@@ -109,7 +142,6 @@ namespace ry {
          */
 
         class Statement;
-        class Expression;
 
         class ExpressionLiteral {
         public:
@@ -150,7 +182,7 @@ namespace ry {
             ExpressionLiteral();
             ExpressionLiteral(const Data& data);
 
-            const Data& GetData() const;
+            const Data& Get() const;
 
         private:
             Data m_data;
@@ -306,7 +338,7 @@ namespace ry {
 
                 LValue(const Data& data);
 
-                const Data& GetData() const;
+                const Data& Get() const;
 
             private:
                 Data m_data;
@@ -325,10 +357,12 @@ namespace ry {
 
             Expression(const Data& data);
 
-            const Data& GetData() const;
+            const Data& Get() const;
             
             bool IsLValue() const;
             LValue ToLValue() const;
+
+            std::string Stringify() const;
 
         private:
             Data m_data;
@@ -438,7 +472,7 @@ namespace ry {
 
             Statement(const Data& data);
 
-            const Data& GetData() const;
+            const Data& Get() const;
     
         private:
             Data m_data;
@@ -455,7 +489,7 @@ namespace ry {
 
         ASTNode(const Data& data);
 
-        const Data& GetData() const;
+        const Data& Get() const;
 
     private:
         Data m_data;

@@ -47,6 +47,7 @@ namespace ry {
                 case '[': tokens.push_back(createToken(Token::Type::LSQUARE)); break;
                 case ']': tokens.push_back(createToken(Token::Type::RSQUARE)); break;
                 case '?': tokens.push_back(createToken(Token::Type::QUESTION)); break;
+                case ',': tokens.push_back(createToken(Token::Type::COLON)); break;
                 case CHAR_EOF:
                     break;
                 default:
@@ -164,11 +165,9 @@ namespace ry {
             };
             using T = Token::Type;
             // check 3-length ops
-            if(is("**=")) return T::OP_POWER_EQ;
             if(is("<<=")) return T::OP_BIT_LSHIFT_EQ;
             if(is(">>=")) return T::OP_BIT_RSHIFT_EQ;
             // check 2-length ops
-            if(is("**" )) return T::OP_POWER;
             if(is("+=" )) return T::OP_ADD_EQ;
             if(is("-=" )) return T::OP_SUB_EQ;
             if(is("*=" )) return T::OP_MUL_EQ;

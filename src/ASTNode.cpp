@@ -5,6 +5,7 @@
 #include <type_traits>
 #include <variant>
 #include <assert.h>
+#include <utility>
 
 namespace ry {
     
@@ -15,17 +16,24 @@ namespace ry {
      */
 
     using TypeStruct = ASTNode::TypeStruct;
-    using Field = TypeStruct::Field;
-    using Fields = TypeStruct::Fields;
+    
+        TypeStruct::NamedField::NamedField(const Names& names, const FieldType& type, const FieldDefaultValue& defaultValue):
+            m_names(names),
+            m_type(type),
+            m_defaultValue(defaultValue)
+        {}
+        const TypeStruct::FieldType         & TypeStruct::NamedField::GetType         () const { return m_type;         }
+        const TypeStruct::NamedField::Names & TypeStruct::NamedField::GetNames        () const { return m_names;        }
+        const TypeStruct::FieldDefaultValue & TypeStruct::NamedField::GetDefaultValue () const { return m_defaultValue; }
 
-    Field::Field(const Field::FieldType& type):
-        m_type(type)
-    {}
-
-    Field::Field(const Field::FieldType& type, const Field::Names& names):
-        m_type(type),
-        m_names(names)
-    {}
+        TypeStruct::UnnamedField::UnnamedField(const FieldType& type, const TypeReps& typeReps, const FieldDefaultValue& defaultValue):
+            m_type(type),
+            m_typeReps(typeReps),
+            m_defaultValue(defaultValue)
+        {}
+        const TypeStruct::FieldType              & TypeStruct::UnnamedField::GetType         () const { return m_type;         }
+        const TypeStruct::UnnamedField::TypeReps & TypeStruct::UnnamedField::GetTypeReps     () const { return m_typeReps;     }
+        const TypeStruct::FieldDefaultValue      & TypeStruct::UnnamedField::GetDefaultValue () const { return m_defaultValue; }
 
     TypeStruct::TypeStruct() {}
 
@@ -33,8 +41,37 @@ namespace ry {
         m_fields(fields)
     {}
 
-    const Fields& TypeStruct::GetFields() const {
+    const TypeStruct::Fields& TypeStruct::GetFields() const {
         return m_fields;
+    }
+
+    std::string TypeStruct::Stringify() const {
+        auto stringifyDefaultValue = [&](const FieldDefaultValue& defaultValue) -> std::string {
+            if(defaultValue.has_value())
+                return " = " + defaultValue.value()->Stringify();
+            return "";
+        };
+
+        auto stringifyPreTypeReps = [&](const UnnamedField::TypeReps& typeReps) -> std::string {
+            if(typeReps.has_value())
+                return typeReps.value()->Stringify() + " * ";
+            return "";
+        };
+
+        auto stringifyField = [&](const Field& field) -> std::string {
+            if(auto * unnamedField = std::get_if<UnnamedField>(&field))
+                return
+                    stringifyPreTypeReps(unnamedField->GetTypeReps())
+                    + unnamedField->GetType()->Stringify()
+                    + stringifyDefaultValue(unnamedField->GetDefaultValue());
+            assert(false);
+            return "???";
+        };
+
+        std::string str = "[";
+        for(const Field& field : m_fields)
+            str += stringifyField(field) + "; ";
+        return str + ']';
     }
 
     // 
@@ -56,6 +93,10 @@ namespace ry {
         return m_returnType;
     }
 
+    std::string TypeFunction::Stringify() const {
+        return m_argumentsType.Stringify() + m_returnType->Stringify();
+    }
+
     // 
 
     using Type = ASTNode::Type;
@@ -69,8 +110,29 @@ namespace ry {
         return m_attribs;
     }
 
-    const Type::Data& Type::GetData() const {
+    const Type::Data& Type::Get() const {
         return m_data;
+    }
+
+    std::string Type::Stringify() const {
+        std::string str;
+
+        if(m_attribs.isMutable)
+            str += '~';
+        if(m_attribs.isOptional)
+            str += '?';
+
+        if(auto * v = std::get_if<TypePrimitive>(&m_data))
+            return str + TYPE_PRIMITIVE_STRING[static_cast<std::size_t>(*v)];
+        if(auto * v = std::get_if<TypePointer>(&m_data))
+            return str + "*" + (**v).Stringify();
+        if(auto * v = std::get_if<TypeFunction>(&m_data))
+            return str + v->Stringify();
+        if(auto * v = std::get_if<TypeStruct>(&m_data))
+            return str + v->Stringify();
+
+        assert(false);
+        return "???";
     }
 
     /*
@@ -114,7 +176,7 @@ namespace ry {
         m_data(data)
     {}
 
-    const ExpressionLiteral::Data& ExpressionLiteral::GetData() const {
+    const ExpressionLiteral::Data& ExpressionLiteral::Get() const {
         return m_data;
     }
 
@@ -273,7 +335,7 @@ namespace ry {
         m_data(data)
     {}
 
-    const LValue::Data& LValue::GetData() const {
+    const LValue::Data& LValue::Get() const {
         return m_data;
     }
 
@@ -281,7 +343,7 @@ namespace ry {
         m_data(data)
     {}
 
-    const Expression::Data& Expression::GetData() const {
+    const Expression::Data& Expression::Get() const {
         return m_data;
     }
 
@@ -299,6 +361,10 @@ namespace ry {
         if(const LValue::StructMemberAccess * ptr = std::get_if<LValue::StructMemberAccess>(&m_data))
             return LValue(*ptr);
         throw std::invalid_argument("expression is not an lvalue");
+    }
+
+    std::string Expression::Stringify() const {
+        return "???";
     }
 
     /*
@@ -414,7 +480,7 @@ namespace ry {
         m_data(data)
     {}
 
-    const Statement::Data& Statement::GetData() const {
+    const Statement::Data& Statement::Get() const {
         return m_data;
     }
 
@@ -428,7 +494,7 @@ namespace ry {
         m_data(data)
     {}
 
-    const ASTNode::Data& ASTNode::GetData() const {
+    const ASTNode::Data& ASTNode::Get() const {
         return m_data;
     }
 

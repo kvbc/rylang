@@ -84,9 +84,9 @@ _(lets just ignore test coverage for now)_
 | &emsp; &emsp; 2.1.2. [Function Type](#function-type)                              |   ✔️   |    ❌     |         ❌          |          ❌          |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.1.3. [Struct Type](#struct-type)                                  |   ✔️   |    ❌     |         ❌          |          ❌          |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.1.4. [Pointer Types](#pointer-types)                              |   ✔️   |    ❌     |         ✔️          |          ❌          |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.1.5. [Type Attributes](#type-attribs)                             |   👇   |    ❌     |         ❌          |          ❌          |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; &emsp; 2.1.5.1. [Type Mutability](#type-mutability)                 |   ✔️   |    ❌     |         ❌          |          ❌          |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; &emsp; 2.1.5.2. [Optional Types](#optional-types)                   |   ✔️   |    ❌     |         ❌          |          ❌          |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.1.5. [Type Attributes](#type-attribs)                             |   👇   |    ❌     |         👇          |          ❌          |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; &emsp; 2.1.5.1. [Type Mutability](#type-mutability)                 |   ✔️   |    ❌     |         ✔️          |          ❌          |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; &emsp; 2.1.5.2. [Optional Types](#optional-types)                   |   ✔️   |    ❌     |         ✔️          |          ❌          |       ❌       |      ❌       |                                                               |
 | &emsp; 2.2. [Operators](#operators)                                               |   👇   |    ❌     |         👇          |          ❌          |       👇       |      👇       |                                                               |
 | &emsp; &emsp; 2.2.1. [Arithmetic Operators](#arithmetic-operators)                |   ✔️   |    ❌     |         ❌          |          ❌          |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.2.2. [Bitwise Operators](#bitwise-operators)                      |   ✔️   |    ❌     |         ❌          |          ❌          |       ❌       |      ❌       |                                                               |
@@ -411,7 +411,7 @@ Tokens represent:
 -   [Keywords](#keywords)
 -   [Operators](#operators)
 -   [Literals](#literals)
--   Characters: `( ) ; [ ] & * ? ~`
+-   Characters: `( ) ; [ ] & * ? ~ ,`
 
 # 2. Parsing and Semantic Analysis {#parsing-and-semantic-analysis}
 
@@ -500,26 +500,24 @@ tuple [i32, bool, f32] = [1, true, 2.3];
 
 ### 2.2.1. Arithmetic Operators {#arithmetic-operators}
 
-| Tag       | Type   | Operator | Name               | Syntax             |
-| --------- | ------ | :------: | ------------------ | ------------------ |
-| <expr_op> | Unary  |   `-`    | negation           | `- <expr>`         |
-| <expr_op> | Binary |   `+`    | addition           | `<expr> + <expr>`  |
-| <expr_op> | Binary |   `-`    | subtraction        | `<expr> - <expr>`  |
-| <expr_op> | Binary |   `*`    | multiplication     | `<expr> * <expr>`  |
-| <expr_op> | Binary |   `**`   | power of           | `<expr> ** <expr>` |
-| <expr_op> | Binary |   `/`    | division           | `<expr> / <expr>`  |
-| <expr_op> | Binary |   `%`    | modulo (remainder) | `<expr> % <expr>`  |
+| Tag       | Type   | Operator | Name               | Syntax            |
+| --------- | ------ | :------: | ------------------ | ----------------- |
+| <expr_op> | Unary  |   `-`    | negation           | `- <expr>`        |
+| <expr_op> | Binary |   `+`    | addition           | `<expr> + <expr>` |
+| <expr_op> | Binary |   `-`    | subtraction        | `<expr> - <expr>` |
+| <expr_op> | Binary |   `*`    | multiplication     | `<expr> * <expr>` |
+| <expr_op> | Binary |   `/`    | division           | `<expr> / <expr>` |
+| <expr_op> | Binary |   `%`    | modulo (remainder) | `<expr> % <expr>` |
 
 Assignment
 
-| Tag       | Type   | Operator | Name               | Syntax              |
-| --------- | ------ | :------: | ------------------ | ------------------- |
-| <stmt_op> | Binary |   `+=`   | addition           | `<name> += <expr>`  |
-| <stmt_op> | Binary |   `-=`   | subtraction        | `<name> -= <expr>`  |
-| <stmt_op> | Binary |   `*=`   | multiplication     | `<name> *= <expr>`  |
-| <stmt_op> | Binary |  `**=`   | power of           | `<name> **= <expr>` |
-| <stmt_op> | Binary |   `/=`   | division           | `<name> /= <expr>`  |
-| <stmt_op> | Binary |   `%=`   | modulo (remainder) | `<name> %= <expr>`  |
+| Tag       | Type   | Operator | Name               | Syntax             |
+| --------- | ------ | :------: | ------------------ | ------------------ |
+| <stmt_op> | Binary |   `+=`   | addition           | `<name> += <expr>` |
+| <stmt_op> | Binary |   `-=`   | subtraction        | `<name> -= <expr>` |
+| <stmt_op> | Binary |   `*=`   | multiplication     | `<name> *= <expr>` |
+| <stmt_op> | Binary |   `/=`   | division           | `<name> /= <expr>` |
+| <stmt_op> | Binary |   `%=`   | modulo (remainder) | `<name> %= <expr>` |
 
 ### 2.2.2. Bitwise Operators {#bitwise-operators}
 
@@ -582,16 +580,15 @@ Assignment
 |   1   | `.`                             |
 |   2   | `-a` `~` `not` `&a` `*a` `comp` |
 |   3   | `as`                            |
-|   4   | `**`                            |
-|   5   | `a*b` `/` `%`                   |
-|   6   | `a+b` `a-b`                     |
-|   7   | `<<` `>>`                       |
-|   8   | `a&b`                           |
-|   9   | `\|`                            |
-|  10   | `^`                             |
-|  11   | `==` `!=` `<` `<=` `>` `>=`     |
-|  12   | `and`                           |
-|  13   | `or`                            |
+|   4   | `a*b` `/` `%`                   |
+|   5   | `a+b` `a-b`                     |
+|   6   | `<<` `>>`                       |
+|   7   | `a&b`                           |
+|   8   | `\|`                            |
+|   9   | `^`                             |
+|  10   | `==` `!=` `<` `<=` `>` `>=`     |
+|  11   | `and`                           |
+|  12   | `or`                            |
 
 ### 2.2.7. Operator Associativity {#operator-associativity}
 

@@ -1,5 +1,6 @@
 #include "Lexer.hpp"
 #include "Parser.hpp"
+#include "ASTNode.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -31,7 +32,13 @@ int main() {
     std::cout << lexer.GetInfos().Stringify() << std::endl;
 
     ry::Parser parser(tokens, lexer.GetInfos());
-    parser.Parse();
+    std::optional<ry::ASTNode> ast = parser.Parse();
+
+    std::cout << header << " AST" << std::endl;
+    if(ast.has_value())
+        if(auto * type = std::get_if<ry::ASTNode::Type>(&ast.value().Get()))
+            std::cout << type->Stringify() << std::endl;
+    std::cout << std::endl;
 
     std::cout << header << " Parser Info" << std::endl;
     std::cout << parser.GetInfos().Stringify() << std::endl;

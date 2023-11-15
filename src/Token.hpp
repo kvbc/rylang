@@ -24,6 +24,8 @@ namespace ry {
             "not", "or", "and",
             "as",
 
+            "", // skip _KW_FIRST_TYPE
+
             "char",
             "i8", "i16", "i32", "i64", "i128",
             "u8", "u16", "u32", "u64", "u128",
@@ -46,6 +48,7 @@ namespace ry {
             LSQUARE,
             RSQUARE,
             QUESTION,
+            COLON,
 
             _KW_FIRST,
             KW_DO,
@@ -64,8 +67,8 @@ namespace ry {
             _KW_LAST_TYPE,
             _KW_LAST,
 
-            OP_SUB_EQ, OP_ADD_EQ, OP_DIV_EQ, OP_MOD_EQ, OP_POWER_EQ, OP_MUL_EQ, 
-            OP_SUB,    OP_ADD,    OP_DIV,    OP_MOD,    OP_POWER,    OP_MUL,
+            OP_SUB_EQ, OP_ADD_EQ, OP_DIV_EQ, OP_MOD_EQ, OP_MUL_EQ, 
+            OP_SUB,    OP_ADD,    OP_DIV,    OP_MOD,    OP_MUL,
 
             OP_BIT_NEG,
             OP_BIT_OR_EQ, OP_BIT_XOR_EQ, OP_BIT_LSHIFT_EQ, OP_BIT_RSHIFT_EQ, OP_BIT_AND_EQ,        
@@ -102,6 +105,7 @@ namespace ry {
             "LSQUARE",
             "RSQUARE",
             "QUESTION",
+            "COLON",
 
             "_KW_FIRST",
             "KW_DO",
@@ -120,8 +124,8 @@ namespace ry {
             "_KW_LAST_TYPE",
             "_KW_LAST",
 
-            "OP_SUB_EQ", "OP_ADD_EQ", "OP_DIV_EQ", "OP_MOD_EQ", "OP_POWER_EQ", "OP_MUL_EQ", 
-            "OP_SUB",    "OP_ADD",    "OP_DIV",    "OP_MOD",    "OP_POWER",    "ASTERISK / OP_MUL / OP_PTR_DEREF",
+            "OP_SUB_EQ", "OP_ADD_EQ", "OP_DIV_EQ", "OP_MOD_EQ", "OP_MUL_EQ", 
+            "OP_SUB",    "OP_ADD",    "OP_DIV",    "OP_MOD",    "ASTERISK / OP_MUL / OP_PTR_DEREF",
 
             "OP_BIT_NEG / TILDE",
             "OP_BIT_OR_EQ", "OP_BIT_XOR_EQ", "OP_BIT_LSHIFT_EQ", "OP_BIT_RSHIFT_EQ", "OP_BIT_AND_EQ",        
