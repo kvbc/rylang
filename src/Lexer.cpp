@@ -44,6 +44,9 @@ namespace ry {
                 case ';': tokens.push_back(createToken(Token::Type::SEMICOLON)); break;
                 case '(': tokens.push_back(createToken(Token::Type::LPAREN)); break;
                 case ')': tokens.push_back(createToken(Token::Type::RPAREN)); break;
+                case '[': tokens.push_back(createToken(Token::Type::LSQUARE)); break;
+                case ']': tokens.push_back(createToken(Token::Type::RSQUARE)); break;
+                case '?': tokens.push_back(createToken(Token::Type::QUESTION)); break;
                 case CHAR_EOF:
                     break;
                 default:
@@ -183,6 +186,7 @@ namespace ry {
             if(is("||" )) return T::OP_OR;
             if(is("&&" )) return T::OP_AND;
             if(is(":=" )) return T::OP_DEFINE;
+            if(is("=>" )) return T::OP_FUNC_ARROW;
             // check 1-length ops
             if(is("-"  )) return T::OP_SUB;
             if(is("+"  )) return T::OP_ADD;

@@ -28,7 +28,7 @@ namespace ry {
             I8, I16, I32, I64, I128,
             U8, U16, U32, U64, U128,
             F32, F64,
-            Bool  
+            Bool
         };
 
         // 
@@ -92,7 +92,7 @@ namespace ry {
             };
             using Data = std::variant<TypePrimitive, TypeFunction, TypeStruct, TypePointer>;
 
-            Type(const Data& data, const std::optional<Attribs>& attribs);
+            Type(const Data& data, const std::optional<Attribs>& attribs = {});
 
             const Attribs& GetAttribs() const;
             const Data& GetData() const;

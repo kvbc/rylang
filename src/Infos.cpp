@@ -35,6 +35,11 @@ namespace ry {
         m_srcPos(srcPos)
     {}
 
+    Info::Info(Level level, std::string_view msg):
+        m_level(level), m_msg(msg),
+        m_srcPos({1,1})
+    {}
+
     Info::Level Info::GetLevel() const {
         return m_level;
     }

@@ -30,6 +30,9 @@ namespace ry {
                 Level lvl, std::string_view msg,
                 const SourcePosition& srcPos
             );
+            Info(
+                Level lvl, std::string_view msg
+            );
 
             std::string_view GetMessage() const;
             Level GetLevel() const;

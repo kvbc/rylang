@@ -43,6 +43,9 @@ namespace ry {
             SEMICOLON,
             LPAREN,
             RPAREN,
+            LSQUARE,
+            RSQUARE,
+            QUESTION,
 
             _KW_FIRST,
             KW_DO,
@@ -52,31 +55,37 @@ namespace ry {
             KW_NOT, KW_OR, KW_AND,
             KW_AS,
             // 
+            _KW_FIRST_TYPE,
             KW_CHAR,
             KW_I8, KW_I16, KW_I32, KW_I64, KW_I128,
             KW_U8, KW_U16, KW_U32, KW_U64, KW_U128,
             KW_F32, KW_F64,
             KW_BOOL,
+            _KW_LAST_TYPE,
             _KW_LAST,
 
             OP_SUB_EQ, OP_ADD_EQ, OP_DIV_EQ, OP_MOD_EQ, OP_POWER_EQ, OP_MUL_EQ, 
             OP_SUB,    OP_ADD,    OP_DIV,    OP_MOD,    OP_POWER,    OP_MUL,
-            /**/ OP_PTR_DEREF = OP_MUL, /**/
 
             OP_BIT_NEG,
             OP_BIT_OR_EQ, OP_BIT_XOR_EQ, OP_BIT_LSHIFT_EQ, OP_BIT_RSHIFT_EQ, OP_BIT_AND_EQ,        
             OP_BIT_OR,    OP_BIT_XOR,    OP_BIT_LSHIFT,    OP_BIT_RSHIFT,    OP_BIT_AND,
-            /**/ OP_ADDRESS = OP_BIT_AND, /**/
 
             OP_EQ,   OP_LESS,    OP_GREAT,
             OP_UNEQ, OP_LESS_EQ, OP_GREAT_EQ,
 
             OP_NOT, OP_OR, OP_AND,
 
-            // OP_ADDRESS,
             OP_BLOCK_ACCESS,
+            OP_FUNC_ARROW,
             OP_ASSIGN,
             OP_DEFINE,
+
+            ASTERISK = OP_MUL,
+            OP_PTR_DEREF = ASTERISK,
+            AMPERSAND = OP_BIT_AND,
+            OP_ADDRESS = AMPERSAND,
+            TILDE = OP_BIT_NEG,
         };
 
         // must be in the same order as the Type enum
@@ -90,6 +99,9 @@ namespace ry {
             "SEMICOLON",
             "LPAREN",
             "RPAREN",
+            "LSQUARE",
+            "RSQUARE",
+            "QUESTION",
 
             "_KW_FIRST",
             "KW_DO",
@@ -99,27 +111,29 @@ namespace ry {
             "KW_NOT",   "KW_OR",   "KW_AND",
             "KW_AS",
             // 
+            "_KW_FIRST_TYPE",
             "KW_CHAR",
             "KW_I8", "KW_I16", "KW_I32", "KW_I64", "KW_I128",
             "KW_U8", "KW_U16", "KW_U32", "KW_U64", "KW_U128",
             "KW_F32", "KW_F64",
             "KW_BOOL",
+            "_KW_LAST_TYPE",
             "_KW_LAST",
 
             "OP_SUB_EQ", "OP_ADD_EQ", "OP_DIV_EQ", "OP_MOD_EQ", "OP_POWER_EQ", "OP_MUL_EQ", 
-            "OP_SUB",    "OP_ADD",    "OP_DIV",    "OP_MOD",    "OP_POWER",    "OP_MUL/OP_PTR_DEREF",    
+            "OP_SUB",    "OP_ADD",    "OP_DIV",    "OP_MOD",    "OP_POWER",    "ASTERISK / OP_MUL / OP_PTR_DEREF",
 
-            "OP_BIT_NEG",
+            "OP_BIT_NEG / TILDE",
             "OP_BIT_OR_EQ", "OP_BIT_XOR_EQ", "OP_BIT_LSHIFT_EQ", "OP_BIT_RSHIFT_EQ", "OP_BIT_AND_EQ",        
-            "OP_BIT_OR",    "OP_BIT_XOR",    "OP_BIT_LSHIFT",    "OP_BIT_RSHIFT",    "OP_BIT_AND/OP_ADDRESS",
+            "OP_BIT_OR",    "OP_BIT_XOR",    "OP_BIT_LSHIFT",    "OP_BIT_RSHIFT",    "AMPERSAND / OP_ADDRESS / OP_BIT_AND",
 
             "OP_EQ",   "OP_LESS",    "OP_GREAT",
             "OP_UNEQ", "OP_LESS_EQ", "OP_GREAT_EQ",
 
             "OP_NOT", "OP_OR", "OP_AND",
 
-            // OP_ADDRESS,
             "OP_BLOCK_ACCESS",
+            "OP_FUNC_ARROW",
             "OP_ASSIGN",
             "OP_DEFINE"
         };
@@ -144,6 +158,8 @@ namespace ry {
         static const char * Stringify(Token::Type type);
 
         std::string Stringify() const;
+
+        bool IsPrimitiveType() const;
 
     private:
         union IntValue {

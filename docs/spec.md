@@ -6,31 +6,42 @@ Note to self: press `CTRL K` + `Z` to leave zen mode
 
 **Other Languages**
 
-- [ ] [Go](https://go.dev/ref/spec)
-- [x] [Zig](https://ziglang.org/documentation/master/)
-- [x] [Haxe](https://haxe.org/manual/introduction.html)
-- [ ] [Nim](https://nim-lang.org/docs/manual.html)
-- [x] [Odin](https://odin-lang.org/docs/overview/) - no spec
-- [x] [Rust](https://doc.rust-lang.org/reference/index.html)
-- [ ] [D](https://dlang.org/spec/spec.html)
-- [ ] [R](https://cran.r-project.org/doc/manuals/r-release/R-lang.pdf)
+-   [ ] [Go](https://go.dev/ref/spec)
+-   [x] [Zig](https://ziglang.org/documentation/master/)
+-   [x] [Odin](https://odin-lang.org/docs/overview/) - no spec
+-   [x] [Rust](https://doc.rust-lang.org/reference/index.html)
+-   [x] [Haxe](https://haxe.org/manual/introduction.html)
+-   [ ] [D](https://dlang.org/spec/spec.html)
 
 ---
 
 **Useful**
 
-- rustc dev guide - https://rustc-dev-guide.rust-lang.org/part-2-intro.html
-- Advanced R - https://adv-r.hadley.nz/
+-   rustc dev guide - https://rustc-dev-guide.rust-lang.org/part-2-intro.html
+-   Advanced R - https://adv-r.hadley.nz/
 
 ---
 
 **Consider**
 
-- static
-- extern
-- type constraints - see [notes/playground/main.rs](../notes/playground/main.rs)
-- closures
-- variadic funtion arguments (struct fields)
+-   static
+-   extern
+-   type constraints - see [notes/playground/main.rs](../notes/playground/main.rs)
+-   closures
+-   variadic funtion arguments (struct fields) - might not need it with macros
+-   we dont need a slice type - see [notes/slice.rs](../notes/slice.rs)
+-   bit sets (odinlang)
+-   `any` type
+-   tests
+
+---
+
+**TODO**
+
+-   Types
+    -   type constraints
+    -   enums
+    -   unions
 
 ---
 
@@ -68,14 +79,14 @@ _(lets just ignore test coverage for now)_
 | Chapter                                                                           | Syntax | Semantics | Parsing Implemented | Analysis Implemented | Error Handling | Test Coverage | Comment                                                       |
 | --------------------------------------------------------------------------------- | :----: | :-------: | :-----------------: | :------------------: | :------------: | :-----------: | ------------------------------------------------------------- |
 | <br> 2. [Parsing and Semantic Analysis](#parsing-and-semantic-analysis) <br> <br> |   👇   |    👇     |         👇          |          👇          |       👇       |      👇       | **Grouping tokens into untyped AST nodes and their analysis** |
-| &emsp; 2.1. [Types](#types)                                                       |   ✔️   |    ❌     |         ❌          |          ❌          |       👇       |      👇       |                                                               |
-| &emsp; &emsp; 2.1.1. [Primitive Types](#primitive-types)                          |   ✔️   |    ❌     |         ❌          |          ❌          |       ❌       |      ❌       |                                                               |
+| &emsp; 2.1. [Types](#types)                                                       |  ✔️👇  |    ❌     |        ❌👇         |          ❌          |       👇       |      👇       |                                                               |
+| &emsp; &emsp; 2.1.1. [Primitive Types](#primitive-types)                          |   ✔️   |    ❌     |         ✔️          |          ❌          |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.1.2. [Function Type](#function-type)                              |   ✔️   |    ❌     |         ❌          |          ❌          |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; 2.1.3. [Struct Type](#struct-type)                                  |   ➖   |    ❌     |         ❌          |          ❌          |       ❌       |      ❌       | // feel like it can still be improved                         |
-| &emsp; &emsp; 2.1.4. [Type Attributes](#type-attribs)                             |   👇   |    ❌     |         ❌          |          ❌          |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; &emsp; 2.1.4.1. [Pointer Types](#pointer-types)                     |   ✔️   |    ❌     |         ❌          |          ❌          |       ❌       |      ❌       |                                                               |
-| &emsp; &emsp; &emsp; 2.1.4.2. [Type Mutability](#type-mutability)                 |   ➖   |    ❌     |         ❌          |          ❌          |       ❌       |      ❌       | // dont like the character being used (perhaps `~` ?)         |
-| &emsp; &emsp; &emsp; 2.1.4.3. [Optional Types](#optional-types)                   |   ✔️   |    ❌     |         ❌          |          ❌          |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.1.3. [Struct Type](#struct-type)                                  |   ✔️   |    ❌     |         ❌          |          ❌          |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.1.4. [Pointer Types](#pointer-types)                              |   ✔️   |    ❌     |         ✔️          |          ❌          |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; 2.1.5. [Type Attributes](#type-attribs)                             |   👇   |    ❌     |         ❌          |          ❌          |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; &emsp; 2.1.5.1. [Type Mutability](#type-mutability)                 |   ✔️   |    ❌     |         ❌          |          ❌          |       ❌       |      ❌       |                                                               |
+| &emsp; &emsp; &emsp; 2.1.5.2. [Optional Types](#optional-types)                   |   ✔️   |    ❌     |         ❌          |          ❌          |       ❌       |      ❌       |                                                               |
 | &emsp; 2.2. [Operators](#operators)                                               |   👇   |    ❌     |         👇          |          ❌          |       👇       |      👇       |                                                               |
 | &emsp; &emsp; 2.2.1. [Arithmetic Operators](#arithmetic-operators)                |   ✔️   |    ❌     |         ❌          |          ❌          |       ❌       |      ❌       |                                                               |
 | &emsp; &emsp; 2.2.2. [Bitwise Operators](#bitwise-operators)                      |   ✔️   |    ❌     |         ❌          |          ❌          |       ❌       |      ❌       |                                                               |
@@ -153,11 +164,11 @@ Lexical analysis is the process of grouping source code characters into tokens.
 
 **Interpretation**
 
-- A name cannot start with a digit.
-- Names (identifiers) can only consist of:
-  - underscores `_`,
-  - lowercase and uppercase letters from `aA` to `zZ`,
-  - digits from `0` to `9`
+-   A name cannot start with a digit.
+-   Names (identifiers) can only consist of:
+    -   underscores `_`,
+    -   lowercase and uppercase letters from `aA` to `zZ`,
+    -   digits from `0` to `9`
 
 **Examples**
 
@@ -396,27 +407,25 @@ Refer to [Operators](#operators)
 
 Tokens represent:
 
-- [Names](#names)
-- [Keywords](#keywords)
-- [Operators](#operators)
-- [Literals](#literals)
-- Characters: `( ) ;`
+-   [Names](#names)
+-   [Keywords](#keywords)
+-   [Operators](#operators)
+-   [Literals](#literals)
+-   Characters: `( ) ; [ ] & * ? ~`
 
 # 2. Parsing and Semantic Analysis {#parsing-and-semantic-analysis}
 
 ## 2.1. Types {#types}
 
-| Tag                              | Syntax                                                                                                                                                                                                     | Comment                                                 |
-| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| \<type>                          | `[<type_attribs>] (<primitive_type> \| <func_type> \| <struct_type> \| <comp_expr>)` where `<comp_expr>` evaluates into `<type>`                                                                           |
-| &emsp; \<type_attribs>           | `<type_attribs_1> = (<opt_type_attrib> \| <ptr_type_attrib>) [<type_attribs>]` <br> `<type_attribs_2> = <mut_type_attrib> [<type_attribs_1>]` <br> `<type_attribs> = <type_attribs_1> \| <type_attribs_2>` | There can NOT be two adjacent `mutable` type attributes |
-| &emsp; &emsp; \<ptr_type_attrib> | See [Pointer Types](#pointer-types)                                                                                                                                                                        |
-| &emsp; &emsp; \<mut_type_attrib> | See [Type Mutability](#type-mutability)                                                                                                                                                                    |
-| &emsp; &emsp; \<opt_type_attrib> | See [Optional Types](#optional-types)                                                                                                                                                                      |
-| &emsp; \<primitive_type>         | See [Primitive Types](#primitive-types)                                                                                                                                                                    |
-| &emsp; \<func_type>              | See [Function Type](#function-type)                                                                                                                                                                        |
-| &emsp; \<struct_type>            | See [Struct Type](#struct-type)                                                                                                                                                                            |
-| &emsp; \<comp_expr>              | See [Compile-time expressions](#compile-time-expressions)                                                                                                                                                  |
+| Tag                       | Syntax                                                                                                     |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| \<type>                   | `[<mut_type_attrib>] [<opt_type_attrib>] (<primitive_type> \| <func_type> \| <struct_type> \| <ptr_type>)` |
+| &emsp; \<mut_type_attrib> | See [Type Mutability](#type-mutability)                                                                    |
+| &emsp; \<opt_type_attrib> | See [Optional Types](#optional-types)                                                                      |
+| &emsp; \<primitive_type>  | See [Primitive Types](#primitive-types)                                                                    |
+| &emsp; \<func_type>       | See [Function Type](#function-type)                                                                        |
+| &emsp; \<struct_type>     | See [Struct Type](#struct-type)                                                                            |
+| &emsp; \<ptr_type>        | See [Pointer Types](#pointer-types)                                                                        |
 
 ### 2.1.1. Primitive Types {#primitive-types}
 
@@ -444,13 +453,13 @@ add[a i32; b i32] => i32 = a + b;
 
 ### 2.1.3. Struct Type {#struct-type}
 
-| Tag                    | Syntax                                                                                                                                                                                                                                                                                                                                                    |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| \<struct_type>         | `'[' [{<struct_field> ,\|;} <struct_field>] ']'`                                                                                                                                                                                                                                                                                                          |
-| &emsp; \<struct_field> | `[<name> {,<name>}] <type> [= <comp_expr>]` where `<comp_expr>` coerces into `<type>` <br> `<type> [* <comp_expr>] [= <comp_expr>]` where the first `<comp_expr>` is of type `u32` and the second coerces into `<type>` <br> `[<comp_expr> *] <type> [= <comp_expr>]` where the first `<comp_expr>` is of type `u32` and the second coerces into `<type>` |
-| &emsp; \<name>         | See [Names](#names)                                                                                                                                                                                                                                                                                                                                       |
-| &emsp; \<type>         | See [Types](#types)                                                                                                                                                                                                                                                                                                                                       |
-| &emsp; \<comp_expr>    | See [Compile-time expressions](#compile-time-expressions)                                                                                                                                                                                                                                                                                                 |
+| Tag                    | Syntax                                                                                                                                                                                                                                                                                                                                                 |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| \<struct_type>         | `'[' [{<struct_field> ,\|;} <struct_field>] ']'`                                                                                                                                                                                                                                                                                                       |
+| &emsp; \<struct_field> | `<name>{,<name>} <type> [= <comp_expr>]` where `<comp_expr>` coerces into `<type>` <br> `<type> [* <comp_expr>] [= <comp_expr>]` where the first `<comp_expr>` is of type `u32` and the second coerces into `<type>` <br> `[<comp_expr> *] <type> [= <comp_expr>]` where the first `<comp_expr>` is of type `u32` and the second coerces into `<type>` |
+| &emsp; \<name>         | See [Names](#names)                                                                                                                                                                                                                                                                                                                                    |
+| &emsp; \<type>         | See [Types](#types)                                                                                                                                                                                                                                                                                                                                    |
+| &emsp; \<comp_expr>    | See [Compile-time expressions](#compile-time-expressions)                                                                                                                                                                                                                                                                                              |
 
 **Examples**
 
@@ -462,28 +471,21 @@ list [i32 * 3] = [1, 2, 3];
 tuple [i32, bool, f32] = [1, true, 2.3];
 ```
 
-### 2.1.4. Type Attributes {#type-attribs}
+### 2.1.4. Pointer Types {#pointer-types}
 
-| Tag                       | Syntax                                                        |
-| ------------------------- | ------------------------------------------------------------- |
-| \<type_attrib>            | `<ptr_type_attrib> \| <mut_type_attrib> \| <opt_type_attrib>` |
-| &emsp; \<ptr_type_attrib> | See [Pointer Types](#pointer-types)                           |
-| &emsp; \<mut_type_attrib> | See [Type Mutability](#type-mutability)                       |
-| &emsp; \<opt_type_attrib> | See [Optional Types](#optional-types)                         |
+| Tag         | Syntax     |
+| ----------- | ---------- |
+| \<ptr_type> | `* <type>` |
 
-#### 2.1.4.1. Pointer Types {#pointer-types}
+### 2.1.5. Type Attributes {#type-attribs}
+
+#### 2.1.5.1. Type Mutability {#type-mutability}
 
 | Tag                | Syntax |
 | ------------------ | ------ |
-| \<ptr_type_attrib> | `*`    |
+| \<mut_type_attrib> | `~`    |
 
-#### 2.1.4.2. Type Mutability {#type-mutability}
-
-| Tag                | Syntax | Comment                    |
-| ------------------ | ------ | -------------------------- |
-| \<mut_type_attrib> | `$`    | This character kinda sucks |
-
-#### 2.1.4.3. Optional Types {#optional-types}
+#### 2.1.5.2. Optional Types {#optional-types}
 
 | Tag                | Syntax |
 | ------------------ | ------ |
@@ -561,13 +563,14 @@ Assignment
 
 ### 2.2.5. Other Operators {#other-operators}
 
-| Type   | Operator | Name                 | Syntax                                                    |
-| ------ | :------: | -------------------- | --------------------------------------------------------- |
+|  Type  | Operator | Name                 | Syntax                                                    |
+| :----: | :------: | -------------------- | --------------------------------------------------------- |
 | Unary  |  `comp`  | Compile-time         | See [Compile-time expressions](#compile-time-expressions) |
 | Unary  |   `&`    | Address Of           | See [Address Of](#address-of)                             |
 | Unary  |   `*`    | Pointer Dereference  | See [Pointer Dereference](#pointer-dereference)           |
 | Binary |   `as`   | Type Cast            | See [Type Cast](#type-cast)                               |
 | Binary |   `.`    | Struct Member Access | See [Struct Member Access](#struct-member-access)         |
+|   -    |   `=>`   | Function Arrow       | See [Function Type](#function-type)                       |
 | Binary |   `=`    | Assignment           | See ... TODO                                              |
 | Binary |   `:=`   | Variable Definition  | See ... TODO                                              |
 
@@ -575,6 +578,7 @@ Assignment
 
 | Level | Operators                       |
 | :---: | :------------------------------ |
+|   -   | `=>`                            |
 |   1   | `.`                             |
 |   2   | `-a` `~` `not` `&a` `*a` `comp` |
 |   3   | `as`                            |
@@ -591,10 +595,10 @@ Assignment
 
 ### 2.2.7. Operator Associativity {#operator-associativity}
 
-| Associativity | Operators                                                                                   |
-| :-----------: | ------------------------------------------------------------------------------------------- |
-|     `<--`     | `-a ~ not &a *a comp`                                                                       |
-|     `-->`     | `a+b a-b a*b ** / %` <br> `\| ^ a&b << >>` <br> `== != < <= > >=` <br> `or and` <br> `as .` |
+| Associativity | Operators                                                                                      |
+| :-----------: | ---------------------------------------------------------------------------------------------- |
+|     `<--`     | `-a ~ not &a *a comp`                                                                          |
+|     `-->`     | `a+b a-b a*b ** / %` <br> `\| ^ a&b << >>` <br> `== != < <= > >=` <br> `or and` <br> `as . =>` |
 
 ## 2.3. Expressions {#expressions}
 
@@ -649,7 +653,7 @@ Assignment
 
 A block is a collection of statements.
 
-- See `<stmt>` in [Statements](#statements) for the definition of a _statement_.
+-   See `<stmt>` in [Statements](#statements) for the definition of a _statement_.
 
 A block can be "broken from" using the `break` statement.
 
@@ -668,21 +672,21 @@ TODO
 
 **Interpretation**
 
-- All blocks can be labeled with a preceding string literal.
-- Break statements can be optionally provided the block label to break from (as a string literal) and an expression to return from a block
-  ```rust
-    max usize = 10;
-    x isize = "x" {
-        for( a usize = max;; a > 0; a -= 1 ) {
-            for( b usize = max;; b > 0; b -= 1 ) {
-                if( a + b == a * b ) {
-                    break "x" (a + b);
-                }
-            }
-        }
-        break -1;
-    }
-  ```
+-   All blocks can be labeled with a preceding string literal.
+-   Break statements can be optionally provided the block label to break from (as a string literal) and an expression to return from a block
+    ```rust
+      max usize = 10;
+      x isize = "x" {
+          for( a usize = max;; a > 0; a -= 1 ) {
+              for( b usize = max;; b > 0; b -= 1 ) {
+                  if( a + b == a * b ) {
+                      break "x" (a + b);
+                  }
+              }
+          }
+          break -1;
+      }
+    ```
 
 **Examples**
 
@@ -946,51 +950,51 @@ An Enum (Enumeration) is a collection of scoped, named & unique integer values (
 
 TODO
 
-- The first enum field, if not explicitely set, is equal to 0.
-- Each next enum field, if not explicitely set, is 1 higher than the previous value.
+-   The first enum field, if not explicitely set, is equal to 0.
+-   Each next enum field, if not explicitely set, is 1 higher than the previous value.
 
 **Interpretation**
 
-- Enum fields are of type `i32`
-  - See `<primitive>` in [Types](#types) for the type of `i32`.
-- Enums can only be defined inside of namespaces.
-  - See [Namespace](#namespace)
-    Enums are also namespaces.
-  - See [Namespace](#namespace).
-- Enum fields can be accessed using the colon `:` operator
-  - See [Operators](#operators) for the _enum field access_ operator.
-  ```rust
-  var #Enum = #Enum:FIELD;
-  ```
-- _Enum_ fields can be explicitely set.
-  - The set value must be a _compile-time_ expression resulting in a value of type `i32`.
-    - See [Expressions](#expressions) for the definition of a _compile-time_ expression `compexpr`.
+-   Enum fields are of type `i32`
+    -   See `<primitive>` in [Types](#types) for the type of `i32`.
+-   Enums can only be defined inside of namespaces.
+    -   See [Namespace](#namespace)
+        Enums are also namespaces.
+    -   See [Namespace](#namespace).
+-   Enum fields can be accessed using the colon `:` operator
+    -   See [Operators](#operators) for the _enum field access_ operator.
     ```rust
-    x i32 = 10;
-    #Color = {
-        RED = x, // ERROR
-        GREEN = 0.5, // ERROR
-    };
+    var #Enum = #Enum:FIELD;
     ```
-  - The set value must be higher than the previous values.
-    ```rust
-    #Color = {
-        RED, // 0
-        GREEN, // 1
-        BLUE = 1 // ERROR
-    }
-    ```
-  - The fields can be set even multiple times
-    ```rust
-    #Animal = {
-        DOG, // 0
-        CAT = 10,
-        WOLF, // 11
-        LION, // 12
-        SQUID = 100,
-        HORSE // 101
-    }
-    ```
+-   _Enum_ fields can be explicitely set.
+    -   The set value must be a _compile-time_ expression resulting in a value of type `i32`.
+        -   See [Expressions](#expressions) for the definition of a _compile-time_ expression `compexpr`.
+        ```rust
+        x i32 = 10;
+        #Color = {
+            RED = x, // ERROR
+            GREEN = 0.5, // ERROR
+        };
+        ```
+    -   The set value must be higher than the previous values.
+        ```rust
+        #Color = {
+            RED, // 0
+            GREEN, // 1
+            BLUE = 1 // ERROR
+        }
+        ```
+    -   The fields can be set even multiple times
+        ```rust
+        #Animal = {
+            DOG, // 0
+            CAT = 10,
+            WOLF, // 11
+            LION, // 12
+            SQUID = 100,
+            HORSE // 101
+        }
+        ```
 
 **Examples**
 

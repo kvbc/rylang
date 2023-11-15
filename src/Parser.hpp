@@ -15,15 +15,17 @@ namespace ry {
 
         const Infos& GetInfos() const;
 
-        ASTNode Parse();
+        std::optional<ASTNode> Parse();
 
     private:
-        bool assertToken(Token::Type type, int offset = 0);
-        const Token * getToken(int offset = 0) const;
+        bool isToken(Token::Type type);
+        bool assertToken(Token::Type type);
+        const Token& getToken(int offset = 0);
         void eatToken();
 
-        ASTNode::Statement parseStatement();
-        ASTNode::ExpressionBlock parseBlock();
+        void errorExpected(std::string_view what);
+
+        std::optional<ASTNode::Type> parseType();
 
         int m_tokenIdx;
         const std::vector<Token>& m_tokens;
