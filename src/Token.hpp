@@ -21,9 +21,9 @@ namespace ry {
             "do",
             "if",    "else",
             "loop",  "continue", "break",
-            "false", "true", "null",
+            "false", "true",     "null",
             "not", "or", "and",
-            "as", "comp",
+            "as", "comp", "times",
 
             "", // skip _KW_FIRST_TYPE
 
@@ -57,9 +57,9 @@ namespace ry {
             KW_DO,
             KW_IF,    KW_ELSE,
             KW_LOOP,  KW_CONTINUE, KW_BREAK,
-            KW_FALSE, KW_TRUE, KW_NULL,
+            KW_FALSE, KW_TRUE,     KW_NULL,
             KW_NOT, KW_OR, KW_AND,
-            KW_AS, KW_COMP,
+            KW_AS, KW_COMP, KW_TIMES,
             // 
             _KW_FIRST_TYPE,
             KW_CHAR,
@@ -118,11 +118,11 @@ namespace ry {
 
             "_KW_FIRST",
             "KW_DO",
-            "KW_IF",     "KW_ELSE",
+            "KW_IF",    "KW_ELSE",
             "KW_LOOP",  "KW_CONTINUE", "KW_BREAK",
             "KW_FALSE", "KW_TRUE", "KW_NULL",
             "KW_NOT",   "KW_OR",   "KW_AND",
-            "KW_AS",
+            "KW_AS",    "KW_COMP", "KW_TIMES",
             // 
             "_KW_FIRST_TYPE",
             "KW_CHAR",
@@ -133,8 +133,8 @@ namespace ry {
             "_KW_LAST_TYPE",
             "_KW_LAST",
 
-            "OP_SUB / OP_NEG", "OP_ADD",    "OP_DIV",    "OP_MOD",    "ASTERISK / OP_MUL / OP_PTR_DEREF",
             "OP_SUB_EQ",       "OP_ADD_EQ", "OP_DIV_EQ", "OP_MOD_EQ", "OP_MUL_EQ", 
+            "OP_SUB / OP_NEG", "OP_ADD",    "OP_DIV",    "OP_MOD",    "ASTERISK / OP_MUL / OP_PTR_DEREF",
 
             "OP_BIT_NEG / TILDE",
             "OP_BIT_OR_EQ", "OP_BIT_XOR_EQ", "OP_BIT_LSHIFT_EQ", "OP_BIT_RSHIFT_EQ", "OP_BIT_AND_EQ",        
@@ -143,9 +143,7 @@ namespace ry {
             "OP_EQ",   "OP_LESS",    "OP_GREAT",
             "OP_UNEQ", "OP_LESS_EQ", "OP_GREAT_EQ",
 
-            "OP_NOT", "OP_OR", "OP_AND",
-
-            "OP_BLOCK_ACCESS",
+            "OP_STRUCT_ACCESS",
             "OP_FUNC_ARROW",
             "OP_ASSIGN",
             "OP_DEFINE"
@@ -183,7 +181,6 @@ namespace ry {
 
         std::string Stringify() const;
 
-        bool IsPrimitiveType() const;
         std::optional<LiteralValue> GetLiteralValue() const;
 
     private:

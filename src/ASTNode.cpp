@@ -54,9 +54,9 @@ namespace ry {
             return "";
         };
 
-        auto stringifyPreTypeReps = [&](const UnnamedField::TypeReps& typeReps) -> std::string {
+        auto stringifyTypeReps = [&](const UnnamedField::TypeReps& typeReps) -> std::string {
             if(typeReps.has_value())
-                return typeReps.value()->Stringify() + " * ";
+                return " times " + typeReps.value()->Stringify();
             return "";
         };
 
@@ -73,8 +73,8 @@ namespace ry {
         auto stringifyField = [&](const Field& field) -> std::string {
             if(auto * unnamedField = std::get_if<UnnamedField>(&field))
                 return
-                    stringifyPreTypeReps(unnamedField->GetTypeReps())
-                    + unnamedField->GetType()->Stringify()
+                    unnamedField->GetType()->Stringify()
+                    + stringifyTypeReps(unnamedField->GetTypeReps())
                     + stringifyDefaultValue(unnamedField->GetDefaultValue());
             if(auto * namedField = std::get_if<NamedField>(&field))
                 return

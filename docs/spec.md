@@ -79,10 +79,10 @@ _(lets just ignore test coverage for now)_
 | Chapter                                                                           | Syntax | Semantics | Parsing Implemented | Analysis Implemented | Elegant Error Handling | Test Coverage | Comment                                                       |
 | --------------------------------------------------------------------------------- | :----: | :-------: | :-----------------: | :------------------: | :--------------------: | :-----------: | ------------------------------------------------------------- |
 | <br> 2. [Parsing and Semantic Analysis](#parsing-and-semantic-analysis) <br> <br> |   👇   |    👇     |         👇          |          👇          |           👇           |      👇       | **Grouping tokens into untyped AST nodes and their analysis** |
-| &emsp; 2.1. [Types](#types)                                                       |  ✔️👇  |    ❌     |        ✔️👇         |          ❌          |           👇           |      👇       |                                                               |
+| &emsp; 2.1. [Types](#types)                                                       |  ✔️👇  |    ❌     |         👇          |          ❌          |           👇           |      👇       |                                                               |
 | &emsp; &emsp; 2.1.1. [Primitive Types](#primitive-types)                          |   ✔️   |    ❌     |         ✔️          |          ❌          |           ❌           |      ❌       |                                                               |
 | &emsp; &emsp; 2.1.2. [Function Type](#function-type)                              |   ✔️   |    ❌     |         ✔️          |          ❌          |           ❌           |      ❌       |                                                               |
-| &emsp; &emsp; 2.1.3. [Struct Type](#struct-type)                                  |   ✔️   |    ❌     |         ✔️          |          ❌          |           ❌           |      ❌       |                                                               |
+| &emsp; &emsp; 2.1.3. [Struct Type](#struct-type)                                  |   ➖   |    ❌     |         ✔️          |          ❌          |           ❌           |      ❌       |                                                               |
 | &emsp; &emsp; 2.1.4. [Pointer Types](#pointer-types)                              |   ✔️   |    ❌     |         ✔️          |          ❌          |           ❌           |      ❌       |                                                               |
 | &emsp; &emsp; 2.1.5. [Type Attributes](#type-attribs)                             |   👇   |    ❌     |         👇          |          ❌          |           ❌           |      ❌       |                                                               |
 | &emsp; &emsp; &emsp; 2.1.5.1. [Type Mutability](#type-mutability)                 |   ✔️   |    ❌     |         ✔️          |          ❌          |           ❌           |      ❌       |                                                               |
@@ -396,7 +396,7 @@ if else
 loop continue break
 false true null
 not or and
-as comp
+as comp times
 ```
 
 ## 1.6. Operators {#lexical-operators}
@@ -453,13 +453,13 @@ add[a i32; b i32] => i32 = a + b;
 
 ### 2.1.3. Struct Type {#struct-type}
 
-| Tag                    | Syntax                                                                                                                                                                                                                                                                                                                                                 |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| \<struct_type>         | `'[' [{<struct_field> ,\|;} <struct_field>] ']'`                                                                                                                                                                                                                                                                                                       |
-| &emsp; \<struct_field> | `<name>{,<name>} <type> [= <comp_expr>]` where `<comp_expr>` coerces into `<type>` <br> `<type> [* <comp_expr>] [= <comp_expr>]` where the first `<comp_expr>` is of type `u32` and the second coerces into `<type>` <br> `[<comp_expr> *] <type> [= <comp_expr>]` where the first `<comp_expr>` is of type `u32` and the second coerces into `<type>` |
-| &emsp; \<name>         | See [Names](#names)                                                                                                                                                                                                                                                                                                                                    |
-| &emsp; \<type>         | See [Types](#types)                                                                                                                                                                                                                                                                                                                                    |
-| &emsp; \<comp_expr>    | See [Compile-time expressions](#compile-time-expressions)                                                                                                                                                                                                                                                                                              |
+| Tag                    | Syntax                                                                                                                                                                                                                   |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| \<struct_type>         | `'[' [{<struct_field> ,\|;} <struct_field>] ']'`                                                                                                                                                                         |
+| &emsp; \<struct_field> | `<name>{,<name>} <type> [= <comp_expr>]` where `<comp_expr>` coerces into `<type>` <br> `<type> [times <comp_expr>] [= <comp_expr>]` where the first `<comp_expr>` is of type `u32` and the second coerces into `<type>` |
+| &emsp; \<name>         | See [Names](#names)                                                                                                                                                                                                      |
+| &emsp; \<type>         | See [Types](#types)                                                                                                                                                                                                      |
+| &emsp; \<comp_expr>    | See [Compile-time expressions](#compile-time-expressions)                                                                                                                                                                |
 
 **Examples**
 

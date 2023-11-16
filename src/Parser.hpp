@@ -18,6 +18,7 @@ namespace ry {
         std::optional<ASTNode> Parse();
 
     private:
+        static std::optional<ASTNode::TypePrimitive> getTokenTypeToPrimitiveType(Token::Type type);
         static std::optional<ASTNode::ExpressionUnaryOperation::Kind>  getTokenTypeToUnaryOperationKind(Token::Type type);
         static std::optional<ASTNode::ExpressionBinaryOperation::Kind> getTokenTypeToBinaryOperationKind(Token::Type type);
 
@@ -30,6 +31,7 @@ namespace ry {
         void errorExpectedToken(Token::Type type);
 
         std::optional<ASTNode::Type> parseType(bool mustParse = true);
+        std::optional<ASTNode::TypeStruct::Field> parseStructTypeField();
 
         std::optional<ASTNode::Expression>                parseExpression               (bool mustParse = true);
         std::optional<ASTNode::ExpressionLiteral::Struct> parseStructLiteralExpression  (bool mustParse = true);

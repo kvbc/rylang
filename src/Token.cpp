@@ -136,10 +136,6 @@ namespace ry {
 
     // 
 
-    bool Token::IsPrimitiveType() const {
-        return int(m_type) > int(Type::_KW_FIRST_TYPE) && int(m_type) < int(Type::_KW_LAST_TYPE);
-    }
-
     std::optional<Token::LiteralValue> Token::GetLiteralValue() const {
         if(m_type == Type::STRING_LIT)
             return m_stringValue;

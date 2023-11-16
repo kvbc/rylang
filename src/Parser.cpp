@@ -8,6 +8,8 @@
 
 namespace ry {
 
+#define RY_PARSER__ASSERT(cond) { if(!(cond)) return {}; }
+
     Parser::Parser(
         const std::vector<Token>& tokens,
         const Infos& infos
@@ -22,13 +24,27 @@ namespace ry {
     }
 
     std::optional<ASTNode> Parser::Parse() {
-        auto optNode = parseExpression();
-        if(optNode.has_value())
-            return ASTNode(optNode.value());
+        auto optType = parseType(false);
+        if(optType)
+            return ASTNode(optType.value());
+
+        auto optExpr = parseExpression(false);
+        if(optExpr)
+            return ASTNode(optExpr.value());
+
         return {};
     }
 
     // 
+
+    std::optional<ASTNode::TypePrimitive> Parser::getTokenTypeToPrimitiveType(Token::Type tokenType) {
+        int firstType = int(Token::Type::_KW_FIRST_TYPE) + 1;
+        int lastType = int(Token::Type::_KW_LAST_TYPE) - 1;
+        int type = int(tokenType);
+        if(type >= firstType && type <= lastType)
+            return ASTNode::TypePrimitive(type - firstType);
+        return {};
+    }
 
     std::optional<ASTNode::ExpressionUnaryOperation::Kind> Parser::getTokenTypeToUnaryOperationKind(Token::Type type) {
         using TT = Token::Type;
@@ -135,6 +151,8 @@ namespace ry {
      */
 
     std::optional<ASTNode::Type> Parser::parseType(bool mustParse) {
+        // type attribs
+
         ASTNode::Type::Attribs attribs;
         if(isToken(Token::Type::TILDE)) {
             eatToken();
@@ -145,22 +163,21 @@ namespace ry {
             attribs.isOptional = true;
         }
 
+        // type
+
         if(isToken(Token::Type::ASTERISK)) {
             // pointer
             eatToken();
-            std::optional<ASTNode::Type> optBaseType = parseType();
-            if(optBaseType.has_value()) {
-                ASTNode::Type baseType = optBaseType.value();
-                ASTNode::TypePointer ptrType = std::make_shared<ASTNode::Type>(baseType);
-                return ASTNode::Type(ptrType, attribs);
-            }
-            return {};
+            auto optBaseType = parseType();
+            RY_PARSER__ASSERT(optBaseType.has_value());
+            ASTNode::Type baseType = optBaseType.value();
+            ASTNode::TypePointer ptrType = std::make_shared<ASTNode::Type>(baseType);
+            return ASTNode::Type(ptrType, attribs);
         }
-        else if(getToken().IsPrimitiveType()) {
+        else if(auto primitiveType = getTokenTypeToPrimitiveType(getToken().GetType())) {
             // primitive
-            auto primType = ASTNode::TypePrimitive( int(getToken().GetType()) - (int(Token::Type::_KW_FIRST_TYPE) + 1) );
             eatToken();
-            return ASTNode::Type(primType, attribs);
+            return ASTNode::Type(primitiveType.value(), attribs);
         }
         else if(isToken(Token::Type::LSQUARE)) {
             // struct or function
@@ -173,113 +190,9 @@ namespace ry {
                     break;
                 }
 
-                using TypeStruct = ASTNode::TypeStruct;
-                using Field = TypeStruct::Field;
-                using NamedField = TypeStruct::NamedField;
-                using UnnamedField = TypeStruct::UnnamedField;
-
-                enum class TypeRepsPos {Pre, Post};
-
-                auto tryParseTypeReps = [&](TypeRepsPos pos) -> UnnamedField::TypeReps {
-                    if(pos == TypeRepsPos::Post) {
-                        if(isToken(Token::Type::OP_MUL))
-                            eatToken();
-                        else
-                            return {};
-                    }
-
-                    auto optExpr = parseExpression(false);
-                    if(optExpr.has_value()) {
-                        if(pos == TypeRepsPos::Pre) {
-                            expectToken(Token::Type::OP_MUL);
-                            eatToken();
-                        }
-                        return std::make_shared<ASTNode::Expression>(optExpr.value());
-                    }
-
-                    return {};
-                };
-
-                auto parseNames = [&](bool mustParse = true) -> std::optional<NamedField::Names> {
-                    NamedField::Names names;
-                    if(!isToken(Token::Type::NAME)) {
-                        if(mustParse)
-                            errorExpectedToken(Token::Type::NAME);
-                        return {};
-                    }
-                    for(;;) {
-                        if(isToken(Token::Type::NAME)) {
-                            names.push_back(getToken().GetStringValue());
-                            eatToken();
-                            if(isToken(Token::Type::COLON))
-                                eatToken();
-                            else
-                                break;
-                        }
-                        else break;
-                    }
-                    return names;
-                };
-
-                auto parseFieldType = [&](bool mustParse = true) -> std::optional<TypeStruct::FieldType> {
-                    auto optType = parseType(mustParse);
-                    if(optType.has_value())
-                        return std::make_shared<ASTNode::Type>(optType.value());
-                    return {};
-                };
-
-                auto tryParseDefaultValue = [&]() -> TypeStruct::FieldDefaultValue {
-                    if(isToken(Token::Type::OP_ASSIGN)) {
-                        eatToken();
-                        auto optExpr = parseExpression();
-                        if(optExpr.has_value())
-                            return std::make_shared<ASTNode::Expression>(optExpr.value());
-                        return {};
-                    }
-                    return {};
-                };
-
-                auto tryParseUnnamedField = [&]() -> std::optional<UnnamedField> {
-                    UnnamedField::TypeReps typeReps;
-
-                    auto optPreTypeReps = tryParseTypeReps(TypeRepsPos::Pre);
-                    if(optPreTypeReps.has_value())
-                        typeReps = optPreTypeReps.value();
-
-                    bool mustParseType = typeReps.has_value();
-                    auto optFieldType = parseFieldType(mustParseType);
-                    if(optFieldType.has_value()) {
-                        auto fieldType = optFieldType.value();
-
-                        if(!typeReps.has_value()) {
-                            auto optPostTypeReps = tryParseTypeReps(TypeRepsPos::Post);
-                            if(optPostTypeReps.has_value())
-                                typeReps = optPostTypeReps.value();
-                        }
-
-                        auto defaultValue = tryParseDefaultValue();
-                        return UnnamedField(fieldType, typeReps, defaultValue);
-                    }
-
-                    return {};
-                };
-
-                std::optional<UnnamedField> optUnnamedField = tryParseUnnamedField();
-                if(optUnnamedField.has_value()) {
-                    structFields.push_back(optUnnamedField.value());
-                } else {
-                    auto optNames = parseNames();
-                    if(optNames.has_value()) {
-                        auto names = optNames.value();
-                        auto optFieldType = parseFieldType();
-                        if(optFieldType.has_value()) {
-                            auto fieldType = optFieldType.value();
-                            auto optDefaultValue = tryParseDefaultValue();
-                            NamedField field(names, fieldType, optDefaultValue);
-                            structFields.push_back(field);
-                        }
-                    }
-                }
+                auto optField = parseStructTypeField();
+                RY_PARSER__ASSERT(optField.has_value());
+                structFields.push_back(optField.value());
 
                 bool isSep = isToken(Token::Type::COLON) || isToken(Token::Type::SEMICOLON);
                 bool isEnd = isToken(Token::Type::RSQUARE);
@@ -294,13 +207,11 @@ namespace ry {
                 // function
                 eatToken();
                 std::optional<ASTNode::Type> optRetType = parseType();
-                if(optRetType.has_value()) {
-                    auto retType = optRetType.value();
-                    auto retTypePtr = std::make_shared<ASTNode::Type>(retType);
-                    auto funcType = ASTNode::TypeFunction(structType, retTypePtr);
-                    return ASTNode::Type(funcType, attribs);
-                }
-                return {};
+                RY_PARSER__ASSERT(optRetType.has_value());
+                auto retType = optRetType.value();
+                auto retTypePtr = std::make_shared<ASTNode::Type>(retType);
+                auto funcType = ASTNode::TypeFunction(structType, retTypePtr);
+                return ASTNode::Type(funcType, attribs);
             }
 
             // struct
@@ -308,10 +219,106 @@ namespace ry {
         }
 
         // not a type
+
         if(mustParse)
             errorExpected("type");
         return {};
     }
+
+    std::optional<ASTNode::TypeStruct::Field> Parser::parseStructTypeField() {
+        using TypeStruct = ASTNode::TypeStruct;
+        using Field = TypeStruct::Field;
+        using NamedField = TypeStruct::NamedField;
+        using UnnamedField = TypeStruct::UnnamedField;
+
+        auto tryParseTypeReps = [&]() -> UnnamedField::TypeReps {
+            if(isToken(Token::Type::KW_TIMES)) {
+                eatToken();
+                auto optExpr = parseExpression();
+                RY_PARSER__ASSERT(optExpr);
+                return std::make_shared<ASTNode::Expression>(optExpr.value());
+            }
+            return {};
+        };
+
+        auto parseNames = [&](bool mustParse = true) -> std::optional<NamedField::Names> {
+            if(!isToken(Token::Type::NAME)) {
+                if(mustParse)
+                    errorExpectedToken(Token::Type::NAME);
+                return {};
+            }
+            NamedField::Names names;
+            for(;;) {
+                if(isToken(Token::Type::NAME)) {
+                    names.push_back(getToken().GetStringValue());
+                    eatToken();
+                    if(isToken(Token::Type::COLON))
+                        eatToken();
+                    else
+                        break;
+                }
+                else break;
+            }
+            return names;
+        };
+
+        auto parseFieldType = [&](bool mustParse = true) -> std::optional<TypeStruct::FieldType> {
+            auto optType = parseType(mustParse);
+            RY_PARSER__ASSERT(optType.has_value());
+            return std::make_shared<ASTNode::Type>(optType.value());
+        };
+
+        auto tryParseDefaultValue = [&]() -> TypeStruct::FieldDefaultValue {
+            if(isToken(Token::Type::OP_ASSIGN)) {
+                eatToken();
+                auto optExpr = parseExpression();
+                RY_PARSER__ASSERT(optExpr.has_value());
+                return std::make_shared<ASTNode::Expression>(optExpr.value());
+            }
+            return {};
+        };
+
+        auto tryParseUnnamedField = [&]() -> std::optional<UnnamedField> {
+            auto optFieldType = parseFieldType();
+            if(optFieldType.has_value()) {
+                auto fieldType = optFieldType.value();
+
+                UnnamedField::TypeReps typeReps;
+                auto optTypeReps = tryParseTypeReps();
+                if(optTypeReps)
+                    typeReps = optTypeReps.value();
+
+                auto defaultValue = tryParseDefaultValue();
+                return UnnamedField(fieldType, typeReps, defaultValue);
+            }
+            return {};
+        };
+
+        auto tryParseNamedField = [&]() -> std::optional<NamedField> {
+            auto optNames = parseNames(false);
+            if(optNames) {
+                auto names = optNames.value();
+                auto optFieldType = parseFieldType();
+                RY_PARSER__ASSERT(optFieldType.has_value());
+                auto fieldType = optFieldType.value();
+                auto optDefaultValue = tryParseDefaultValue();
+                return NamedField(names, fieldType, optDefaultValue);
+            }
+            return {};
+        };
+
+        auto optNamedField = tryParseNamedField();
+        if(optNamedField) {
+            return optNamedField.value();
+        } else {
+            auto optUnnamedField = tryParseUnnamedField();
+            RY_PARSER__ASSERT(optUnnamedField);
+            return optUnnamedField.value();
+        }
+
+        return {};
+    }
+
 
     /*
      *
