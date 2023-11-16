@@ -1,4 +1,6 @@
 #include "Token.hpp"
+#include "ry.hpp"
+
 #include <format>
 #include <string_view>
 #include <string>
@@ -87,6 +89,34 @@ namespace ry {
 
     // 
 
+    std::string Token::StringifyLiteralValue(const LiteralValue& literalValue) {
+        return std::visit(overloaded{
+            [](intlit_t intValue) -> std::string {
+                std::string str = "";
+                do {
+                    str = std::string(1 ,'0' + (intValue % 10)) + str;
+                    intValue /= 10;
+                } while(intValue > 0);
+                return str;
+            },
+            [](floatlit_t floatValue) -> std::string{
+                return std::format("{:.14f}", floatValue);
+            },
+            [](char charValue) -> std::string{
+                return '\'' + std::to_string(charValue) + '\'';
+            },
+            [](const std::string& stringValue) -> std::string {
+                return '"' + stringValue + '"';
+            },
+            [](bool boolValue) -> std::string {
+                return std::to_string(boolValue);
+            },
+            [](NullValue) -> std::string {
+                return "null";
+            }
+        }, literalValue);
+    }
+
     const char * Token::Stringify(Token::Type type) {
         int stringsIdx = int(type);
         assert(stringsIdx >= 0
@@ -94,23 +124,13 @@ namespace ry {
         return TYPE_STRINGS[stringsIdx];
     }
 
+    // 
+
     std::string Token::Stringify() const {
         const char * cstr = Token::Stringify(m_type);
-        if(m_type == Type::STRING_LIT || m_type == Type::NAME)
-            return std::string(cstr) + '(' + std::string(GetStringValue()) + ')';
-        if(m_type == Type::INT_LIT) {
-            std::string str = "";
-            intlit_t val = GetIntValue();
-            do {
-                str = std::string(1 ,'0' + (val % 10)) + str;
-                val /= 10;
-            } while(val > 0);
-            return std::string(cstr) + '(' + str + ')';
-        }
-        if(m_type == Type::FLOAT_LIT)
-            return std::string(cstr) + '(' + std::format("{:.14f}", GetFloatValue()) + ')';
-        if(m_type == Type::CHAR_LIT)
-            return std::string(cstr) + '(' + std::string(1, GetCharValue()) + ')';
+        auto optLitValue = GetLiteralValue();
+        if(optLitValue.has_value())
+            return std::string(cstr) + '(' + StringifyLiteralValue(optLitValue.value()) + ')';
         return cstr;
     }
 
@@ -118,6 +138,24 @@ namespace ry {
 
     bool Token::IsPrimitiveType() const {
         return int(m_type) > int(Type::_KW_FIRST_TYPE) && int(m_type) < int(Type::_KW_LAST_TYPE);
+    }
+
+    std::optional<Token::LiteralValue> Token::GetLiteralValue() const {
+        if(m_type == Type::STRING_LIT)
+            return m_stringValue;
+        if(m_type == Type::INT_LIT)
+            return m_intValue->intv;
+        if(m_type == Type::CHAR_LIT)
+            return m_intValue->charv;
+        if(m_type == Type::FLOAT_LIT)
+            return m_intValue->floatv;
+        if(m_type == Type::KW_NULL)
+            return NullValue{};
+        if(m_type == Type::KW_TRUE)
+            return true;
+        if(m_type == Type::KW_FALSE)
+            return false;
+        return {};
     }
 
 }

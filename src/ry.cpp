@@ -36,7 +36,7 @@ int main() {
 
     std::cout << header << " AST" << std::endl;
     if(ast.has_value())
-        if(auto * type = std::get_if<ry::ASTNode::Type>(&ast.value().Get()))
+        if(auto * type = std::get_if<ry::ASTNode::Expression>(&ast.value().Get()))
             std::cout << type->Stringify() << std::endl;
     std::cout << std::endl;
 

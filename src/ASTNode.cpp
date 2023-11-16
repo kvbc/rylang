@@ -2,10 +2,12 @@
 
 #include <optional>
 #include <stdexcept>
+#include <string>
 #include <type_traits>
 #include <variant>
 #include <assert.h>
 #include <utility>
+#include <iostream>
 
 namespace ry {
     
@@ -58,19 +60,37 @@ namespace ry {
             return "";
         };
 
+        auto stringifyNames = [&](const NamedField::Names& names) -> std::string {
+            std::string str;
+            for(auto it = names.cbegin(); it != names.cend(); it++) {
+                str += *it;
+                if(it != names.cend() - 1)
+                    str += ", ";
+            }
+            return str + ' ';
+        };
+
         auto stringifyField = [&](const Field& field) -> std::string {
             if(auto * unnamedField = std::get_if<UnnamedField>(&field))
                 return
                     stringifyPreTypeReps(unnamedField->GetTypeReps())
                     + unnamedField->GetType()->Stringify()
                     + stringifyDefaultValue(unnamedField->GetDefaultValue());
+            if(auto * namedField = std::get_if<NamedField>(&field))
+                return
+                    stringifyNames(namedField->GetNames())
+                    + namedField->GetType()->Stringify()
+                    + stringifyDefaultValue(namedField->GetDefaultValue());
             assert(false);
             return "???";
         };
 
         std::string str = "[";
-        for(const Field& field : m_fields)
-            str += stringifyField(field) + "; ";
+        for(auto it = m_fields.cbegin(); it != m_fields.cend(); it++) {
+            str += stringifyField(*it);
+            if(it != m_fields.cend() - 1)
+                str += "; ";
+        }
         return str + ']';
     }
 
@@ -94,7 +114,7 @@ namespace ry {
     }
 
     std::string TypeFunction::Stringify() const {
-        return m_argumentsType.Stringify() + m_returnType->Stringify();
+        return m_argumentsType.Stringify() + " => " + m_returnType->Stringify();
     }
 
     // 
@@ -122,17 +142,20 @@ namespace ry {
         if(m_attribs.isOptional)
             str += '?';
 
-        if(auto * v = std::get_if<TypePrimitive>(&m_data))
-            return str + TYPE_PRIMITIVE_STRING[static_cast<std::size_t>(*v)];
-        if(auto * v = std::get_if<TypePointer>(&m_data))
-            return str + "*" + (**v).Stringify();
-        if(auto * v = std::get_if<TypeFunction>(&m_data))
-            return str + v->Stringify();
-        if(auto * v = std::get_if<TypeStruct>(&m_data))
-            return str + v->Stringify();
-
-        assert(false);
-        return "???";
+        return std::visit(overloaded{
+            [&](const TypePrimitive& primitive) -> std::string {
+                return str + TYPE_PRIMITIVE_STRING[static_cast<std::size_t>(primitive)];
+            },
+            [&](const TypePointer& pointer) -> std::string {
+                return str + "*" + (*pointer).Stringify();
+            },
+            [&](const TypeFunction& function) -> std::string {
+                return str + function.Stringify();
+            },
+            [&](const TypeStruct& structType) -> std::string {
+                return str + structType.Stringify();
+            }
+        }, m_data);
     }
 
     /*
@@ -162,12 +185,32 @@ namespace ry {
         return m_value;
     }
 
+    std::string StructLitField::Stringify() const {
+        std::string str;
+        if(m_name.has_value()) {
+            str += m_name.value();
+            str += " = ";
+        }
+        str += m_value->Stringify();
+        return str;
+    }
+
     StructLit::Struct(const Fields& fields):
         m_fields(fields)
     {}
 
     const StructLit::Fields& StructLit::GetFields() const {
         return m_fields;
+    }
+
+    std::string StructLit::Stringify() const {
+        std::string str = "[";
+        for(auto it = m_fields.cbegin(); it != m_fields.cend(); it++) {
+            str += it->Stringify();
+            if(it != m_fields.cend() - 1)
+                str += ", ";
+        }
+        return str + ']';
     }
 
     ExpressionLiteral::ExpressionLiteral() {}
@@ -178,6 +221,19 @@ namespace ry {
 
     const ExpressionLiteral::Data& ExpressionLiteral::Get() const {
         return m_data;
+    }
+
+    std::string ExpressionLiteral::Stringify() const {
+        if(!m_data.has_value())
+            return "null";
+        return std::visit(overloaded{
+            [&](Int intValue)              -> std::string { return Token::StringifyLiteralValue(intValue); },
+            [&](Float floatValue)          -> std::string { return Token::StringifyLiteralValue(floatValue); },
+            [&](const String& stringValue) -> std::string { return Token::StringifyLiteralValue(stringValue); },
+            [&](Char charValue)            -> std::string { return Token::StringifyLiteralValue(charValue); },
+            [&](Bool boolValue)            -> std::string { return Token::StringifyLiteralValue(boolValue); },
+            [&](const Struct& structValue) -> std::string { return structValue.Stringify(); }
+        }, m_data.value());
     }
 
     // 
@@ -195,6 +251,10 @@ namespace ry {
 
     const ExpressionFunctionCall::Parameters& ExpressionFunctionCall::GetParameters() const {
         return m_parameters;
+    }
+
+    std::string ExpressionFunctionCall::Stringify() const {
+        return m_function->Stringify() + m_parameters.Stringify();
     }
 
     // 
@@ -218,6 +278,24 @@ namespace ry {
 
     const ExpressionBlock::Statements& ExpressionBlock::GetStatements() const {
         return m_statements;
+    }
+
+    std::string ExpressionBlock::Stringify() const {
+        std::string str;
+
+        if(m_label.has_value())
+            str += ExpressionLiteral(m_label).Stringify();
+
+        str += '{';
+
+        for(auto it = m_statements.cbegin(); it != m_statements.cend(); it++) {
+            str += it->Stringify();
+            if(it != m_statements.cend() - 1)
+                str += "; ";
+        }
+
+        str += '}';
+        return str;
     }
 
     // 
@@ -245,31 +323,33 @@ namespace ry {
     const ExpressionIf::FailExpression& ExpressionIf::GetFailExpression() const {
         return m_failExpression;
     }
+    
+    std::string ExpressionIf::Stringify() const {
+        std::string str = "if ";
+        str += m_condition->Stringify();
+        str += " do ";
+        str += m_successExpression->Stringify();
+        if(m_failExpression.has_value()) {
+            str += " else ";
+            str += m_failExpression.value()->Stringify();
+        }
+        return str;
+    }
 
     // 
 
     using ExpressionLoop = ASTNode::ExpressionLoop;
 
-    ExpressionLoop::ExpressionLoop(const InitStatement& initStatement):
-        m_initStatement(initStatement)
-    {}
-
-    ExpressionLoop::ExpressionLoop(
-        const InitStatement& initStatement,
-        const Condition& condition
-    ):
-        m_initStatement(initStatement),
-        m_condition(condition)
-    {}
-
     ExpressionLoop::ExpressionLoop(
         const InitStatement& initStatement,
         const Condition& condition,
-        const PostStatement& postStatement
+        const PostStatement& postStatement,
+        const BodyStatement& bodyStatement
     ):
         m_initStatement(initStatement),
         m_condition(condition),
-        m_postStatement(postStatement)
+        m_postStatement(postStatement),
+        m_bodyStatement(bodyStatement)
     {}
 
     const ExpressionLoop::InitStatement& ExpressionLoop::GetInitStatement() const {
@@ -283,6 +363,28 @@ namespace ry {
     const ExpressionLoop::PostStatement& ExpressionLoop::GetPostStatement() const {
         return m_postStatement;
     }
+
+    const ExpressionLoop::BodyStatement& ExpressionLoop::GetBodyStatement() const {
+        return m_bodyStatement;
+    }
+
+    std::string ExpressionLoop::Stringify() const {
+        std::string str = "loop ";
+        if(m_initStatement.has_value()) {
+            str += m_initStatement.value()->Stringify();
+            if(m_condition.has_value()) {
+                str += "; ";
+                str += m_condition.value()->Stringify();
+                if(m_postStatement.has_value()) {
+                    str += "; ";
+                    str += m_postStatement.value()->Stringify();
+                }
+            }
+            str += " do ";
+        }
+        str += m_bodyStatement->Stringify();
+        return str;
+    } 
 
     // 
 
@@ -299,6 +401,10 @@ namespace ry {
 
     const ExpressionUnaryOperation::Operand& ExpressionUnaryOperation::GetOperand() const {
         return m_operand;
+    }
+
+    std::string ExpressionUnaryOperation::Stringify() const {
+        return "???";
     }
 
     // 
@@ -320,6 +426,10 @@ namespace ry {
 
     const ExpressionBinaryOperation::Operands& ExpressionBinaryOperation::GetOperands() const {
         return m_operands;
+    }
+
+    std::string ExpressionBinaryOperation::Stringify() const {
+        return "???";
     }
 
     // 
@@ -364,7 +474,16 @@ namespace ry {
     }
 
     std::string Expression::Stringify() const {
-        return "???";
+        return std::visit(overloaded{
+            [](const ExpressionLiteral         & literal ){ return literal .Stringify(); },
+            [](const ExpressionFunctionCall    & funcCall){ return funcCall.Stringify(); },
+            [](const ExpressionBlock           & block   ){ return block   .Stringify(); },
+            [](const ExpressionIf              & ifExpr  ){ return ifExpr  .Stringify(); },
+            [](const ExpressionLoop            & loop    ){ return loop    .Stringify(); },
+            [](const ExpressionUnaryOperation  & unaryOp ){ return unaryOp .Stringify(); },
+            [](const ExpressionBinaryOperation & binOp   ){ return binOp   .Stringify(); },
+            [](const ExpressionName            & name    ){ return std::string(name); }
+        }, m_data);
     }
 
     /*
@@ -482,6 +601,10 @@ namespace ry {
 
     const Statement::Data& Statement::Get() const {
         return m_data;
+    }
+
+    std::string Statement::Stringify() const {
+        return "???";
     }
 
     /*

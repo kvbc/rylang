@@ -7,6 +7,7 @@
 #include <string_view>
 #include <string>
 #include <stdint.h>
+#include <variant>
 
 namespace ry {
 
@@ -22,7 +23,7 @@ namespace ry {
             "loop",  "continue", "break",
             "false", "true", "null",
             "not", "or", "and",
-            "as",
+            "as", "comp",
 
             "", // skip _KW_FIRST_TYPE
 
@@ -49,6 +50,8 @@ namespace ry {
             RSQUARE,
             QUESTION,
             COLON,
+            LCURLY,
+            RCURLY,
 
             _KW_FIRST,
             KW_DO,
@@ -56,7 +59,7 @@ namespace ry {
             KW_LOOP,  KW_CONTINUE, KW_BREAK,
             KW_FALSE, KW_TRUE, KW_NULL,
             KW_NOT, KW_OR, KW_AND,
-            KW_AS,
+            KW_AS, KW_COMP,
             // 
             _KW_FIRST_TYPE,
             KW_CHAR,
@@ -77,9 +80,7 @@ namespace ry {
             OP_EQ,   OP_LESS,    OP_GREAT,
             OP_UNEQ, OP_LESS_EQ, OP_GREAT_EQ,
 
-            OP_NOT, OP_OR, OP_AND,
-
-            OP_BLOCK_ACCESS,
+            OP_STRUCT_ACCESS,
             OP_FUNC_ARROW,
             OP_ASSIGN,
             OP_DEFINE,
@@ -89,6 +90,12 @@ namespace ry {
             AMPERSAND = OP_BIT_AND,
             OP_ADDRESS = AMPERSAND,
             TILDE = OP_BIT_NEG,
+            OP_NEG = OP_SUB,
+            OP_NOT = KW_NOT,
+            OP_OR = KW_OR,
+            OP_AND = KW_AND,
+            OP_COMP = KW_COMP,
+            OP_TYPE_CAST = KW_AS,
         };
 
         // must be in the same order as the Type enum
@@ -106,6 +113,8 @@ namespace ry {
             "RSQUARE",
             "QUESTION",
             "COLON",
+            "LCURLY",
+            "RCURLY",
 
             "_KW_FIRST",
             "KW_DO",
@@ -124,8 +133,8 @@ namespace ry {
             "_KW_LAST_TYPE",
             "_KW_LAST",
 
-            "OP_SUB_EQ", "OP_ADD_EQ", "OP_DIV_EQ", "OP_MOD_EQ", "OP_MUL_EQ", 
-            "OP_SUB",    "OP_ADD",    "OP_DIV",    "OP_MOD",    "ASTERISK / OP_MUL / OP_PTR_DEREF",
+            "OP_SUB / OP_NEG", "OP_ADD",    "OP_DIV",    "OP_MOD",    "ASTERISK / OP_MUL / OP_PTR_DEREF",
+            "OP_SUB_EQ",       "OP_ADD_EQ", "OP_DIV_EQ", "OP_MOD_EQ", "OP_MUL_EQ", 
 
             "OP_BIT_NEG / TILDE",
             "OP_BIT_OR_EQ", "OP_BIT_XOR_EQ", "OP_BIT_LSHIFT_EQ", "OP_BIT_RSHIFT_EQ", "OP_BIT_AND_EQ",        
@@ -143,6 +152,16 @@ namespace ry {
         };
         static constexpr std::size_t TYPE_STRINGS_LEN = sizeof(TYPE_STRINGS) / sizeof(*TYPE_STRINGS);
 
+        using NullValue = struct {};
+        using LiteralValue = std::variant<
+            intlit_t,
+            floatlit_t,
+            char,
+            std::string,
+            bool,
+            NullValue
+        >;
+
         Token(const SourcePosition& srcPos, Type type);
         Token(const SourcePosition& srcPos, Type type, std::string_view value);
         Token(const SourcePosition& srcPos, Type type, intlit_t value);
@@ -159,11 +178,13 @@ namespace ry {
         floatlit_t GetFloatValue() const;
         char       GetCharValue () const;
 
+        static std::string StringifyLiteralValue(const LiteralValue& literalValue);
         static const char * Stringify(Token::Type type);
 
         std::string Stringify() const;
 
         bool IsPrimitiveType() const;
+        std::optional<LiteralValue> GetLiteralValue() const;
 
     private:
         union IntValue {

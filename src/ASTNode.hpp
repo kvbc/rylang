@@ -1,12 +1,13 @@
 #pragma once
 
 #include "ry.hpp"
-#include "Lexer.hpp"
+#include "Token.hpp"
 
 #include <memory>
 #include <optional>
 #include <string_view>
 #include <variant>
+#include <vector>
 
 namespace ry {
     
@@ -145,9 +146,9 @@ namespace ry {
 
         class ExpressionLiteral {
         public:
-            using Int = Lexer::intlit_t;
-            using Float = Lexer::floatlit_t;
-            using String = std::string_view;
+            using Int = Token::intlit_t;
+            using Float = Token::floatlit_t;
+            using String = std::string;
             using Char = char;
             using Bool = bool;
             class Struct {
@@ -158,10 +159,12 @@ namespace ry {
                     using Value = std::shared_ptr<Expression>;
 
                     Field(const Value& value);
-                    Field(const Value& value, const FieldName& name);
+                    Field(const Value& value, const FieldName& name = {});
 
                     const FieldName & GetName  () const;
                     const Value     & GetValue () const;
+
+                    std::string Stringify() const;
 
                 private:
                     FieldName m_name;
@@ -173,6 +176,8 @@ namespace ry {
 
                 const Fields& GetFields() const;
 
+                std::string Stringify() const;
+
             private:
                 Fields m_fields;
             };
@@ -183,6 +188,8 @@ namespace ry {
             ExpressionLiteral(const Data& data);
 
             const Data& Get() const;
+
+            std::string Stringify() const;
 
         private:
             Data m_data;
@@ -199,6 +206,8 @@ namespace ry {
 
             const Function   & GetFunction   () const;
             const Parameters & GetParameters () const;
+
+            std::string Stringify() const;
 
         private:
             Function m_function;
@@ -218,6 +227,8 @@ namespace ry {
 
             const Label      & GetLabel      () const;
             const Statements & GetStatements () const;
+
+            std::string Stringify() const;
 
         private:
             Label m_label;
@@ -242,6 +253,8 @@ namespace ry {
             const SuccessExpression & GetSuccessExpression () const;
             const FailExpression    & GetFailExpression    () const;
 
+            std::string Stringify() const;
+
         private:
             Condition m_condition;
             SuccessExpression m_successExpression;
@@ -255,19 +268,27 @@ namespace ry {
             using InitStatement = std::optional<std::shared_ptr<Statement>>;
             using Condition = std::optional<std::shared_ptr<Expression>>;
             using PostStatement = InitStatement;
+            using BodyStatement = std::shared_ptr<Statement>;
 
-            ExpressionLoop(const InitStatement& initStatement);
-            ExpressionLoop(const InitStatement& initStatement, const Condition& condition);
-            ExpressionLoop(const InitStatement& initStatement, const Condition& condition, const PostStatement& postStatement);
+            ExpressionLoop(
+                const InitStatement& initStatement,
+                const Condition& condition,
+                const PostStatement& postStatement,
+                const BodyStatement& bodyStatement
+            );
 
             const InitStatement & GetInitStatement () const;
             const Condition     & GetCondition     () const;
             const PostStatement & GetPostStatement () const;
+            const BodyStatement & GetBodyStatement () const;
+
+            std::string Stringify() const;
 
         private:
             InitStatement m_initStatement;
             Condition m_condition;
             PostStatement m_postStatement;
+            BodyStatement m_bodyStatement;
         };
 
         // 
@@ -290,6 +311,8 @@ namespace ry {
             Kind GetKind() const;
             const Operand& GetOperand() const;
 
+            std::string Stringify() const;
+
         private:
             Kind m_kind;
             Operand m_operand;
@@ -303,7 +326,7 @@ namespace ry {
             using Operands = std::pair<Operand, Operand>;
 
             enum class Kind {
-                Add, Sub, Mul, Power, Div, Mod,
+                Add, Sub, Mul, Div, Mod,
                 BitOr, BitXor, BitAnd, BitLShift, BitRShift,
                 Eq, Uneq, Less, LessEqual, Great, GreatEqual,
                 Or, And,
@@ -314,6 +337,8 @@ namespace ry {
 
             Kind GetKind() const;
             const Operands& GetOperands() const;
+
+            std::string Stringify() const;
 
         private:
             Kind m_kind;
@@ -473,6 +498,8 @@ namespace ry {
             Statement(const Data& data);
 
             const Data& Get() const;
+
+            std::string Stringify() const;
     
         private:
             Data m_data;

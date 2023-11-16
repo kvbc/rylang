@@ -48,6 +48,8 @@ namespace ry {
                 case ']': tokens.push_back(createToken(Token::Type::RSQUARE)); break;
                 case '?': tokens.push_back(createToken(Token::Type::QUESTION)); break;
                 case ',': tokens.push_back(createToken(Token::Type::COLON)); break;
+                case '{': tokens.push_back(createToken(Token::Type::LCURLY)); break;
+                case '}': tokens.push_back(createToken(Token::Type::RCURLY)); break;
                 case CHAR_EOF:
                     break;
                 default:
@@ -182,8 +184,6 @@ namespace ry {
             if(is("!=" )) return T::OP_UNEQ;
             if(is("<=" )) return T::OP_LESS_EQ;
             if(is(">=" )) return T::OP_GREAT_EQ;
-            if(is("||" )) return T::OP_OR;
-            if(is("&&" )) return T::OP_AND;
             if(is(":=" )) return T::OP_DEFINE;
             if(is("=>" )) return T::OP_FUNC_ARROW;
             // check 1-length ops
@@ -197,8 +197,7 @@ namespace ry {
             if(is("&"  )) return T::OP_BIT_AND;
             if(is("<"  )) return T::OP_LESS;
             if(is(">"  )) return T::OP_GREAT;
-            if(is("!"  )) return T::OP_NOT;
-            if(is("."  )) return T::OP_BLOCK_ACCESS;
+            if(is("."  )) return T::OP_STRUCT_ACCESS;
             if(is("="  )) return T::OP_ASSIGN;
             return {};
         };

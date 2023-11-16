@@ -1,4 +1,6 @@
 #include "Parser.hpp"
+#include "Token.hpp"
+#include "ry.hpp"
 
 #include <format>
 #include <memory>
@@ -20,19 +22,68 @@ namespace ry {
     }
 
     std::optional<ASTNode> Parser::Parse() {
-        std::optional<ASTNode::Type> typeNode = parseType();
-        if(typeNode.has_value())
-            return ASTNode(typeNode.value());
+        auto optNode = parseExpression();
+        if(optNode.has_value())
+            return ASTNode(optNode.value());
         return {};
     }
 
     // 
 
-    bool Parser::isToken(Token::Type type, int offset) {
-        return getToken(offset).GetType() == type;
+    std::optional<ASTNode::ExpressionUnaryOperation::Kind> Parser::getTokenTypeToUnaryOperationKind(Token::Type type) {
+        using TT = Token::Type;
+        using UK = ASTNode::ExpressionUnaryOperation::Kind;
+        if(type == TT::OP_NEG)       return UK::ArithmeticNegation;
+        if(type == TT::OP_BIT_NEG)   return UK::BitwiseNegation;
+        if(type == TT::OP_NOT)       return UK::LogicalNegation;
+        if(type == TT::OP_ADDRESS)   return UK::AddressOf;
+        if(type == TT::OP_COMP)      return UK::Comp;
+        if(type == TT::OP_PTR_DEREF) return UK::PointerDereference;
+        return {};
     }
 
-    bool Parser::assertToken(Token::Type type) {
+    std::optional<ASTNode::ExpressionBinaryOperation::Kind> Parser::getTokenTypeToBinaryOperationKind(Token::Type type) {
+        using TT = Token::Type;
+        using BK = ASTNode::ExpressionBinaryOperation::Kind;
+
+        if(type == TT::OP_ADD) return BK::Add;
+        if(type == TT::OP_SUB) return BK::Sub;
+        if(type == TT::OP_MUL) return BK::Mul;
+        if(type == TT::OP_DIV) return BK::Div;
+        if(type == TT::OP_MOD) return BK::Mod;
+
+        if(type == TT::OP_BIT_OR)     return BK::BitOr;
+        if(type == TT::OP_BIT_XOR)    return BK::BitXor;
+        if(type == TT::OP_BIT_AND)    return BK::BitAnd;
+        if(type == TT::OP_BIT_LSHIFT) return BK::BitLShift;
+        if(type == TT::OP_BIT_RSHIFT) return BK::BitRShift;
+
+        if(type == TT::OP_EQ)       return BK::Eq;
+        if(type == TT::OP_UNEQ)     return BK::Uneq;
+        if(type == TT::OP_LESS)     return BK::Less;
+        if(type == TT::OP_LESS_EQ)  return BK::LessEqual;
+        if(type == TT::OP_GREAT)    return BK::Great;
+        if(type == TT::OP_GREAT_EQ) return BK::GreatEqual;
+
+        if(type == TT::OP_OR)  return BK::Or;
+        if(type == TT::OP_AND) return BK::Or;
+
+        if(type == TT::OP_TYPE_CAST)     return BK::TypeCast;
+        if(type == TT::OP_STRUCT_ACCESS) return BK::StructMemberAccess;
+
+        return {};
+    }
+
+    // 
+
+    bool Parser::isToken(Token::Type expectedType, std::optional<Token::Type> orExpectedType) {
+        Token::Type type = getToken().GetType();
+        if(orExpectedType.has_value() && type == orExpectedType.value())
+            return true;
+        return expectedType == type;
+    }
+
+    bool Parser::expectToken(Token::Type type) {
         if(!isToken(type)) {
             errorExpectedToken(type);
             return false;
@@ -77,9 +128,11 @@ namespace ry {
 
     // 
 
-    std::optional<ASTNode::Expression> Parser::parseExpression(bool mustParse) {
-        return {};
-    }
+    /*
+     *
+     * Type
+     *
+     */
 
     std::optional<ASTNode::Type> Parser::parseType(bool mustParse) {
         ASTNode::Type::Attribs attribs;
@@ -106,6 +159,7 @@ namespace ry {
         else if(getToken().IsPrimitiveType()) {
             // primitive
             auto primType = ASTNode::TypePrimitive( int(getToken().GetType()) - (int(Token::Type::_KW_FIRST_TYPE) + 1) );
+            eatToken();
             return ASTNode::Type(primType, attribs);
         }
         else if(isToken(Token::Type::LSQUARE)) {
@@ -137,7 +191,7 @@ namespace ry {
                     auto optExpr = parseExpression(false);
                     if(optExpr.has_value()) {
                         if(pos == TypeRepsPos::Pre) {
-                            assertToken(Token::Type::OP_MUL);
+                            expectToken(Token::Type::OP_MUL);
                             eatToken();
                         }
                         return std::make_shared<ASTNode::Expression>(optExpr.value());
@@ -185,22 +239,37 @@ namespace ry {
                     return {};
                 };
 
-                // either: typeReps, name, type
-                auto optPreTypeReps = tryParseTypeReps(TypeRepsPos::Pre);
-                if(!optPreTypeReps.has_value()) {
-                    // typeReps ...
-                    auto optFieldType = parseFieldType();
+                auto tryParseUnnamedField = [&]() -> std::optional<UnnamedField> {
+                    UnnamedField::TypeReps typeReps;
+
+                    auto optPreTypeReps = tryParseTypeReps(TypeRepsPos::Pre);
+                    if(optPreTypeReps.has_value())
+                        typeReps = optPreTypeReps.value();
+
+                    bool mustParseType = typeReps.has_value();
+                    auto optFieldType = parseFieldType(mustParseType);
                     if(optFieldType.has_value()) {
                         auto fieldType = optFieldType.value();
-                        auto optDefaultValue = tryParseDefaultValue();
-                        UnnamedField field(fieldType, optPreTypeReps, optDefaultValue);
-                        structFields.push_back(field);
+
+                        if(!typeReps.has_value()) {
+                            auto optPostTypeReps = tryParseTypeReps(TypeRepsPos::Post);
+                            if(optPostTypeReps.has_value())
+                                typeReps = optPostTypeReps.value();
+                        }
+
+                        auto defaultValue = tryParseDefaultValue();
+                        return UnnamedField(fieldType, typeReps, defaultValue);
                     }
+
+                    return {};
+                };
+
+                std::optional<UnnamedField> optUnnamedField = tryParseUnnamedField();
+                if(optUnnamedField.has_value()) {
+                    structFields.push_back(optUnnamedField.value());
                 } else {
-                    // either: name, type
-                    auto optNames = parseNames(false);
+                    auto optNames = parseNames();
                     if(optNames.has_value()) {
-                        // name ...
                         auto names = optNames.value();
                         auto optFieldType = parseFieldType();
                         if(optFieldType.has_value()) {
@@ -209,26 +278,14 @@ namespace ry {
                             NamedField field(names, fieldType, optDefaultValue);
                             structFields.push_back(field);
                         }
-                    } else {
-                        // type ...
-                        auto optFieldType = parseFieldType();
-                        if(optFieldType.has_value()) {
-                            auto fieldType = optFieldType.value();
-                            auto optPostTypeReps = tryParseTypeReps(TypeRepsPos::Post);
-                            if(optPreTypeReps.has_value()) {
-                                auto optDefaultValue = tryParseDefaultValue();
-                                UnnamedField field(fieldType, optPreTypeReps, optDefaultValue);
-                                structFields.push_back(field);
-                            }
-                        }
                     }
                 }
 
                 bool isSep = isToken(Token::Type::COLON) || isToken(Token::Type::SEMICOLON);
-                bool isNextEnd = isToken(Token::Type::RSQUARE, 1);
+                bool isEnd = isToken(Token::Type::RSQUARE);
                 if(isSep)
                     eatToken();
-                else if(!isNextEnd)
+                else if(!isEnd)
                     errorExpected("separator");
             }
             auto structType = ASTNode::TypeStruct(structFields);
@@ -253,6 +310,305 @@ namespace ry {
         // not a type
         if(mustParse)
             errorExpected("type");
+        return {};
+    }
+
+    /*
+     *
+     * Expression
+     *
+     */
+
+    std::optional<ASTNode::Expression> Parser::parseExpression(bool mustParse) {
+    #define TRY_RETURN(OPT) { \
+        auto opt = OPT; \
+        if(opt.has_value()) \
+            return ASTNode::Expression(opt.value()); \
+    }
+
+        auto tryParse = [&]() -> std::optional<ASTNode::Expression> {
+            TRY_RETURN(parseUnaryOperationExpression(false));
+            TRY_RETURN(parseNameExpression          (false));
+            TRY_RETURN(parseLiteralExpression       (false));
+            TRY_RETURN(parseBlockExpression         (false));
+            TRY_RETURN(parseIfExpression            (false));
+            TRY_RETURN(parseLoopExpression          (false));
+            return {};
+        };
+
+        auto optExpr = tryParse();
+        if(optExpr.has_value()) {
+            auto optStructLit = parseStructLiteralExpression(false);
+            if(optStructLit.has_value()) {
+                auto func = std::make_shared<ASTNode::Expression>(optExpr.value());
+                auto params = optStructLit.value();
+                return ASTNode::Expression(
+                    ASTNode::ExpressionFunctionCall(func, params)
+                );
+            }
+
+            auto optBinOpKind = getTokenTypeToBinaryOperationKind(getToken().GetType());
+            if(optBinOpKind.has_value()) {
+                eatToken();
+
+                auto optExpr2 = parseExpression();
+                if(optExpr2.has_value()) {
+                    auto kind = optBinOpKind.value();
+                    auto firstOperand = std::make_shared<ASTNode::Expression>(optExpr.value());
+                    auto secondOperand = std::make_shared<ASTNode::Expression>(optExpr2.value());
+                    return ASTNode::Expression(
+                        ASTNode::ExpressionBinaryOperation(kind, firstOperand, secondOperand)
+                    );
+                }
+            }
+
+            return optExpr.value();
+        }
+
+        if(mustParse)
+            errorExpected("expression");
+        return {};
+    #undef TRY_RETURN
+    }
+
+    std::optional<ASTNode::ExpressionLiteral::Struct> Parser::parseStructLiteralExpression(bool mustParse) {
+    #define ASSERT(cond)     { if(!cond) goto error; }
+    #define ASSERT_RET(cond) { if(!cond) return {};  }
+
+        using StructLiteral = ASTNode::ExpressionLiteral::Struct;
+
+        if(isToken(Token::Type::LSQUARE)) {
+            eatToken();
+
+            auto parseField = [&]() -> std::optional<StructLiteral::Field> {
+                StructLiteral::Field::FieldName name;
+                if(isToken(Token::Type::NAME)) {
+                    name = getToken().GetStringValue();
+                    eatToken();
+                    ASSERT_RET(expectToken(Token::Type::OP_ASSIGN));
+                    eatToken();
+                }
+                auto optExpr = parseExpression();
+                ASSERT_RET(optExpr.has_value());
+                auto value = std::make_shared<ASTNode::Expression>(optExpr.value());
+                return StructLiteral::Field(value, name);
+            };
+
+            StructLiteral::Fields fields;
+            for(;;) {
+                if(isToken(Token::Type::RSQUARE)) {
+                    eatToken();
+                    break;
+                }
+
+                auto optField = parseField();
+                ASSERT(optField.has_value())
+                fields.push_back(optField.value());
+
+                bool isSep = isToken(Token::Type::COLON, Token::Type::SEMICOLON);
+                bool isEnd = isToken(Token::Type::RSQUARE);
+                if(isSep)
+                    eatToken();
+                else if(!isEnd)
+                    errorExpected("separator");
+            }
+            return StructLiteral(fields);
+        }
+
+    error:
+        if(mustParse)
+            errorExpected("struct literal");
+        return {};
+    #undef ASSERT
+    #undef ASSERT_RET
+    }
+
+    std::optional<ASTNode::ExpressionLiteral> Parser::parseLiteralExpression(bool mustParse) {
+        using Literal = ASTNode::ExpressionLiteral;
+
+        auto optStructLiteral = parseStructLiteralExpression(false);
+        if(optStructLiteral.has_value()) {
+            return ASTNode::ExpressionLiteral(optStructLiteral.value());
+        }
+
+        auto optLitValue = getToken().GetLiteralValue();
+        if(optLitValue.has_value()) {
+            eatToken();
+            Literal::Data litData = std::visit(overloaded{
+                [](Token::intlit_t intValue)       -> Literal::Data { return intValue; },
+                [](Token::floatlit_t floatValue)   -> Literal::Data { return floatValue; },
+                [](char charValue)                 -> Literal::Data { return charValue; },
+                [](const std::string& stringValue) -> Literal::Data { return stringValue; },
+                [](bool boolValue)                 -> Literal::Data { return boolValue; },
+                [](Token::NullValue)               -> Literal::Data { return {}; }
+            }, optLitValue.value());
+            return ASTNode::ExpressionLiteral(litData);
+        }
+
+        if(mustParse)
+            errorExpected("literal");
+        return {};
+    }
+
+    std::optional<ASTNode::ExpressionBlock> Parser::parseBlockExpression(bool mustParse) {
+        using Block = ASTNode::ExpressionBlock;
+
+        Block::Label label;
+        if(isToken(Token::Type::STRING_LIT)) {
+            label = getToken().GetStringValue();
+            eatToken();
+        }
+
+        if(isToken(Token::Type::LCURLY)) {
+            eatToken();
+            Block::Statements statements;
+            for(;;) {
+                if(isToken(Token::Type::RCURLY)) {
+                    eatToken();
+                    break;
+                }
+
+                auto optStatement = parseStatement();
+                if(optStatement.has_value())
+                    statements.push_back(optStatement.value());
+
+                if(isToken(Token::Type::SEMICOLON))
+                    eatToken();
+                else if(!isToken(Token::Type::RCURLY)) {
+                    errorExpectedToken(Token::Type::SEMICOLON);
+                    break;
+                }
+            }
+            return Block(label, statements);
+        }
+
+        if(mustParse)
+            errorExpected("block");
+        return {};
+    }
+
+    std::optional<ASTNode::ExpressionIf> Parser::parseIfExpression(bool mustParse) {
+        if(isToken(Token::Type::KW_IF)) {
+            eatToken();
+
+            auto optCondExpr = parseExpression();
+            if(optCondExpr.has_value()) {
+                if (expectToken(Token::Type::KW_DO)) {
+                    eatToken();
+                    auto optThenExpr = parseExpression();
+                    if(optThenExpr.has_value()) {
+                        // else
+                        ASTNode::ExpressionIf::FailExpression failExpr;
+                        if(isToken(Token::Type::KW_ELSE)) {
+                            eatToken();
+                            auto optFailExpr = parseExpression(false);
+                            if(optFailExpr.has_value())
+                                failExpr = std::make_shared<ASTNode::Expression>(optFailExpr.value());
+                        }
+
+                        auto condExpr = std::make_shared<ASTNode::Expression>(optCondExpr.value());
+                        auto thenExpr = std::make_shared<ASTNode::Expression>(optThenExpr.value());
+                        return ASTNode::ExpressionIf(condExpr, thenExpr, failExpr);
+                    }
+                }
+            }
+        }
+
+        if(mustParse)
+            errorExpected("if");
+        return {};
+    }
+
+    std::optional<ASTNode::ExpressionLoop> Parser::parseLoopExpression(bool mustParse) {
+    #define ASSERT(cond) if(cond) goto error;
+
+        using Loop = ASTNode::ExpressionLoop;
+
+        if(isToken(Token::Type::KW_LOOP)) {
+            eatToken();
+
+            Loop::InitStatement initStatement; {
+                auto optInitStatement = parseStatement(false);
+                if(optInitStatement.has_value())
+                    initStatement = std::make_shared<ASTNode::Statement>(optInitStatement.value());
+            }
+
+            Loop::Condition condition;
+            if(initStatement.has_value())
+                if(isToken(Token::Type::SEMICOLON, Token::Type::COLON)) {
+                    eatToken();
+                    auto optCondition = parseExpression();
+                    ASSERT(optCondition.has_value());
+                    condition = std::make_shared<ASTNode::Expression>(optCondition.value());
+                }
+
+            Loop::PostStatement postStatement;
+            if(condition.has_value())
+                if(isToken(Token::Type::SEMICOLON, Token::Type::COLON)) {
+                    eatToken();
+                    auto optPostStatement = parseExpression();
+                    ASSERT(optPostStatement.has_value());
+                    postStatement = std::make_shared<ASTNode::Statement>(optPostStatement.value());
+                }
+
+            if(initStatement.has_value()) {
+                ASSERT(expectToken(Token::Type::KW_DO))
+                eatToken();
+            }
+
+            auto optBodyStatement = parseExpression();
+            ASSERT(optBodyStatement.has_value());
+            Loop::BodyStatement bodyStatement = std::make_shared<ASTNode::Statement>(optBodyStatement.value());
+
+            return ASTNode::ExpressionLoop(initStatement, condition, postStatement, bodyStatement);
+        }
+
+    #undef ASSERT
+    error:
+        if(mustParse)
+            errorExpected("loop");
+        return {};
+    }
+
+    std::optional<ASTNode::ExpressionName> Parser::parseNameExpression(bool mustParse) {
+        if(isToken(Token::Type::NAME)) {
+            auto name = getToken().GetStringValue();
+            eatToken();
+            return name;
+        }
+
+        if(mustParse)
+            errorExpected("name");
+        return {};
+    }
+
+    std::optional<ASTNode::ExpressionUnaryOperation> Parser::parseUnaryOperationExpression(bool mustParse) {
+        auto optUnaryKind = getTokenTypeToUnaryOperationKind(getToken().GetType());
+        if(optUnaryKind.has_value()) {
+            eatToken();
+
+            auto optExpr = parseExpression();
+            if(optExpr.has_value()) {
+                auto kind = optUnaryKind.value();
+                auto operand = std::make_shared<ASTNode::Expression>(optExpr.value());
+                return ASTNode::ExpressionUnaryOperation(kind, operand);
+            }
+        }
+
+        if(mustParse)
+            errorExpected("unary operation");
+        return {};
+    }
+
+    /*
+     *
+     * Statement
+     *
+     */
+
+    std::optional<ASTNode::Statement> Parser::parseStatement(bool mustParse) {
+        if(mustParse)
+            errorExpected("statement");
         return {};
     }
 
