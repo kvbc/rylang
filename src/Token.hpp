@@ -23,7 +23,7 @@ namespace ry {
             "loop",  "continue", "break",
             "false", "true",     "null",
             "not", "or", "and",
-            "as", "comp", "times",
+            "as", "comp",
 
             "", // skip _KW_FIRST_TYPE
 
@@ -34,6 +34,23 @@ namespace ry {
             "bool"
         };
         static constexpr std::size_t KEYWORDS_LEN = sizeof(KEYWORDS) / sizeof(*KEYWORDS);
+
+    // #define CHAR_SEQUENCES(E) /* E - expand macro */ \
+    //     E(';', Semicolon) \
+    //     E('(', LParen)  \
+    //     E(')', RParen)  \
+    //     E('[', LSquare) \
+    //     E(']', RSquare) \
+    //     E('?', QuestionMark) \
+    //     E(':', Colon)  \
+    //     E('{', LCurly) \
+    //     E('}', RCurly) \
+    //     \
+    //     E('-', Sub) E('-=', SubEqual) \
+    //     E('+', Add) E('+=', AddEqual) \
+    //     E('/', Div) E('/=', DivEqual) \
+    //     E('%', Mod) E('%=', ModEqual) \
+    //     E('*', Mul) E('*=', MulEqual) \ 
 
         // keywords must be in same order as in KEYWORDS
         enum class Type {
@@ -59,7 +76,7 @@ namespace ry {
             KW_LOOP,  KW_CONTINUE, KW_BREAK,
             KW_FALSE, KW_TRUE,     KW_NULL,
             KW_NOT, KW_OR, KW_AND,
-            KW_AS, KW_COMP, KW_TIMES,
+            KW_AS, KW_COMP,
             // 
             _KW_FIRST_TYPE,
             KW_CHAR,
@@ -122,7 +139,7 @@ namespace ry {
             "KW_LOOP",  "KW_CONTINUE", "KW_BREAK",
             "KW_FALSE", "KW_TRUE", "KW_NULL",
             "KW_NOT",   "KW_OR",   "KW_AND",
-            "KW_AS",    "KW_COMP", "KW_TIMES",
+            "KW_AS",    "KW_COMP",
             // 
             "_KW_FIRST_TYPE",
             "KW_CHAR",

@@ -4,6 +4,8 @@
 
 // ~bool x = 3;
 
+3 + 5;
+
 [*?*?*?[i32 = 9] times 3 = 5]
 
 [i32, bool, x,y f32] => [i32, bool, char, *f32]

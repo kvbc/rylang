@@ -134,6 +134,10 @@ namespace ry {
         return m_data;
     }
 
+    const char * Type::StringifyPrimitiveType(TypePrimitive primitiveType) {
+        return Token::Stringify(Token::Type(primitiveType));
+    }
+
     std::string Type::Stringify() const {
         std::string str;
 
@@ -144,7 +148,7 @@ namespace ry {
 
         return std::visit(overloaded{
             [&](const TypePrimitive& primitive) -> std::string {
-                return str + TYPE_PRIMITIVE_STRING[static_cast<std::size_t>(primitive)];
+                return str + StringifyPrimitiveType(primitive);
             },
             [&](const TypePointer& pointer) -> std::string {
                 return str + "*" + (*pointer).Stringify();
@@ -390,6 +394,18 @@ namespace ry {
 
     using ExpressionUnaryOperation = ASTNode::ExpressionUnaryOperation;
 
+    const std::set<Token::Type> ExpressionUnaryOperation::KINDS {
+        RY_ASTNODE__UNARYOP_KINDS(RY_EXPAND_VALUES)
+    };
+    Token::Type ExpressionUnaryOperation::GetKindToTokenType(Kind kind) {
+        return Token::Type(kind);
+    }
+    std::optional<ExpressionUnaryOperation::Kind> ExpressionUnaryOperation::GetTokenTypeToKind(Token::Type tokenType) {
+        if(KINDS.contains(tokenType))
+            return Kind(tokenType);
+        return {};
+    }
+
     ExpressionUnaryOperation::ExpressionUnaryOperation(Kind kind, const Operand& operand):
         m_kind(kind),
         m_operand(operand)
@@ -403,13 +419,29 @@ namespace ry {
         return m_operand;
     }
 
-    std::string ExpressionUnaryOperation::Stringify() const {
+    const char * ExpressionUnaryOperation::StringifyKind(Kind kind) {
         return "???";
+    }
+
+    std::string ExpressionUnaryOperation::Stringify() const {
+        return StringifyKind(m_kind) + m_operand->Stringify();
     }
 
     // 
 
     using ExpressionBinaryOperation = ASTNode::ExpressionBinaryOperation;
+
+    const std::set<Token::Type> ExpressionBinaryOperation::KINDS {
+        RY_ASTNODE__BINOP_KINDS(RY_EXPAND_VALUES)
+    };
+    Token::Type ExpressionBinaryOperation::GetKindToTokenType(Kind kind) {
+        return Token::Type(kind);
+    }
+    std::optional<ExpressionBinaryOperation::Kind> ExpressionBinaryOperation::GetTokenTypeToKind(Token::Type tokenType) {
+        if(KINDS.contains(tokenType))
+            return Kind(tokenType);
+        return {};
+    }
 
     ExpressionBinaryOperation::ExpressionBinaryOperation(
         Kind kind,
@@ -428,8 +460,12 @@ namespace ry {
         return m_operands;
     }
 
-    std::string ExpressionBinaryOperation::Stringify() const {
+    const char * ExpressionBinaryOperation::StringifyKind(Kind kind) {
         return "???";
+    }
+
+    std::string ExpressionBinaryOperation::Stringify() const {
+        return m_operands.first->Stringify() + ' ' + StringifyKind(m_kind) + ' ' + m_operands.second->Stringify();
     }
 
     // 

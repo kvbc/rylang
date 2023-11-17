@@ -1,19 +1,21 @@
 #pragma once
 
-#include "ry.hpp"
 #include "Token.hpp"
+#include "ry.hpp"
 
 #include <memory>
 #include <optional>
 #include <string_view>
 #include <variant>
 #include <vector>
+#include <set>
 
 namespace ry {
     
     class ASTNode {
     private:
         using Name = std::string_view;
+        using TK = Token::Type;
 
     public:
         class Expression;
@@ -26,19 +28,26 @@ namespace ry {
 
         class Type;
 
-        #define RY_TYPE_PRIMITIVES(WRAP) \
-            WRAP(Char)                                        \
-            WRAP(I8) WRAP(I16) WRAP(I32) WRAP(I64) WRAP(I128) \
-            WRAP(U8) WRAP(U16) WRAP(U32) WRAP(U64) WRAP(U128) \
-            WRAP(F32) WRAP(F64)                               \
-            WRAP(Bool)
         enum class TypePrimitive {
-            RY_TYPE_PRIMITIVES(RY_WRAP_ENUM)
+            Char = (int)TK::KW_CHAR,
+
+            I8   = (int)TK::KW_I8,
+            I16  = (int)TK::KW_I16,
+            I32  = (int)TK::KW_I32,
+            I64  = (int)TK::KW_I64,
+            I128 = (int)TK::KW_I128,
+
+            U8   = (int)TK::KW_U8,
+            U16  = (int)TK::KW_U16,
+            U32  = (int)TK::KW_U32,
+            U64  = (int)TK::KW_U64,
+            U128 = (int)TK::KW_U128,
+
+            F32 = (int)TK::KW_F32,
+            F64 = (int)TK::KW_F64,
+
+            Bool = (int)TK::KW_BOOL
         };
-        static constexpr const char * const TYPE_PRIMITIVE_STRING[] = {
-            RY_TYPE_PRIMITIVES(RY_WRAP_STR)
-        };
-        #undef RY_TYPE_PRIMITIVES
 
         // 
 
@@ -129,6 +138,7 @@ namespace ry {
             const Attribs& GetAttribs() const;
             const Data& Get() const;
 
+            static const char * StringifyPrimitiveType(TypePrimitive primitiveType);
             std::string Stringify() const;
 
         private:
@@ -294,26 +304,38 @@ namespace ry {
         // 
 
         class ExpressionUnaryOperation {
+        private:
+            using TK = Token::Type;
+
         public:
             using Operand = std::shared_ptr<Expression>;
 
+        #define RY_ASTNODE__UNARYOP_KINDS(E) /* E - expand macro */ \
+            E(ArithmeticNegation, TK::OP_NEG)     \
+            E(BitwiseNegation,    TK::OP_BIT_NEG) \
+            E(LogicalNegation,    TK::OP_NOT)     \
+            E(AddressOf,          TK::OP_ADDRESS) \
+            E(Comp,               TK::OP_COMP)    \
+            E(PointerDereference, TK::OP_PTR_DEREF)
+
             enum class Kind {
-                ArithmeticNegation,
-                BitwiseNegation,
-                LogicalNegation,
-                AddressOf,
-                Comp,
-                PointerDereference
+                RY_ASTNODE__UNARYOP_KINDS(RY_EXPAND_ENUM_VALUES)
             };
+
+            static Token::Type GetKindToTokenType(Kind kind);
+            static std::optional<Kind> GetTokenTypeToKind(Token::Type tokenType);
 
             ExpressionUnaryOperation(Kind kind, const Operand& operand);
 
             Kind GetKind() const;
             const Operand& GetOperand() const;
 
+            static const char * StringifyKind(Kind kind);
             std::string Stringify() const;
 
         private:
+            static const std::set<Token::Type> KINDS;
+
             Kind m_kind;
             Operand m_operand;
         };
@@ -321,26 +343,57 @@ namespace ry {
         // 
         
         class ExpressionBinaryOperation {
+        private:
+            using TK = Token::Type;
+
         public:
             using Operand = ExpressionUnaryOperation::Operand;
             using Operands = std::pair<Operand, Operand>;
 
+        #define RY_ASTNODE__BINOP_KINDS(E) /* E - expand macro */ \
+            E(Add, TK::OP_ADD) \
+            E(Sub, TK::OP_SUB) \
+            E(Mul, TK::OP_MUL) \
+            E(Div, TK::OP_DIV) \
+            E(Mod, TK::OP_MOD) \
+            \
+            E(BitOr,     TK::OP_BIT_OR)  \
+            E(BitXor,    TK::OP_BIT_XOR) \
+            E(BitAnd,    TK::OP_BIT_AND) \
+            E(BitLShift, TK::OP_BIT_LSHIFT) \
+            E(BitRShift, TK::OP_BIT_RSHIFT) \
+            \
+            E(Eq,         TK::OP_EQ)   \
+            E(Uneq,       TK::OP_UNEQ) \
+            E(Less,       TK::OP_LESS) \
+            E(LessEqual,  TK::OP_LESS_EQ)  \
+            E(Great,      TK::OP_GREAT)    \
+            E(GreatEqual, TK::OP_GREAT_EQ) \
+            \
+            E(Or,  TK::OP_OR)  \
+            E(And, TK::OP_AND) \
+            \
+            E(TypeCast,           TK::OP_TYPE_CAST) \
+            E(StructMemberAccess, TK::OP_STRUCT_ACCESS)
+
             enum class Kind {
-                Add, Sub, Mul, Div, Mod,
-                BitOr, BitXor, BitAnd, BitLShift, BitRShift,
-                Eq, Uneq, Less, LessEqual, Great, GreatEqual,
-                Or, And,
-                TypeCast, StructMemberAccess
+                RY_ASTNODE__BINOP_KINDS(RY_EXPAND_ENUM_VALUES)
             };
+
+            static Token::Type GetKindToTokenType(Kind kind);
+            static std::optional<Kind> GetTokenTypeToKind(Token::Type tokenType);
 
             ExpressionBinaryOperation(Kind kind, const Operand& firstOperand, const Operand& secondOperand);
 
             Kind GetKind() const;
             const Operands& GetOperands() const;
 
+            static const char * StringifyKind(Kind kind);
             std::string Stringify() const;
 
         private:
+            static const std::set<Token::Type> KINDS;
+
             Kind m_kind;
             Operands m_operands;
         };

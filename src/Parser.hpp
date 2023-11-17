@@ -19,8 +19,6 @@ namespace ry {
 
     private:
         static std::optional<ASTNode::TypePrimitive> getTokenTypeToPrimitiveType(Token::Type type);
-        static std::optional<ASTNode::ExpressionUnaryOperation::Kind>  getTokenTypeToUnaryOperationKind(Token::Type type);
-        static std::optional<ASTNode::ExpressionBinaryOperation::Kind> getTokenTypeToBinaryOperationKind(Token::Type type);
 
         bool isToken(Token::Type type, std::optional<Token::Type> orType = {});
         bool expectToken(Token::Type type);
@@ -33,14 +31,16 @@ namespace ry {
         std::optional<ASTNode::Type> parseType(bool mustParse = true);
         std::optional<ASTNode::TypeStruct::Field> parseStructTypeField();
 
-        std::optional<ASTNode::Expression>                parseExpression               (bool mustParse = true);
-        std::optional<ASTNode::ExpressionLiteral::Struct> parseStructLiteralExpression  (bool mustParse = true);
-        std::optional<ASTNode::ExpressionLiteral>         parseLiteralExpression        (bool mustParse = true);
-        std::optional<ASTNode::ExpressionBlock>           parseBlockExpression          (bool mustParse = true);
-        std::optional<ASTNode::ExpressionIf>              parseIfExpression             (bool mustParse = true);
-        std::optional<ASTNode::ExpressionLoop>            parseLoopExpression           (bool mustParse = true);
-        std::optional<ASTNode::ExpressionName>            parseNameExpression           (bool mustParse = true);
-        std::optional<ASTNode::ExpressionUnaryOperation>  parseUnaryOperationExpression (bool mustParse = true);
+        std::optional<ASTNode::Expression>                parseExpression                (bool mustParse = true);
+        std::optional<ASTNode::ExpressionLiteral::Struct> parseStructLiteralExpression   (bool mustParse = true);
+        std::optional<ASTNode::ExpressionLiteral>         parseLiteralExpression         (bool mustParse = true);
+        std::optional<ASTNode::ExpressionFunctionCall>    parseFunctionCallExpression    (bool mustParse, const ASTNode::Expression& expr);
+        std::optional<ASTNode::ExpressionBlock>           parseBlockExpression           (bool mustParse = true);
+        std::optional<ASTNode::ExpressionIf>              parseIfExpression              (bool mustParse = true);
+        std::optional<ASTNode::ExpressionLoop>            parseLoopExpression            (bool mustParse = true);
+        std::optional<ASTNode::ExpressionName>            parseNameExpression            (bool mustParse = true);
+        std::optional<ASTNode::ExpressionUnaryOperation>  parseUnaryOperationExpression  (bool mustParse = true);
+        std::optional<ASTNode::ExpressionBinaryOperation> parseBinaryOperationExpression (bool mustParse, const ASTNode::Expression& expr);
 
         std::optional<ASTNode::Statement> parseStatement(bool mustParse = true);
 
