@@ -30,7 +30,7 @@ namespace ry {
         class Type;
 
     #define RY_ASTNODE__PRIMITIVE_TYPES_E_ENUM(NAME, VALUE) NAME = int(VALUE),
-    #define RY_ASTNODE__PRIMITIVE_TYPES_E_STR(NAME, _) #NAME ,
+    #define RY_ASTNODE__PRIMITIVE_TYPES_E_MAP(NAME, _) { TypePrimitive::NAME, #NAME } ,
     #define RY_ASTNODE__PRIMITIVE_TYPES_E_VALUES(_, VALUE) Token::NumericKind(VALUE) ,
     #define RY_ASTNODE__PRIMITIVE_TYPES(E) /* E - expand macro */ \
         E(Char, TK::KeywordChar) \
@@ -51,9 +51,7 @@ namespace ry {
         enum class TypePrimitive {
             RY_ASTNODE__PRIMITIVE_TYPES(RY_ASTNODE__PRIMITIVE_TYPES_E_ENUM)
         };
-        static constexpr const char * const PRIMITIVE_TYPES_STRINGS[] = {
-            RY_ASTNODE__PRIMITIVE_TYPES(RY_ASTNODE__PRIMITIVE_TYPES_E_STR)
-        };
+        static const std::unordered_map<TypePrimitive, const char *> PRIMITIVE_TYPES_STRINGS_MAP;
         static const std::set<Token::NumericKind> PRIMITIVE_TYPES_TOKEN_KINDS;
 
     #undef RY_ASTNODE__PRIMITIVE_TYPES_E_STR

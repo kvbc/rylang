@@ -17,6 +17,10 @@ namespace ry {
      *
      */
 
+    const std::unordered_map<ASTNode::TypePrimitive, const char *> ASTNode::PRIMITIVE_TYPES_STRINGS_MAP = { 
+        RY_ASTNODE__PRIMITIVE_TYPES(RY_ASTNODE__PRIMITIVE_TYPES_E_MAP)
+    };
+
     const std::set<Token::NumericKind> ASTNode::PRIMITIVE_TYPES_TOKEN_KINDS = {
         RY_ASTNODE__PRIMITIVE_TYPES(RY_ASTNODE__PRIMITIVE_TYPES_E_VALUES)
     };
@@ -141,7 +145,7 @@ namespace ry {
     }
 
     const char * Type::StringifyPrimitiveType(TypePrimitive primitiveType) {
-        return PRIMITIVE_TYPES_STRINGS[int(primitiveType)];
+        return PRIMITIVE_TYPES_STRINGS_MAP.at(primitiveType);
     }
 
     std::string Type::Stringify() const {

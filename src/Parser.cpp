@@ -61,10 +61,12 @@ namespace ry {
         const std::optional<T>& orExpectedKind
     ) {
         auto kind = getToken().GetKind();
-        if(Token::IsKind<T>(kind))
+        if(Token::IsKind<T>(kind)) {
             if(expectedKind && Token::IsKindEqual(kind, expectedKind.value()))
                 return true;
-        return isToken(orExpectedKind);
+            return orExpectedKind && isToken(orExpectedKind);
+        }
+        return false;
     }
 
     bool Parser::isToken(
@@ -72,9 +74,9 @@ namespace ry {
         const std::optional<Token::Kind>& orExpectedKind
     ) {
         auto kind = getToken().GetKind();
-            if(expectedKind && Token::IsKindEqual(kind, expectedKind.value()))
-                return true;
-        return isToken(orExpectedKind);
+        if(expectedKind && Token::IsKindEqual(kind, expectedKind.value()))
+            return true;
+        return orExpectedKind && isToken(orExpectedKind);
     }
 
     bool Parser::expectToken(const Token::Kind& kind) {
