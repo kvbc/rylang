@@ -5,6 +5,8 @@
 #include <format>
 #include <memory>
 #include <iostream>
+#include <optional>
+#include <variant>
 
 namespace ry {
 
@@ -53,11 +55,29 @@ namespace ry {
 
     // 
 
-    bool Parser::isToken(const Token::Kind& expectedKind, const std::optional<Token::Kind>& orExpectedKind) {
+    template<typename T>
+    bool Parser::isToken(
+        const std::optional<T>& expectedKind,
+        const std::optional<T>& orExpectedKind
+    ) {
         auto kind = getToken().GetKind();
-        if(orExpectedKind && Token::IsKindEqual(kind, orExpectedKind.value()))
-            return true;
-        return Token::IsKindEqual(kind, expectedKind);
+        if(Token::IsKind<T>(kind))
+            if(expectedKind && Token::IsKindEqual(kind, expectedKind.value()))
+                return true;
+        return isToken(orExpectedKind);
+    }
+
+    template<typename T>
+    bool Parser::isToken(const T& kind) {
+        return isToken(std::optional<T>(kind));
+    }
+
+    template<typename T>
+    bool Parser::isToken(const T& kind, const T& orKind) {
+        return isToken(
+            std::optional<T>(kind),
+            std::optional<T>(orKind)
+        );
     }
 
     bool Parser::expectToken(const Token::Kind& kind) {
@@ -97,6 +117,11 @@ namespace ry {
             ),
             token.GetSourcePosition()
         ));
+    }
+
+    template<typename T>
+    void Parser::errorExpectedToken() {
+        errorExpected(Token::StringifyKindType<T>());
     }
 
     void Parser::errorExpectedToken(const Token::Kind& kind) {
@@ -215,17 +240,17 @@ namespace ry {
         };
 
         auto parseNames = [&](bool mustParse = true) -> std::optional<NamedField::Names> {
-            if(!isToken(Token::Type::Name)) {
+            if(!isToken<TokenName>()) {
                 if(mustParse)
-                    errorExpectedToken(Token::Type::NAME);
+                    errorExpectedToken<TokenName>();
                 return {};
             }
             NamedField::Names names;
             for(;;) {
-                if(isToken(Token::Type::NAME)) {
-                    names.push_back(getToken().GetStringValue());
+                if(auto nameToken = std::get_if<TokenName>(&getToken().GetKind())) {
+                    names.push_back(*nameToken);
                     eatToken();
-                    if(isToken(Token::Type::COLON))
+                    if(isToken(','))
                         eatToken();
                     else
                         break;
@@ -242,7 +267,7 @@ namespace ry {
         };
 
         auto tryParseDefaultValue = [&]() -> TypeStruct::FieldDefaultValue {
-            if(isToken(Token::Type::OP_ASSIGN)) {
+            if(isToken('=')) {
                 eatToken();
                 auto optExpr = parseExpression();
                 RY_PARSER__ASSERT(optExpr.has_value());
@@ -338,15 +363,15 @@ namespace ry {
 
         using StructLiteral = ASTNode::ExpressionLiteral::Struct;
 
-        if(isToken(Token::Type::LSQUARE)) {
+        if(isToken('[')) {
             eatToken();
 
             auto parseField = [&]() -> std::optional<StructLiteral::Field> {
                 StructLiteral::Field::FieldName name;
-                if(isToken(Token::Type::NAME)) {
-                    name = getToken().GetStringValue();
+                if(auto nameToken = std::get_if<TokenName>(&getToken().GetKind())) {
+                    name = *nameToken;
                     eatToken();
-                    ASSERT_RET(expectToken(Token::Type::OP_ASSIGN));
+                    ASSERT_RET(expectToken('='));
                     eatToken();
                 }
                 auto optExpr = parseExpression();
@@ -357,7 +382,7 @@ namespace ry {
 
             StructLiteral::Fields fields;
             for(;;) {
-                if(isToken(Token::Type::RSQUARE)) {
+                if(isToken(']')) {
                     eatToken();
                     break;
                 }
@@ -366,8 +391,8 @@ namespace ry {
                 ASSERT(optField.has_value())
                 fields.push_back(optField.value());
 
-                bool isSep = isToken(Token::Type::COLON, Token::Type::SEMICOLON);
-                bool isEnd = isToken(Token::Type::RSQUARE);
+                bool isSep = isToken(',', ';');
+                bool isEnd = isToken(']');
                 if(isSep)
                     eatToken();
                 else if(!isEnd)
@@ -392,17 +417,15 @@ namespace ry {
             return ASTNode::ExpressionLiteral(optStructLiteral.value());
         }
 
-        auto optLitValue = getToken().GetLiteralValue();
-        if(optLitValue.has_value()) {
+        if(auto literal = std::get_if<TokenLiteral>(&getToken().GetKind())) {
             eatToken();
             Literal::Data litData = std::visit(overloaded{
-                [](Token::intlit_t intValue)       -> Literal::Data { return intValue; },
-                [](Token::floatlit_t floatValue)   -> Literal::Data { return floatValue; },
-                [](char charValue)                 -> Literal::Data { return charValue; },
-                [](const std::string& stringValue) -> Literal::Data { return stringValue; },
-                [](bool boolValue)                 -> Literal::Data { return boolValue; },
-                [](Token::NullValue)               -> Literal::Data { return {}; }
-            }, optLitValue.value());
+                [](Literal::Int intValue)              -> Literal::Data { return intValue; },
+                [](Literal::Float floatValue)          -> Literal::Data { return floatValue; },
+                [](Literal::Char charValue)            -> Literal::Data { return charValue; },
+                [](const Literal::String& stringValue) -> Literal::Data { return stringValue; },
+                [](bool boolValue)                     -> Literal::Data { return boolValue; },
+            }, literal->GetValue());
             return ASTNode::ExpressionLiteral(litData);
         }
 

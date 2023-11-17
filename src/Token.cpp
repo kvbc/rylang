@@ -63,6 +63,35 @@ namespace ry {
 
     // 
 
+    template<typename T>
+    bool Token::IsKind(const Kind& kind) {
+        return std::holds_alternative<T>(kind);
+    }
+    template<>
+    bool Token::IsKind<TokenIntegerLiteral>(const Kind& kind) {
+        if(auto literal = std::get_if<TokenLiteral>(&kind))
+            return std::holds_alternative<TokenLiteral::Int>(literal->GetValue());
+        return false;
+    }
+    template<>
+    bool Token::IsKind<TokenFloatLiteral>(const Kind& kind) {
+        if(auto literal = std::get_if<TokenLiteral>(&kind))
+            return std::holds_alternative<TokenLiteral::Float>(literal->GetValue());
+        return false;
+    }
+    template<>
+    bool Token::IsKind<TokenStringLiteral>(const Kind& kind) {
+        if(auto literal = std::get_if<TokenLiteral>(&kind))
+            return std::holds_alternative<TokenLiteral::String>(literal->GetValue());
+        return false;
+    }
+    template<>
+    bool Token::IsKind<TokenCharLiteral>(const Kind& kind) {
+        if(auto literal = std::get_if<TokenLiteral>(&kind))
+            return std::holds_alternative<TokenLiteral::Char>(literal->GetValue());
+        return false;
+    }
+
     bool Token::IsKindEqual(const Kind& kind1, const Kind& kind2) {
         return kind1.index() == kind2.index();
     }
@@ -129,6 +158,35 @@ namespace ry {
 
     // 
 
+    template<typename T>
+    const char * Token::StringifyKindType() {
+        return "???";
+    }
+    template<>
+    const char * Token::StringifyKindType<TokenName>() {
+        return "name";
+    }
+    template<>
+    const char * Token::StringifyKindType<TokenLiteral>() {
+        return "literal";
+    }
+    template<>
+    const char * Token::StringifyKindType<TokenIntegerLiteral>() {
+        return "integer literal";
+    }
+    template<>
+    const char * Token::StringifyKindType<TokenFloatLiteral>() {
+        return "float literal";
+    }
+    template<>
+    const char * Token::StringifyKindType<TokenStringLiteral>() {
+        return "string literal";
+    }
+    template<>
+    const char * Token::StringifyKindType<TokenCharLiteral>() {
+        return "character literal";
+    }
+
     std::string Token::StringifyKind(const Token::Kind& kind) {
         return std::visit(overloaded{
             [](const TokenName& name) {
@@ -166,12 +224,18 @@ namespace ry {
 
     // 
 
-    bool Token::IsName() const {
-        return std::holds_alternative<TokenName>(m_kind);
+    const std::string * Token::GetName() {
+        if(auto name = std::get_if<TokenName>(&m_kind))
+            return name;
+        return nullptr;
     }
 
-    bool Token::IsLiteral() const {
-        return std::holds_alternative<TokenLiteral>(m_kind);
+    template<typename T>
+    const T * Token::GetLiteralValue() {
+        if(auto literal = std::get_if<TokenLiteral>(&m_kind))
+            if(auto value = std::get_if<T>(&literal->GetValue()))
+                return value;
+        return nullptr;
     }
 
 }

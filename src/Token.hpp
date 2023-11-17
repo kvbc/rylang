@@ -14,6 +14,11 @@ namespace ry {
 
     using TokenName = std::string;
 
+    struct TokenIntegerLiteral {};
+    struct TokenFloatLiteral {};
+    struct TokenStringLiteral {};
+    struct TokenCharLiteral {};
+
     class TokenLiteral {
     public:
         using Int = __uint128_t;
@@ -50,10 +55,17 @@ namespace ry {
             CODES(CODES_E_ENUM, RY_PARSER_SPECIAL_TOKENS_EXPAND_NAMES)
         };
         using NumericKind = std::variant<Code, char>;
-        using Kind = std::variant<TokenName, TokenLiteral, Code, char>;
+        using Kind = std::variant<
+            TokenName,
+            TokenLiteral,
+            Code,
+            char
+        >;
 
         Token(const SourcePosition& srcPos, const Kind& kind);
 
+        template<typename T>
+        static bool IsKind(const Kind& kind);
         static bool IsKindEqual(const Kind& kind1, const Kind& kind2);
         static std::optional<NumericKind> GetKindToNumericKind(const Kind& kind);
         static int GetNumericKindToInt(NumericKind kind);
@@ -63,14 +75,17 @@ namespace ry {
         const SourcePosition& GetSourcePosition() const;
         const Kind& GetKind() const;
 
+        template<typename T>
+        static const char * StringifyKindType();
         static std::string StringifyKind(const Kind& value);
         std::string Stringify() const;
 
         bool operator==(char c) const;
         bool operator==(Code code) const;
 
-        bool IsName() const;
-        bool IsLiteral() const;
+        const std::string * GetName();
+        template<typename T>
+        const T * GetLiteralValue();
 
     private:
         static constexpr const char * const CODE_STRINGS[] = {
