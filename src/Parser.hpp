@@ -24,10 +24,10 @@ namespace ry {
             const std::optional<T>& kind = {},
             const std::optional<T>& orKind = {}
         );
-        template<typename T>
-        bool isToken(const T& kind);
-        template<typename T>
-        bool isToken(const T& kind, const T& orKind);
+        bool isToken(
+            const std::optional<Token::Kind>& kind,
+            const std::optional<Token::Kind>& orKind = {}
+        );
 
         bool expectToken(const Token::Kind& kind);
         const Token& getToken(int offset = 0);

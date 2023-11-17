@@ -67,17 +67,14 @@ namespace ry {
         return isToken(orExpectedKind);
     }
 
-    template<typename T>
-    bool Parser::isToken(const T& kind) {
-        return isToken(std::optional<T>(kind));
-    }
-
-    template<typename T>
-    bool Parser::isToken(const T& kind, const T& orKind) {
-        return isToken(
-            std::optional<T>(kind),
-            std::optional<T>(orKind)
-        );
+    bool Parser::isToken(
+        const std::optional<Token::Kind>& expectedKind,
+        const std::optional<Token::Kind>& orExpectedKind
+    ) {
+        auto kind = getToken().GetKind();
+            if(expectedKind && Token::IsKindEqual(kind, expectedKind.value()))
+                return true;
+        return isToken(orExpectedKind);
     }
 
     bool Parser::expectToken(const Token::Kind& kind) {
@@ -448,16 +445,16 @@ namespace ry {
         using Block = ASTNode::ExpressionBlock;
 
         Block::Label label;
-        if(isToken(Token::Type::STRING_LIT)) {
-            label = getToken().GetStringValue();
+        if(auto string = getToken().GetLiteralValue<TokenLiteral::String>()) {
+            label = *string;
             eatToken();
         }
 
-        if(isToken(Token::Type::LCURLY)) {
+        if(isToken('{')) {
             eatToken();
             Block::Statements statements;
             for(;;) {
-                if(isToken(Token::Type::RCURLY)) {
+                if(isToken('}')) {
                     eatToken();
                     break;
                 }
@@ -466,10 +463,10 @@ namespace ry {
                 if(optStatement.has_value())
                     statements.push_back(optStatement.value());
 
-                if(isToken(Token::Type::SEMICOLON))
+                if(isToken(';'))
                     eatToken();
-                else if(!isToken(Token::Type::RCURLY)) {
-                    errorExpectedToken(Token::Type::SEMICOLON);
+                else if(!isToken('}')) {
+                    errorExpectedToken(';');
                     break;
                 }
             }
@@ -482,18 +479,18 @@ namespace ry {
     }
 
     std::optional<ASTNode::ExpressionIf> Parser::parseIfExpression(bool mustParse) {
-        if(isToken(Token::Type::KW_IF)) {
+        if(isToken(Token::Code::KeywordIf)) {
             eatToken();
 
             auto optCondExpr = parseExpression();
             if(optCondExpr.has_value()) {
-                if (expectToken(Token::Type::KW_DO)) {
+                if (expectToken(Token::Code::KeywordDo)) {
                     eatToken();
                     auto optThenExpr = parseExpression();
                     if(optThenExpr.has_value()) {
                         // else
                         ASTNode::ExpressionIf::FailExpression failExpr;
-                        if(isToken(Token::Type::KW_ELSE)) {
+                        if(isToken(Token::Code::KeywordElse)) {
                             eatToken();
                             auto optFailExpr = parseExpression(false);
                             if(optFailExpr.has_value())
@@ -518,7 +515,7 @@ namespace ry {
 
         using Loop = ASTNode::ExpressionLoop;
 
-        if(isToken(Token::Type::KW_LOOP)) {
+        if(isToken(Token::Code::KeywordLoop)) {
             eatToken();
 
             Loop::InitStatement initStatement; {
@@ -529,7 +526,7 @@ namespace ry {
 
             Loop::Condition condition;
             if(initStatement.has_value())
-                if(isToken(Token::Type::SEMICOLON, Token::Type::COLON)) {
+                if(isToken(';', ',')) {
                     eatToken();
                     auto optCondition = parseExpression();
                     ASSERT(optCondition.has_value());
@@ -538,7 +535,7 @@ namespace ry {
 
             Loop::PostStatement postStatement;
             if(condition.has_value())
-                if(isToken(Token::Type::SEMICOLON, Token::Type::COLON)) {
+                if(isToken(';', ',')) {
                     eatToken();
                     auto optPostStatement = parseExpression();
                     ASSERT(optPostStatement.has_value());
@@ -546,7 +543,7 @@ namespace ry {
                 }
 
             if(initStatement.has_value()) {
-                ASSERT(expectToken(Token::Type::KW_DO))
+                ASSERT(expectToken(Token::Code::KeywordDo))
                 eatToken();
             }
 
@@ -565,10 +562,9 @@ namespace ry {
     }
 
     std::optional<ASTNode::ExpressionName> Parser::parseNameExpression(bool mustParse) {
-        if(isToken(Token::Type::NAME)) {
-            auto name = getToken().GetStringValue();
+        if(auto name = getToken().GetName()) {
             eatToken();
-            return name;
+            return *name;
         }
 
         if(mustParse)
@@ -579,7 +575,7 @@ namespace ry {
     std::optional<ASTNode::ExpressionUnaryOperation> Parser::parseUnaryOperationExpression(bool mustParse) {
         using UnaryOp = ASTNode::ExpressionUnaryOperation;
         RY_PARSER__WRAP_PARSE_FUNC("unary operation", std::optional<UnaryOp>, {
-            auto optUnaryKind = UnaryOp::GetTokenTypeToKind(getToken().GetType());
+            auto optUnaryKind = UnaryOp::GetTokenKindToUnaryKind(getToken().GetKind());
             if(optUnaryKind.has_value()) {
                 eatToken();
 
@@ -595,7 +591,7 @@ namespace ry {
     std::optional<ASTNode::ExpressionBinaryOperation> Parser::parseBinaryOperationExpression(bool mustParse, const ASTNode::Expression& expr1) {
         using BinOp = ASTNode::ExpressionBinaryOperation;
         RY_PARSER__WRAP_PARSE_FUNC("binary operation", std::optional<BinOp>, {
-            auto optBinaryKind = BinOp::GetTokenTypeToKind(getToken().GetType());
+            auto optBinaryKind = BinOp::GetTokenKindToBinaryKind(getToken().GetKind());
             RY_PARSER__ASSERT(optBinaryKind);
             eatToken();
 

@@ -63,10 +63,6 @@ namespace ry {
 
     // 
 
-    template<typename T>
-    bool Token::IsKind(const Kind& kind) {
-        return std::holds_alternative<T>(kind);
-    }
     template<>
     bool Token::IsKind<TokenIntegerLiteral>(const Kind& kind) {
         if(auto literal = std::get_if<TokenLiteral>(&kind))
@@ -158,14 +154,10 @@ namespace ry {
 
     // 
 
-    template<typename T>
-    const char * Token::StringifyKindType() {
-        return "???";
-    }
-    template<>
-    const char * Token::StringifyKindType<TokenName>() {
-        return "name";
-    }
+    // template<>
+    // const char * Token::StringifyKindType<TokenName>() {
+    //     return "name";
+    // }
     template<>
     const char * Token::StringifyKindType<TokenLiteral>() {
         return "literal";
@@ -224,17 +216,9 @@ namespace ry {
 
     // 
 
-    const std::string * Token::GetName() {
+    const std::string * Token::GetName() const {
         if(auto name = std::get_if<TokenName>(&m_kind))
             return name;
-        return nullptr;
-    }
-
-    template<typename T>
-    const T * Token::GetLiteralValue() {
-        if(auto literal = std::get_if<TokenLiteral>(&m_kind))
-            if(auto value = std::get_if<T>(&literal->GetValue()))
-                return value;
         return nullptr;
     }
 

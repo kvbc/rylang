@@ -65,7 +65,9 @@ namespace ry {
         Token(const SourcePosition& srcPos, const Kind& kind);
 
         template<typename T>
-        static bool IsKind(const Kind& kind);
+        static bool IsKind(const Kind& kind) {
+            return std::holds_alternative<T>(kind);
+        }
         static bool IsKindEqual(const Kind& kind1, const Kind& kind2);
         static std::optional<NumericKind> GetKindToNumericKind(const Kind& kind);
         static int GetNumericKindToInt(NumericKind kind);
@@ -76,16 +78,23 @@ namespace ry {
         const Kind& GetKind() const;
 
         template<typename T>
-        static const char * StringifyKindType();
+        static const char * StringifyKindType() {
+            return "???";
+        }
         static std::string StringifyKind(const Kind& value);
         std::string Stringify() const;
 
         bool operator==(char c) const;
         bool operator==(Code code) const;
 
-        const std::string * GetName();
+        const std::string * GetName() const;
         template<typename T>
-        const T * GetLiteralValue();
+        const T * GetLiteralValue() const {
+            if(auto literal = std::get_if<TokenLiteral>(&m_kind))
+                if(auto value = std::get_if<T>(&literal->GetValue()))
+                    return value;
+            return nullptr;
+        }
 
     private:
         static constexpr const char * const CODE_STRINGS[] = {
