@@ -6,92 +6,27 @@
 #include <string>
 #include <assert.h>
 #include <cstring>
+#include <variant>
 
 namespace ry {                                                      
 
-    Token::Token(const SourcePosition& srcPos, Token::Type type):
-        m_type(type),
-        m_srcPos(srcPos)
+    /*
+     *
+     * TokenLiteral
+     *
+     */
+
+    TokenLiteral::TokenLiteral(const Value& value):
+        m_value(value)
     {}
 
-    Token::Token(const SourcePosition& srcPos, Token::Type type, std::string_view value):
-        m_type(type),
-        m_stringValue(value),
-        m_srcPos(srcPos)
-    {
-        assert(m_type == Token::Type::STRING_LIT
-            || m_type == Token::Type::NAME);
+    const TokenLiteral::Value& TokenLiteral::GetValue() const {
+        return m_value;
     }
 
-    Token::Token(const SourcePosition& srcPos, Token::Type type, intlit_t value):
-        m_type(type),
-        m_intValue({ .intv = value }),
-        m_srcPos(srcPos)
-    {
-        assert(m_type == Token::Type::INT_LIT);
-    }
-
-    Token::Token(const SourcePosition& srcPos, Token::Type type, floatlit_t value):
-        m_type(type),
-        m_intValue({ .floatv = value }),
-        m_srcPos(srcPos)
-    {
-        assert(m_type == Token::Type::FLOAT_LIT);
-    }
-
-    Token::Token(const SourcePosition& srcPos, Token::Type type, char value):
-        m_type(type),
-        m_intValue({ .charv = value }),
-        m_srcPos(srcPos)
-    {
-        assert(m_type == Token::Type::CHAR_LIT);
-    }
-
-    // 
-
-    std::optional<Token::Type> Token::GetStringToKeywordType(std::string_view str) {
-        for(std::size_t i = 0; i < KEYWORDS_LEN; i++)
-            if(strncmp(KEYWORDS[i], str.data(), str.length()) == 0)
-                return Type(int(Type::_KW_FIRST) + 1 + i);
-        return {};
-    }
-
-    const SourcePosition& Token::GetSourcePosition() const {
-        return m_srcPos;
-    }
-
-    // 
-
-    Token::Type Token::GetType() const {
-        return m_type;
-    }
-
-    std::string_view Token::GetStringValue() const {
-        assert(m_type == Token::Type::STRING_LIT
-            || m_type == Token::Type::NAME);
-        return m_stringValue;
-    }
-
-    Token::intlit_t Token::GetIntValue() const {
-        assert(m_type == Token::Type::INT_LIT);
-        return m_intValue->intv;
-    }
-
-    Token::floatlit_t Token::GetFloatValue() const {
-        assert(m_type == Token::Type::FLOAT_LIT);
-        return m_intValue->floatv;
-    }
-
-    char Token::GetCharValue() const {
-        assert(m_type == Token::Type::CHAR_LIT);
-        return m_intValue->charv;
-    }
-
-    // 
-
-    std::string Token::StringifyLiteralValue(const LiteralValue& literalValue) {
+    std::string TokenLiteral::StringifyValue(const Value &value) {
         return std::visit(overloaded{
-            [](intlit_t intValue) -> std::string {
+            [](Int intValue) -> std::string {
                 std::string str = "";
                 do {
                     str = std::string(1 ,'0' + (intValue % 10)) + str;
@@ -99,59 +34,144 @@ namespace ry {
                 } while(intValue > 0);
                 return str;
             },
-            [](floatlit_t floatValue) -> std::string{
+            [](Float floatValue) -> std::string{
                 return std::format("{:.14f}", floatValue);
             },
-            [](char charValue) -> std::string{
+            [](Char charValue) -> std::string{
                 return '\'' + std::to_string(charValue) + '\'';
             },
-            [](const std::string& stringValue) -> std::string {
+            [](const String& stringValue) -> std::string {
                 return '"' + stringValue + '"';
-            },
-            [](bool boolValue) -> std::string {
-                return std::to_string(boolValue);
-            },
-            [](NullValue) -> std::string {
-                return "null";
             }
-        }, literalValue);
+        }, value);
     }
 
-    const char * Token::Stringify(Token::Type type) {
-        int stringsIdx = int(type);
-        assert(stringsIdx >= 0
-            && stringsIdx < TYPE_STRINGS_LEN);
-        return TYPE_STRINGS[stringsIdx];
+    std::string TokenLiteral::Stringify() const {
+        return StringifyValue(m_value);
+    }
+
+    /*
+     *
+     * Token
+     *
+     */
+
+    Token::Token(const SourcePosition& srcPos, const Kind& kind):
+        m_srcPos(srcPos),
+        m_kind(kind)
+    {}
+
+    // 
+
+    bool Token::IsKindEqual(const Kind& kind1, const Kind& kind2) {
+        return kind1.index() == kind2.index();
+    }
+
+    std::optional<Token::NumericKind> Token::GetKindToNumericKind(const Kind& kind) {
+        if(auto * codePtr = std::get_if<Code>(&kind))
+            return *codePtr;
+        if(auto * charPtr = std::get_if<char>(&kind))
+            return *charPtr;
+        return {};
+    }
+
+    int Token::GetNumericKindToInt(NumericKind kind) {
+        return std::visit([](auto&&v){ return int(v); }, kind);
+    }
+
+    std::optional<std::pair<Token::Kind, std::size_t>> Token::GetCharsToKind(char c1, char c2, char c3) {
+        if(c1 == 0)
+            return {};
+
+        int len = 1;
+        if(c2 != 0) len++;
+        if(c3 != 0) len++;
+
+        const char chars[] = {c1, c2, c3};
+
+        for(int i = 0; i < CODE_STRINGS_LEN; i++) {
+            const char * str = CODE_STRINGS[i];
+            Code code = Code( int(Code::_First) + 1 + i );
+            if(strncmp(str, chars, len) == 0)
+                return {{code, len}};
+        }
+
+        if(len == 3) return GetCharsToKind(c1, c2, 0);
+        if(len == 2) return GetCharsToKind(c1, 0, 0);
+
+        return {{c1, len}};
+    }
+
+    std::optional<Token::Code> Token::GetStringToKeywordCode(std::string_view str) {
+        if(str.empty())
+            return {};
+        if(!std::isalpha(str.at(0)))
+            return {};
+        for(std::size_t i = 0; i < CODE_STRINGS_LEN; i++) {
+            const char * codeStr = CODE_STRINGS[i];
+            if(!std::isalpha(codeStr[0]))
+                continue;
+            if(strncmp(codeStr, str.data(), str.length()) == 0)
+                return Code(int(Code::_First) + 1 + i);
+        }
+        return {};
     }
 
     // 
+
+    const SourcePosition& Token::GetSourcePosition() const {
+        return m_srcPos;
+    }
+
+    const Token::Kind& Token::GetKind() const {
+        return m_kind;
+    }
+
+    // 
+
+    std::string Token::StringifyKind(const Token::Kind& kind) {
+        return std::visit(overloaded{
+            [](const TokenName& name) {
+                return std::string(name);
+            },
+            [](const TokenLiteral& literal) {
+                return literal.Stringify();
+            },
+            [](Code code) {
+                return std::string(CODE_STRINGS[ int(code) ]);
+            },
+            [](char c) {
+                return std::to_string(c);
+            }
+        }, kind);
+    }
 
     std::string Token::Stringify() const {
-        const char * cstr = Token::Stringify(m_type);
-        auto optLitValue = GetLiteralValue();
-        if(optLitValue.has_value())
-            return std::string(cstr) + '(' + StringifyLiteralValue(optLitValue.value()) + ')';
-        return cstr;
+        return StringifyKind(m_kind);
+    }
+
+    //
+
+    bool Token::operator==(char checkChar) const {
+        if(auto ch = std::get_if<char>(&m_kind))
+            return *ch == checkChar;
+        return false;
+    }
+
+    bool Token::operator==(Code checkCode) const {
+        if(auto code = std::get_if<Code>(&m_kind))
+            return *code == checkCode;
+        return false;
     }
 
     // 
 
-    std::optional<Token::LiteralValue> Token::GetLiteralValue() const {
-        if(m_type == Type::STRING_LIT)
-            return m_stringValue;
-        if(m_type == Type::INT_LIT)
-            return m_intValue->intv;
-        if(m_type == Type::CHAR_LIT)
-            return m_intValue->charv;
-        if(m_type == Type::FLOAT_LIT)
-            return m_intValue->floatv;
-        if(m_type == Type::KW_NULL)
-            return NullValue{};
-        if(m_type == Type::KW_TRUE)
-            return true;
-        if(m_type == Type::KW_FALSE)
-            return false;
-        return {};
+    bool Token::IsName() const {
+        return std::holds_alternative<TokenName>(m_kind);
+    }
+
+    bool Token::IsLiteral() const {
+        return std::holds_alternative<TokenLiteral>(m_kind);
     }
 
 }

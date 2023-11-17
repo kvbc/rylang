@@ -30,37 +30,25 @@ namespace ry {
             return false;
         };
 
-        while(getChar() != CHAR_EOF) {
+        for(;;) {
+            if(getChar() == CHAR_EOF)
+                break;
+
             if(tryPushToken(tryLexNameOrKeyword())) continue;
             if(             tryLexComment      () ) continue;
             if(tryPushToken(tryLexNumber       ())) continue;
             if(tryPushToken(tryLexStringLiteral())) continue;
             if(tryPushToken(tryLexCharLiteral  ())) continue;
-            if(tryPushToken(tryLexOperator     ())) continue; // after tryLexComment()!
             if(             trySkipWhitespace  () ) continue;
 
-            char c = getChar();
-            switch(getChar()) {
-                case ';': tokens.push_back(createToken(Token::Type::SEMICOLON)); break;
-                case '(': tokens.push_back(createToken(Token::Type::LPAREN)); break;
-                case ')': tokens.push_back(createToken(Token::Type::RPAREN)); break;
-                case '[': tokens.push_back(createToken(Token::Type::LSQUARE)); break;
-                case ']': tokens.push_back(createToken(Token::Type::RSQUARE)); break;
-                case '?': tokens.push_back(createToken(Token::Type::QUESTION)); break;
-                case ',': tokens.push_back(createToken(Token::Type::COLON)); break;
-                case '{': tokens.push_back(createToken(Token::Type::LCURLY)); break;
-                case '}': tokens.push_back(createToken(Token::Type::RCURLY)); break;
-                case CHAR_EOF:
-                    break;
-                default:
-                    m_infos.Push({
-                        Infos::Info::Level::WARN,
-                        std::format("Unexpected character '{}'", getChar()),
-                        m_ln, m_col
-                });
+            auto optPair = Token::GetCharsToKind(getChar(0), getChar(1), getChar(2));
+            if(optPair) {
+                auto kind = optPair->first;
+                auto len = optPair->second;
+                tokens.push_back(createToken(kind));
+                eatChar(len);
             }
 
-            eatChar();
         }
 
         return tokens;
@@ -108,11 +96,11 @@ namespace ry {
                 len++;
             }
 
-            std::string_view str(srcStartPtr, len);
-            std::optional<Token::Type> type = Token::GetStringToKeywordType(str);
-            if(type.has_value())
-                return createToken(type.value());
-            return createToken(Token::Type::NAME, str);
+            std::string str(srcStartPtr, len);
+            std::optional<Token::Code> optKwCode = Token::GetStringToKeywordCode(str);
+            if(optKwCode)
+                return createToken(optKwCode.value());
+            return createToken(str);
         }
 
         return {};
@@ -155,58 +143,6 @@ namespace ry {
         return false;
     }
 
-    std::optional<Token> Lexer::tryLexOperator() {
-        auto getType = [&]() -> std::optional<Token::Type> {
-            auto is = [&](const char * str) -> bool {
-                size_t i = 0;
-                for(; i < 3 && str[i]!='\0'; i++)
-                    if(getChar(i) != str[i])
-                        return false;
-                eatChar(i);
-                return true;
-            };
-            using T = Token::Type;
-            // check 3-length ops
-            if(is("<<=")) return T::OP_BIT_LSHIFT_EQ;
-            if(is(">>=")) return T::OP_BIT_RSHIFT_EQ;
-            // check 2-length ops
-            if(is("+=" )) return T::OP_ADD_EQ;
-            if(is("-=" )) return T::OP_SUB_EQ;
-            if(is("*=" )) return T::OP_MUL_EQ;
-            if(is("/=" )) return T::OP_DIV_EQ;
-            if(is("%=" )) return T::OP_MOD_EQ;
-            if(is("<<" )) return T::OP_BIT_LSHIFT;
-            if(is(">>" )) return T::OP_BIT_RSHIFT;
-            if(is("|=" )) return T::OP_BIT_OR;
-            if(is("^=" )) return T::OP_BIT_XOR;
-            if(is("&=" )) return T::OP_BIT_AND;
-            if(is("==" )) return T::OP_EQ;
-            if(is("!=" )) return T::OP_UNEQ;
-            if(is("<=" )) return T::OP_LESS_EQ;
-            if(is(">=" )) return T::OP_GREAT_EQ;
-            if(is(":=" )) return T::OP_DEFINE;
-            if(is("=>" )) return T::OP_FUNC_ARROW;
-            // check 1-length ops
-            if(is("-"  )) return T::OP_SUB;
-            if(is("+"  )) return T::OP_ADD;
-            if(is("*"  )) return T::OP_MUL;
-            if(is("/"  )) return T::OP_DIV;
-            if(is("%"  )) return T::OP_MOD;
-            if(is("~"  )) return T::OP_BIT_NEG;
-            if(is("|"  )) return T::OP_BIT_OR;
-            if(is("&"  )) return T::OP_BIT_AND;
-            if(is("<"  )) return T::OP_LESS;
-            if(is(">"  )) return T::OP_GREAT;
-            if(is("."  )) return T::OP_STRUCT_ACCESS;
-            if(is("="  )) return T::OP_ASSIGN;
-            return {};
-        };
-        std::optional<Token::Type> tkType = getType();
-        if(tkType.has_value())
-            return createToken(tkType.value());
-        return {};
-    }
-
     bool Lexer::trySkipWhitespace() {
         for(bool skipped = false ;;) {
             char c = getChar();
@@ -219,7 +155,7 @@ namespace ry {
         }
     }
 
-    std::optional<Token::intlit_t> Lexer::tryLexInteger(std::string_view allowedSuffixChars) {
+    std::optional<TokenLiteral::Int> Lexer::tryLexInteger(std::string_view allowedSuffixChars) {
         auto isValidDigit = [](char c, int base = 10) -> bool {
             bool is09 = c >= '0' && c < '0' + base;
             if(base <= 10)
@@ -246,7 +182,7 @@ namespace ry {
         char c1 = getChar(0);
         char c2 = getChar(1);
         if(isValidDigit(c1)) {
-            intlit_t base = 10;
+            IntLit base = 10;
             const char * baseName = "decimal";
             if(c1=='0' && (c2=='b' || c2=='o' || c2=='x')) {
                      if(c2 == 'b') { base = 2;  baseName = "binary"; eatChar(2); }
@@ -289,8 +225,8 @@ namespace ry {
             }
             auto srcEndPtr = getSourcePointer();
             
-            intlit_t num = 0;
-            intlit_t curBase = 1;
+            IntLit num = 0;
+            IntLit curBase = 1;
             std::string_view numStr(srcStartPtr, srcEndPtr);
             for(auto it = numStr.crbegin(); it != numStr.crend(); it++) {
                 char c = *it;
@@ -298,7 +234,7 @@ namespace ry {
                     continue;
                 bool is_09 = (c >= '0' && c <= '9');
                 bool is_az = (c >= 'a' && c <= 'z');
-                intlit_t digit = is_09 ? c-'0' : is_az ? c-'a'+10 : c-'A'+10;
+                IntLit digit = is_09 ? c-'0' : is_az ? c-'a'+10 : c-'A'+10;
                 num += digit * curBase;
                 curBase *= base;
             }
@@ -308,12 +244,12 @@ namespace ry {
     }
 
     std::optional<Token> Lexer::tryLexNumber() {
-        auto tryLexExponent = [&]() -> std::optional<floatlit_t> {
+        auto tryLexExponent = [&]() -> std::optional<FloatLit> {
             char c1 = getChar(0);
             char c2 = getChar(1);
             if(c1=='e' || c1=='E') {
                 eatChar();
-                floatlit_t e = 1;
+                FloatLit e = 1;
                 if(c2=='+' || c2=='-') {
                     eatChar();
                     if(c2 == '-')
@@ -336,11 +272,11 @@ namespace ry {
         if(int1.has_value()) {
             if(getChar() == '.') {
                 eatChar();
-                floatlit_t num = floatlit_t(int1.value());
+                FloatLit num = FloatLit(int1.value());
                 auto int2 = tryLexInteger();
                 if(int2.has_value()) {
-                    std::size_t int2len = std::floor(std::log10(floatlit_t(int2.value()))) + 1;
-                    num += floatlit_t(int2.value()) / std::pow(10, int2len);
+                    std::size_t int2len = std::floor(std::log10(FloatLit(int2.value()))) + 1;
+                    num += FloatLit(int2.value()) / std::pow(10, int2len);
                 } else {
                      m_infos.Push({
                         Infos::Info::Level::ERROR,
@@ -349,14 +285,14 @@ namespace ry {
                      });
                 }
                 num *= tryLexExponent().value_or(1);
-                return createToken(Token::Type::FLOAT_LIT, num);
+                return createToken(TokenLiteral(num));
             }
 
-            std::optional<floatlit_t> exp = tryLexExponent();
+            std::optional<FloatLit> exp = tryLexExponent();
             if(exp.has_value())
-                return createToken(Token::Type::FLOAT_LIT, floatlit_t(int1.value()) * exp.value());
+                return createToken(TokenLiteral(FloatLit(int1.value()) * exp.value()));
 
-            return createToken(Token::Type::INT_LIT, int1.value());
+            return createToken(TokenLiteral(IntLit(int1.value())));
         }
         return {};
     }
@@ -368,9 +304,9 @@ namespace ry {
             switch(c2) {
                 case '0': case '1': case '2': case '3': case '4':
                 case '5': case '6': case '7': case '8': case '9': {
-                    std::optional<intlit_t> numOpt = tryLexInteger();
+                    std::optional<IntLit> numOpt = tryLexInteger();
                     if(numOpt.has_value()) {
-                        intlit_t num = numOpt.value();
+                        IntLit num = numOpt.value();
                         if(num < 1 || num > 127)
                             m_infos.Push({
                                 Infos::Info::Level::ERROR,
@@ -432,7 +368,7 @@ namespace ry {
                 });
             eatChar();
 
-            return createToken(Token::Type::CHAR_LIT, ch);
+            return createToken(TokenLiteral(ch));
         }
         return {};
     }
@@ -502,14 +438,10 @@ namespace ry {
             }
             auto srcEndPos = getSourcePointer();
             if(isRaw)
-                return createToken(
-                    Token::Type::STRING_LIT,
-                    std::string_view(srcStartPos, srcEndPos - numQuotes)
-                );
-            return createToken(
-                Token::Type::STRING_LIT,
-                escapedStr
-            );
+                return createToken(TokenLiteral(
+                    std::string(srcStartPos, srcEndPos - numQuotes)
+                ));
+            return createToken(TokenLiteral(escapedStr));
         }
         return {};
     }

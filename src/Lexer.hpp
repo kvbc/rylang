@@ -15,9 +15,6 @@ namespace ry {
     public:
         static constexpr char CHAR_EOF = 0;
 
-        using intlit_t = Token::intlit_t;
-        using floatlit_t = Token::floatlit_t;
-
         Lexer(std::string_view id, std::string_view src);
 
         std::vector<Token> Lex();
@@ -25,6 +22,9 @@ namespace ry {
         const Infos& GetInfos() const;
 
     private:
+        using IntLit = TokenLiteral::Int;
+        using FloatLit = TokenLiteral::Float;
+
         template<typename ...Args>
         Token createToken(Args&&... args) const;
 
@@ -32,9 +32,8 @@ namespace ry {
 
         std::optional<Token> tryLexNameOrKeyword();
         bool tryLexComment();
-        std::optional<Token> tryLexOperator();
         bool trySkipWhitespace();
-        std::optional<intlit_t> tryLexInteger(std::string_view allowedSuffixChars = "");
+        std::optional<IntLit> tryLexInteger(std::string_view allowedSuffixChars = "");
         std::optional<Token> tryLexNumber();
         std::optional<char> tryLexEscapeSequence(bool escapeNewlines);
         std::optional<Token> tryLexCharLiteral();

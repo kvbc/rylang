@@ -18,15 +18,14 @@ namespace ry {
         std::optional<ASTNode> Parse();
 
     private:
-        static std::optional<ASTNode::TypePrimitive> getTokenTypeToPrimitiveType(Token::Type type);
-
-        bool isToken(Token::Type type, std::optional<Token::Type> orType = {});
-        bool expectToken(Token::Type type);
+        template<typename T>
+        bool isToken(const Token::Kind& kind, const std::optional<Token::Kind>& orKind = {});
+        bool expectToken(const Token::Kind& kind);
         const Token& getToken(int offset = 0);
         void eatToken();
 
         void errorExpected(std::string_view what);
-        void errorExpectedToken(Token::Type type);
+        void errorExpectedToken(const Token::Kind& kind);
 
         std::optional<ASTNode::Type> parseType(bool mustParse = true);
         std::optional<ASTNode::TypeStruct::Field> parseStructTypeField();

@@ -53,27 +53,16 @@ namespace ry {
 
     // 
 
-    std::optional<ASTNode::TypePrimitive> Parser::getTokenTypeToPrimitiveType(Token::Type tokenType) {
-        int firstType = int(Token::Type::_KW_FIRST_TYPE) + 1;
-        int lastType = int(Token::Type::_KW_LAST_TYPE) - 1;
-        int type = int(tokenType);
-        if(type >= firstType && type <= lastType)
-            return ASTNode::TypePrimitive(type - firstType);
-        return {};
-    }
-
-    // 
-
-    bool Parser::isToken(Token::Type expectedType, std::optional<Token::Type> orExpectedType) {
-        Token::Type type = getToken().GetType();
-        if(orExpectedType.has_value() && type == orExpectedType.value())
+    bool Parser::isToken(const Token::Kind& expectedKind, const std::optional<Token::Kind>& orExpectedKind) {
+        auto kind = getToken().GetKind();
+        if(orExpectedKind && Token::IsKindEqual(kind, orExpectedKind.value()))
             return true;
-        return expectedType == type;
+        return Token::IsKindEqual(kind, expectedKind);
     }
 
-    bool Parser::expectToken(Token::Type type) {
-        if(!isToken(type)) {
-            errorExpectedToken(type);
+    bool Parser::expectToken(const Token::Kind& kind) {
+        if(!isToken(kind)) {
+            errorExpectedToken(kind);
             return false;
         }
         return true;
@@ -104,14 +93,14 @@ namespace ry {
             std::format(
                 "Unexpected token: Expected {}, got \"{}\"",
                 what,
-                Token::Stringify(token.GetType())
+                token.Stringify()
             ),
             token.GetSourcePosition()
         ));
     }
 
-    void Parser::errorExpectedToken(Token::Type type) {
-        errorExpected(Token::Stringify(type));
+    void Parser::errorExpectedToken(const Token::Kind& kind) {
+        errorExpected(Token::StringifyKind(kind));
     }
 
     // 
@@ -126,18 +115,18 @@ namespace ry {
         // type attribs
 
         ASTNode::Type::Attribs attribs;
-        if(isToken(Token::Type::TILDE)) {
+        if(isToken('~')) {
             eatToken();
             attribs.isMutable = true;
         }
-        if(isToken(Token::Type::QUESTION)) {
+        if(isToken('?')) {
             eatToken();
             attribs.isOptional = true;
         }
 
         // type
 
-        if(isToken(Token::Type::ASTERISK)) {
+        if(isToken('*')) {
             // pointer
             eatToken();
             auto optBaseType = parseType();
@@ -146,18 +135,18 @@ namespace ry {
             ASTNode::TypePointer ptrType = std::make_shared<ASTNode::Type>(baseType);
             return ASTNode::Type(ptrType, attribs);
         }
-        else if(auto primitiveType = getTokenTypeToPrimitiveType(getToken().GetType())) {
+        else if(auto optPrimitiveType = ASTNode::Type::GetTokenKindToPrimitiveType(getToken().GetKind())) {
             // primitive
             eatToken();
-            return ASTNode::Type(primitiveType.value(), attribs);
+            return ASTNode::Type(optPrimitiveType.value(), attribs);
         }
-        else if(isToken(Token::Type::LSQUARE)) {
+        else if(isToken('[')) {
             // struct or function
             eatToken();
             
             ASTNode::TypeStruct::Fields structFields;
             for(;;) {
-                if(isToken(Token::Type::RSQUARE)) {
+                if(isToken(']')) {
                     eatToken();
                     break;
                 }
@@ -166,8 +155,8 @@ namespace ry {
                 RY_PARSER__ASSERT(optField);
                 structFields.push_back(optField.value());
 
-                bool isSep = isToken(Token::Type::COLON) || isToken(Token::Type::SEMICOLON);
-                bool isEnd = isToken(Token::Type::RSQUARE);
+                bool isSep = isToken(',', ';');
+                bool isEnd = isToken(']');
                 if(isSep)
                     eatToken();
                 else if(!isEnd)
@@ -175,7 +164,7 @@ namespace ry {
             }
             auto structType = ASTNode::TypeStruct(structFields);
 
-            if(isToken(Token::Type::OP_FUNC_ARROW)) {
+            if(isToken(Token::Code::FunctionArrow)) {
                 // function
                 eatToken();
                 std::optional<ASTNode::Type> optRetType = parseType();
@@ -207,7 +196,7 @@ namespace ry {
 
         auto tryParseTypeReps = [&](TypeRepsPos pos) -> UnnamedField::TypeReps {
             if(pos == TypeRepsPos::Post) {
-                if(isToken(Token::Type::OP_MUL))
+                if(isToken('*'))
                     eatToken();
                 else
                     return {};
@@ -216,7 +205,7 @@ namespace ry {
             auto optExpr = parseExpression(false);
             if(optExpr.has_value()) {
                 if(pos == TypeRepsPos::Pre) {
-                    RY_PARSER__ASSERT(expectToken(Token::Type::OP_MUL));
+                    RY_PARSER__ASSERT(expectToken('*'));
                     eatToken();
                 }
                 return std::make_shared<ASTNode::Expression>(optExpr.value());
@@ -226,7 +215,7 @@ namespace ry {
         };
 
         auto parseNames = [&](bool mustParse = true) -> std::optional<NamedField::Names> {
-            if(!isToken(Token::Type::NAME)) {
+            if(!isToken(Token::Type::Name)) {
                 if(mustParse)
                     errorExpectedToken(Token::Type::NAME);
                 return {};

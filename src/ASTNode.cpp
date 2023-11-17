@@ -17,6 +17,12 @@ namespace ry {
      *
      */
 
+    const std::set<Token::NumericKind> ASTNode::PRIMITIVE_TYPES_TOKEN_KINDS = {
+        RY_ASTNODE__PRIMITIVE_TYPES(RY_ASTNODE__PRIMITIVE_TYPES_E_VALUES)
+    };
+
+    // 
+
     using TypeStruct = ASTNode::TypeStruct;
     
         TypeStruct::NamedField::NamedField(const Names& names, const FieldType& type, const FieldDefaultValue& defaultValue):
@@ -135,7 +141,7 @@ namespace ry {
     }
 
     const char * Type::StringifyPrimitiveType(TypePrimitive primitiveType) {
-        return Token::Stringify(Token::Type(primitiveType));
+        return PRIMITIVE_TYPES_STRINGS[int(primitiveType)];
     }
 
     std::string Type::Stringify() const {
@@ -160,6 +166,16 @@ namespace ry {
                 return str + structType.Stringify();
             }
         }, m_data);
+    }
+
+    std::optional<ASTNode::TypePrimitive> Type::GetTokenKindToPrimitiveType(const Token::Kind& tokenKind) {
+        auto optNumericKind = Token::GetKindToNumericKind(tokenKind);
+        if(!optNumericKind)
+            return {};
+        auto numericKind = optNumericKind.value();
+        if(PRIMITIVE_TYPES_TOKEN_KINDS.contains(numericKind))
+            return ASTNode::TypePrimitive(Token::GetNumericKindToInt(numericKind));
+        return {};
     }
 
     /*
@@ -231,11 +247,11 @@ namespace ry {
         if(!m_data.has_value())
             return "null";
         return std::visit(overloaded{
-            [&](Int intValue)              -> std::string { return Token::StringifyLiteralValue(intValue); },
-            [&](Float floatValue)          -> std::string { return Token::StringifyLiteralValue(floatValue); },
-            [&](const String& stringValue) -> std::string { return Token::StringifyLiteralValue(stringValue); },
-            [&](Char charValue)            -> std::string { return Token::StringifyLiteralValue(charValue); },
-            [&](Bool boolValue)            -> std::string { return Token::StringifyLiteralValue(boolValue); },
+            [&](Int intValue)              -> std::string { return TokenLiteral::StringifyValue(intValue); },
+            [&](Float floatValue)          -> std::string { return TokenLiteral::StringifyValue(floatValue); },
+            [&](const String& stringValue) -> std::string { return TokenLiteral::StringifyValue(stringValue); },
+            [&](Char charValue)            -> std::string { return TokenLiteral::StringifyValue(charValue); },
+            [&](Bool boolValue)            -> std::string { return std::to_string(boolValue); },
             [&](const Struct& structValue) -> std::string { return structValue.Stringify(); }
         }, m_data.value());
     }
@@ -394,15 +410,16 @@ namespace ry {
 
     using ExpressionUnaryOperation = ASTNode::ExpressionUnaryOperation;
 
-    const std::set<Token::Type> ExpressionUnaryOperation::KINDS {
-        RY_ASTNODE__UNARYOP_KINDS(RY_EXPAND_VALUES)
+    const std::set<Token::NumericKind> ExpressionUnaryOperation::TOKEN_KINDS {
+        RY_ASTNODE__UNARYOP_KINDS(RY_ASTNODE__UNARYOP_KINDS_E_VALUES)
     };
-    Token::Type ExpressionUnaryOperation::GetKindToTokenType(Kind kind) {
-        return Token::Type(kind);
-    }
-    std::optional<ExpressionUnaryOperation::Kind> ExpressionUnaryOperation::GetTokenTypeToKind(Token::Type tokenType) {
-        if(KINDS.contains(tokenType))
-            return Kind(tokenType);
+    std::optional<ExpressionUnaryOperation::Kind> ExpressionUnaryOperation::GetTokenKindToUnaryKind(const Token::Kind& tokenKind) {
+        auto optNumericKind = Token::GetKindToNumericKind(tokenKind);
+        if(!optNumericKind.has_value())
+            return {};
+        auto numericKind = optNumericKind.value();
+        if(TOKEN_KINDS.contains(numericKind))
+            return Kind(Token::GetNumericKindToInt(numericKind));
         return {};
     }
 
@@ -431,15 +448,16 @@ namespace ry {
 
     using ExpressionBinaryOperation = ASTNode::ExpressionBinaryOperation;
 
-    const std::set<Token::Type> ExpressionBinaryOperation::KINDS {
-        RY_ASTNODE__BINOP_KINDS(RY_EXPAND_VALUES)
+    const std::set<Token::NumericKind> ExpressionBinaryOperation::TOKEN_KINDS {
+        RY_ASTNODE__BINOP_KINDS(RY_ASTNODE__BINOP_KINDS_E_VALUES)
     };
-    Token::Type ExpressionBinaryOperation::GetKindToTokenType(Kind kind) {
-        return Token::Type(kind);
-    }
-    std::optional<ExpressionBinaryOperation::Kind> ExpressionBinaryOperation::GetTokenTypeToKind(Token::Type tokenType) {
-        if(KINDS.contains(tokenType))
-            return Kind(tokenType);
+    std::optional<ExpressionBinaryOperation::Kind> ExpressionBinaryOperation::GetTokenKindToBinaryKind(const Token::Kind& tokenKind) {
+        auto optNumericKind = Token::GetKindToNumericKind(tokenKind);
+        if(!optNumericKind.has_value())
+            return {};
+        auto numericKind = optNumericKind.value();
+        if(TOKEN_KINDS.contains(numericKind))
+            return Kind(Token::GetNumericKindToInt(numericKind));
         return {};
     }
 
