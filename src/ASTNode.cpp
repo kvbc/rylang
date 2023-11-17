@@ -66,7 +66,7 @@ namespace ry {
 
         auto stringifyTypeReps = [&](const UnnamedField::TypeReps& typeReps) -> std::string {
             if(typeReps.has_value())
-                return " times " + typeReps.value()->Stringify();
+                return " * " + typeReps.value()->Stringify();
             return "";
         };
 

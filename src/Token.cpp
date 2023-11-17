@@ -90,6 +90,15 @@ namespace ry {
     }
 
     bool Token::IsKindEqual(const Kind& kind1, const Kind& kind2) {
+        if(auto lit1 = std::get_if<TokenLiteral>(&kind1))
+            if(auto lit2 = std::get_if<TokenLiteral>(&kind2))
+                return lit1->GetValue().index() == lit2->GetValue().index();
+        if(auto code1 = std::get_if<Code>(&kind1))
+            if(auto code2 = std::get_if<Code>(&kind2))
+                return *code1 == *code2;
+        if(auto ch1 = std::get_if<char>(&kind1))
+            if(auto ch2 = std::get_if<char>(&kind2))
+                return *ch1 == *ch2;
         return kind1.index() == kind2.index();
     }
 

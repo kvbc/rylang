@@ -246,8 +246,8 @@ namespace ry {
             }
             NamedField::Names names;
             for(;;) {
-                if(auto nameToken = std::get_if<TokenName>(&getToken().GetKind())) {
-                    names.push_back(*nameToken);
+                if(auto name = getToken().GetName()) {
+                    names.push_back(*name);
                     eatToken();
                     if(isToken(','))
                         eatToken();
@@ -357,55 +357,46 @@ namespace ry {
     }
 
     std::optional<ASTNode::ExpressionLiteral::Struct> Parser::parseStructLiteralExpression(bool mustParse) {
-    #define ASSERT(cond)     { if(!cond) goto error; }
-    #define ASSERT_RET(cond) { if(!cond) return {};  }
-
         using StructLiteral = ASTNode::ExpressionLiteral::Struct;
+        RY_PARSER__WRAP_PARSE_FUNC("struct literal", std::optional<StructLiteral>, {
+            if(isToken('[')) {
+                eatToken();
 
-        if(isToken('[')) {
-            eatToken();
+                auto parseField = [&]() -> std::optional<StructLiteral::Field> {
+                    StructLiteral::Field::FieldName name;
+                    if(auto nameToken = std::get_if<TokenName>(&getToken().GetKind())) {
+                        name = *nameToken;
+                        eatToken();
+                        RY_PARSER__ASSERT(expectToken('='));
+                        eatToken();
+                    }
+                    auto optExpr = parseExpression();
+                    RY_PARSER__ASSERT(optExpr.has_value());
+                    auto value = std::make_shared<ASTNode::Expression>(optExpr.value());
+                    return StructLiteral::Field(value, name);
+                };
 
-            auto parseField = [&]() -> std::optional<StructLiteral::Field> {
-                StructLiteral::Field::FieldName name;
-                if(auto nameToken = std::get_if<TokenName>(&getToken().GetKind())) {
-                    name = *nameToken;
-                    eatToken();
-                    ASSERT_RET(expectToken('='));
-                    eatToken();
+                StructLiteral::Fields fields;
+                for(;;) {
+                    if(isToken(']')) {
+                        eatToken();
+                        break;
+                    }
+
+                    auto optField = parseField();
+                    RY_PARSER__ASSERT(optField.has_value())
+                    fields.push_back(optField.value());
+
+                    bool isSep = isToken(',', ';');
+                    bool isEnd = isToken(']');
+                    if(isSep)
+                        eatToken();
+                    else if(!isEnd)
+                        errorExpected("separator");
                 }
-                auto optExpr = parseExpression();
-                ASSERT_RET(optExpr.has_value());
-                auto value = std::make_shared<ASTNode::Expression>(optExpr.value());
-                return StructLiteral::Field(value, name);
-            };
-
-            StructLiteral::Fields fields;
-            for(;;) {
-                if(isToken(']')) {
-                    eatToken();
-                    break;
-                }
-
-                auto optField = parseField();
-                ASSERT(optField.has_value())
-                fields.push_back(optField.value());
-
-                bool isSep = isToken(',', ';');
-                bool isEnd = isToken(']');
-                if(isSep)
-                    eatToken();
-                else if(!isEnd)
-                    errorExpected("separator");
+                return StructLiteral(fields);
             }
-            return StructLiteral(fields);
-        }
-
-    error:
-        if(mustParse)
-            errorExpected("struct literal");
-        return {};
-    #undef ASSERT
-    #undef ASSERT_RET
+        })
     }
 
     std::optional<ASTNode::ExpressionLiteral> Parser::parseLiteralExpression(bool mustParse) {
