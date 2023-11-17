@@ -48,7 +48,7 @@ namespace ry {
                 tokens.push_back(createToken(kind));
                 eatChar(len);
             }
-
+            else eatChar();
         }
 
         return tokens;

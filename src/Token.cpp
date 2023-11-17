@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <cstring>
 #include <variant>
+#include <iostream>
 
 namespace ry {                                                      
 
@@ -112,19 +113,18 @@ namespace ry {
         if(c2 != 0) len++;
         if(c3 != 0) len++;
 
-        const char chars[] = {c1, c2, c3};
+        const char chars[] = {c1, c2, c3, 0};
 
-        for(int i = 0; i < CODE_STRINGS_LEN; i++) {
-            const char * str = CODE_STRINGS[i];
-            Code code = Code( int(Code::_First) + 1 + i );
-            if(strncmp(str, chars, len) == 0)
-                return {{code, len}};
+        for(; len > 0; len--) {
+            for(int i = 0; i < CODE_STRINGS_LEN; i++) {
+                const char * str = CODE_STRINGS[i];
+                Code code = Code( int(Code::_First) + 1 + i );
+                if(strlen(str) == len && strncmp(str, chars, len) == 0)
+                    return {{code, len}};
+            }
         }
 
-        if(len == 3) return GetCharsToKind(c1, c2, 0);
-        if(len == 2) return GetCharsToKind(c1, 0, 0);
-
-        return {{c1, len}};
+        return {{c1, 1}};
     }
 
     std::optional<Token::Code> Token::GetStringToKeywordCode(std::string_view str) {
@@ -188,10 +188,10 @@ namespace ry {
                 return literal.Stringify();
             },
             [](Code code) {
-                return std::string(CODE_STRINGS[ int(code) ]);
+                return std::string(CODE_STRINGS[ int(code) - (int(Code::_First) + 1) ]);
             },
             [](char c) {
-                return std::to_string(c);
+                return std::string(1, c);
             }
         }, kind);
     }
