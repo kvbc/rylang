@@ -8,8 +8,8 @@ For ease of reading the Markdown files, I recommend opening them up in VSCode
 
 # TODO
 
--   Link to external Markdown reader, for example: https://dillinger.io/ (this one is broken with custom heading ids)
--   Better error messages and handling
+- Link to external Markdown reader, for example: https://dillinger.io/ (this one is broken with custom heading ids)
+- Better error messages and handling
 
 # Compiler
 
@@ -59,3 +59,17 @@ main[] => [] = {
     dif i32 = pair..0 - pair..1; // -1
 }
 ```
+
+# Installing
+
+1. Get meson with `pip3 install meson`
+2. Get [ninja](https://github.com/ninja-build/ninja/releases)
+3. Run `setup.bat`
+
+# Building
+
+Run `build.bat`
+
+# Running
+
+Run `run.bat`
