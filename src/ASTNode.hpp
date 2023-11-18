@@ -338,7 +338,7 @@ namespace ry {
             Kind GetKind() const;
             const Operand& GetOperand() const;
 
-            static const char * StringifyKind(Kind kind);
+            static std::string StringifyKind(Kind kind);
             std::string Stringify() const;
 
         private:
@@ -394,7 +394,7 @@ namespace ry {
             Kind GetKind() const;
             const Operands& GetOperands() const;
 
-            static const char * StringifyKind(Kind kind);
+            static std::string StringifyKind(Kind kind);
             std::string Stringify() const;
 
         private:

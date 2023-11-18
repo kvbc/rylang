@@ -7,7 +7,7 @@
 #include <sstream>
 
 int main() {
-    static constexpr const char * const FILENAME = "test.ry";
+    static constexpr const char * const FILENAME = "../test.ry";
 
     std::string src;
     {

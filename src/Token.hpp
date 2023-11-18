@@ -21,7 +21,7 @@ namespace ry {
 
     class TokenLiteral {
     public:
-        using Int = __uint128_t;
+        using Int = int;
         using Float = double;
         using String = std::string;
         using Char = char;
@@ -69,8 +69,10 @@ namespace ry {
             return std::holds_alternative<T>(kind);
         }
         static bool IsKindEqual(const Kind& kind1, const Kind& kind2);
+        static std::optional<NumericKind> GetIntToNumericKind(int v);
         static std::optional<NumericKind> GetKindToNumericKind(const Kind& kind);
-        static int GetNumericKindToInt(NumericKind kind);
+        static std::optional<Kind> GetNumericKindToKind(NumericKind kind);
+        static int GetNumericKindToInt(const NumericKind& kind);
         static std::optional<std::pair<Kind, std::size_t>> GetCharsToKind(char c1, char c2, char c3);
         static std::optional<Code> GetStringToKeywordCode(std::string_view str);
 
@@ -81,6 +83,7 @@ namespace ry {
         static const char * StringifyKindType() {
             return "???";
         }
+        static std::string StringifyNumericKind(NumericKind kind);
         static std::string StringifyKind(const Kind& value);
         std::string Stringify() const;
 

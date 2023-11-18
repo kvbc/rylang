@@ -423,7 +423,7 @@ namespace ry {
             return {};
         auto numericKind = optNumericKind.value();
         if(TOKEN_KINDS.contains(numericKind))
-            return Kind(Token::GetNumericKindToInt(numericKind));
+            return static_cast<Kind>(Token::GetNumericKindToInt(numericKind));
         return {};
     }
 
@@ -440,8 +440,10 @@ namespace ry {
         return m_operand;
     }
 
-    const char * ExpressionUnaryOperation::StringifyKind(Kind kind) {
-        return "???";
+    std::string ExpressionUnaryOperation::StringifyKind(Kind kind) {
+        auto optTokenNumericKind = Token::GetIntToNumericKind(int(kind));
+        assert(optTokenNumericKind);
+        return Token::StringifyNumericKind(optTokenNumericKind.value());
     }
 
     std::string ExpressionUnaryOperation::Stringify() const {
@@ -482,8 +484,10 @@ namespace ry {
         return m_operands;
     }
 
-    const char * ExpressionBinaryOperation::StringifyKind(Kind kind) {
-        return "???";
+    std::string ExpressionBinaryOperation::StringifyKind(Kind kind) {
+        auto optTokenNumericKind = Token::GetIntToNumericKind(int(kind));
+        assert(optTokenNumericKind);
+        return Token::StringifyNumericKind(optTokenNumericKind.value());
     }
 
     std::string ExpressionBinaryOperation::Stringify() const {

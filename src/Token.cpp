@@ -58,11 +58,28 @@ namespace ry {
      */
 
     Token::Token(const SourcePosition& srcPos, const Kind& kind):
-        m_srcPos(srcPos),
-        m_kind(kind)
+        m_kind(kind),
+        m_srcPos(srcPos)
     {}
 
     // 
+
+    std::optional<Token::NumericKind> Token::GetIntToNumericKind(int v) {
+        if(v < int(Code::_First))
+            return char(v);
+        if(v < int(Code::_Last))
+            return Code(v);
+        return {};
+    }
+
+    std::optional<Token::Kind> Token::GetNumericKindToKind(NumericKind kind) {
+        if(auto * codePtr = std::get_if<Code>(&kind))
+            return *codePtr;
+        if(auto * charPtr = std::get_if<char>(&kind))
+            return *charPtr;
+        return {};
+    }
+
 
     template<>
     bool Token::IsKind<TokenIntegerLiteral>(const Kind& kind) {
@@ -110,8 +127,11 @@ namespace ry {
         return {};
     }
 
-    int Token::GetNumericKindToInt(NumericKind kind) {
-        return std::visit([](auto&&v){ return int(v); }, kind);
+    int Token::GetNumericKindToInt(const NumericKind& kind) {
+        return std::visit(overloaded{
+            [](Code code){ return int(code); },
+            [](char ch){ return int(ch); }
+        }, kind);
     }
 
     std::optional<std::pair<Token::Kind, std::size_t>> Token::GetCharsToKind(char c1, char c2, char c3) {
@@ -188,6 +208,17 @@ namespace ry {
         return "character literal";
     }
 
+    std::string Token::StringifyNumericKind(NumericKind kind) {
+        return std::visit(overloaded{
+            [](Code code) {
+                return std::string(CODE_STRINGS[ int(code) - (int(Code::_First) + 1) ]);
+            },
+            [](char c) {
+                return std::string(1, c);
+            }
+        }, kind);
+    }
+
     std::string Token::StringifyKind(const Token::Kind& kind) {
         return std::visit(overloaded{
             [](const TokenName& name) {
@@ -197,10 +228,10 @@ namespace ry {
                 return literal.Stringify();
             },
             [](Code code) {
-                return std::string(CODE_STRINGS[ int(code) - (int(Code::_First) + 1) ]);
+                return Token::StringifyNumericKind(code);
             },
             [](char c) {
-                return std::string(1, c);
+                return Token::StringifyNumericKind(c);
             }
         }, kind);
     }

@@ -1,1 +1,1 @@
-"_bin/Debug/rylang.exe"
+"build/rylang.exe"

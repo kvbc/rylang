@@ -20,17 +20,11 @@ namespace ry {
 
     private:
         template<typename T>
-        bool isToken(
-            const std::optional<T>& kind = {},
-            const std::optional<T>& orKind = {}
-        );
-        bool isToken(
-            const std::optional<Token::Kind>& kind,
-            const std::optional<Token::Kind>& orKind = {}
-        );
+        bool isToken(const std::optional<T>& kind = {});
+        bool isToken(const std::optional<Token::Kind>& kind);
 
         bool expectToken(const Token::Kind& kind);
-        const Token& getToken(int offset = 0);
+        const Token * getToken(int offset = 0);
         void eatToken();
 
         void errorExpected(std::string_view what);

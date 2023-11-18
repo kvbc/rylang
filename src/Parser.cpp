@@ -6,7 +6,9 @@
 #include <memory>
 #include <iostream>
 #include <optional>
+#include <stack>
 #include <variant>
+#include <stacktrace>
 
 namespace ry {
 
@@ -56,27 +58,25 @@ namespace ry {
     // 
 
     template<typename T>
-    bool Parser::isToken(
-        const std::optional<T>& expectedKind,
-        const std::optional<T>& orExpectedKind
-    ) {
-        auto kind = getToken().GetKind();
-        if(Token::IsKind<T>(kind)) {
-            if(expectedKind && Token::IsKindEqual(kind, expectedKind.value()))
+    bool Parser::isToken(const std::optional<T>& expectedKind) {
+        if(auto token = getToken()) {
+            auto kind = token->GetKind();
+            if(Token::IsKind<T>(kind)) {
+                if(expectedKind)
+                    return Token::IsKindEqual(kind, expectedKind.value());
                 return true;
-            return orExpectedKind && isToken(orExpectedKind);
+            }
         }
         return false;
     }
 
-    bool Parser::isToken(
-        const std::optional<Token::Kind>& expectedKind,
-        const std::optional<Token::Kind>& orExpectedKind
-    ) {
-        auto kind = getToken().GetKind();
-        if(expectedKind && Token::IsKindEqual(kind, expectedKind.value()))
-            return true;
-        return orExpectedKind && isToken(orExpectedKind);
+    bool Parser::isToken(const std::optional<Token::Kind>& expectedKind) {
+        if(auto token = getToken()) {
+            auto kind = token->GetKind();
+            if(expectedKind)
+                return Token::IsKindEqual(kind, expectedKind.value());
+        }
+        return false;
     }
 
     bool Parser::expectToken(const Token::Kind& kind) {
@@ -87,16 +87,12 @@ namespace ry {
         return true;
     }
 
-    const Token& Parser::getToken(int offset) {
+    const Token * Parser::getToken(int offset) {
         bool tooLow = m_tokenIdx + offset < 0;
         bool tooHigh = m_tokenIdx + offset >= m_tokens.size();
-        if(tooLow || tooHigh) {
-            m_infos.Push(Infos::Info(
-                Infos::Info::Level::ERROR,
-                "Unexpected EOF"
-            ));
-        }
-        return m_tokens.at(m_tokenIdx + offset);
+        if(tooLow || tooHigh)
+            return nullptr;
+        return &m_tokens.at(m_tokenIdx + offset);
     };
 
     void Parser::eatToken() {
@@ -106,16 +102,18 @@ namespace ry {
     // 
 
     void Parser::errorExpected(std::string_view what) {
-        const Token& token = getToken();
-        m_infos.Push(Infos::Info(
-            Infos::Info::Level::ERROR,
-            std::format(
-                "Unexpected token: Expected {}, got \"{}\"",
-                what,
-                token.Stringify()
-            ),
-            token.GetSourcePosition()
-        ));
+        std::cout << std::stacktrace::current() << std::endl;
+        if(auto token = getToken()) {
+            m_infos.Push(Infos::Info(
+                Infos::Info::Level::ERROR,
+                std::format(
+                    "Unexpected token: Expected {}, got \"{}\"",
+                    what,
+                    token->Stringify()
+                ),
+                token->GetSourcePosition()
+            ));
+        }
     }
 
     template<typename T>
@@ -150,6 +148,9 @@ namespace ry {
 
         // type
 
+        auto token = getToken();
+        RY_PARSER__ASSERT(token);
+
         if(isToken('*')) {
             // pointer
             eatToken();
@@ -159,7 +160,7 @@ namespace ry {
             ASTNode::TypePointer ptrType = std::make_shared<ASTNode::Type>(baseType);
             return ASTNode::Type(ptrType, attribs);
         }
-        else if(auto optPrimitiveType = ASTNode::Type::GetTokenKindToPrimitiveType(getToken().GetKind())) {
+        else if(auto optPrimitiveType = ASTNode::Type::GetTokenKindToPrimitiveType(token->GetKind())) {
             // primitive
             eatToken();
             return ASTNode::Type(optPrimitiveType.value(), attribs);
@@ -179,7 +180,7 @@ namespace ry {
                 RY_PARSER__ASSERT(optField);
                 structFields.push_back(optField.value());
 
-                bool isSep = isToken(',', ';');
+                bool isSep = isToken(',') || isToken(';');
                 bool isEnd = isToken(']');
                 if(isSep)
                     eatToken();
@@ -246,15 +247,18 @@ namespace ry {
             }
             NamedField::Names names;
             for(;;) {
-                if(auto name = getToken().GetName()) {
-                    names.push_back(*name);
-                    eatToken();
-                    if(isToken(','))
+                if(auto token = getToken())
+                    if(auto name = token->GetName()) {
+                        names.push_back(*name);
                         eatToken();
-                    else
-                        break;
-                }
-                else break;
+                        if(isToken(',')) {
+                            eatToken();
+                            continue;
+                        }
+                        else
+                            break;
+                    }
+                break;
             }
             return names;
         };
@@ -359,18 +363,21 @@ namespace ry {
     std::optional<ASTNode::ExpressionLiteral::Struct> Parser::parseStructLiteralExpression(bool mustParse) {
         using StructLiteral = ASTNode::ExpressionLiteral::Struct;
         RY_PARSER__WRAP_PARSE_FUNC("struct literal", std::optional<StructLiteral>, {
+            isToken('[');
+
             if(isToken('[')) {
                 eatToken();
 
                 auto parseField = [&]() -> std::optional<StructLiteral::Field> {
                     StructLiteral::Field::FieldName name;
-                    if(auto nameToken = std::get_if<TokenName>(&getToken().GetKind())) {
-                        name = *nameToken;
-                        eatToken();
-                        RY_PARSER__ASSERT(expectToken('='));
-                        eatToken();
-                    }
-                    auto optExpr = parseExpression();
+                    if(auto token = getToken())
+                        if(auto namePtr = token->GetName()) {
+                            name = *namePtr;
+                            eatToken();
+                            RY_PARSER__ASSERT(expectToken('='));
+                            eatToken();
+                        }
+                    auto optExpr = parseExpression(mustParse);
                     RY_PARSER__ASSERT(optExpr.has_value());
                     auto value = std::make_shared<ASTNode::Expression>(optExpr.value());
                     return StructLiteral::Field(value, name);
@@ -387,7 +394,7 @@ namespace ry {
                     RY_PARSER__ASSERT(optField.has_value())
                     fields.push_back(optField.value());
 
-                    bool isSep = isToken(',', ';');
+                    bool isSep = isToken(',') || isToken(';');
                     bool isEnd = isToken(']');
                     if(isSep)
                         eatToken();
@@ -407,17 +414,18 @@ namespace ry {
             return ASTNode::ExpressionLiteral(optStructLiteral.value());
         }
 
-        if(auto literal = std::get_if<TokenLiteral>(&getToken().GetKind())) {
-            eatToken();
-            Literal::Data litData = std::visit(overloaded{
-                [](Literal::Int intValue)              -> Literal::Data { return intValue; },
-                [](Literal::Float floatValue)          -> Literal::Data { return floatValue; },
-                [](Literal::Char charValue)            -> Literal::Data { return charValue; },
-                [](const Literal::String& stringValue) -> Literal::Data { return stringValue; },
-                [](bool boolValue)                     -> Literal::Data { return boolValue; },
-            }, literal->GetValue());
-            return ASTNode::ExpressionLiteral(litData);
-        }
+        if(auto token = getToken())
+            if(auto literal = std::get_if<TokenLiteral>(&token->GetKind())) {
+                eatToken();
+                Literal::Data litData = std::visit(overloaded{
+                    [](Literal::Int intValue)              -> Literal::Data { return intValue; },
+                    [](Literal::Float floatValue)          -> Literal::Data { return floatValue; },
+                    [](Literal::Char charValue)            -> Literal::Data { return charValue; },
+                    [](const Literal::String& stringValue) -> Literal::Data { return stringValue; },
+                    [](bool boolValue)                     -> Literal::Data { return boolValue; },
+                }, literal->GetValue());
+                return ASTNode::ExpressionLiteral(litData);
+            }
 
         if(mustParse)
             errorExpected("literal");
@@ -438,10 +446,11 @@ namespace ry {
         using Block = ASTNode::ExpressionBlock;
 
         Block::Label label;
-        if(auto string = getToken().GetLiteralValue<TokenLiteral::String>()) {
-            label = *string;
-            eatToken();
-        }
+        if(auto token = getToken())
+            if(auto string = token->GetLiteralValue<TokenLiteral::String>()) {
+                label = *string;
+                eatToken();
+            }
 
         if(isToken('{')) {
             eatToken();
@@ -519,7 +528,7 @@ namespace ry {
 
             Loop::Condition condition;
             if(initStatement.has_value())
-                if(isToken(';', ',')) {
+                if(isToken(';') || isToken(',')) {
                     eatToken();
                     auto optCondition = parseExpression();
                     ASSERT(optCondition.has_value());
@@ -528,7 +537,7 @@ namespace ry {
 
             Loop::PostStatement postStatement;
             if(condition.has_value())
-                if(isToken(';', ',')) {
+                if(isToken(';') || isToken(',')) {
                     eatToken();
                     auto optPostStatement = parseExpression();
                     ASSERT(optPostStatement.has_value());
@@ -555,10 +564,11 @@ namespace ry {
     }
 
     std::optional<ASTNode::ExpressionName> Parser::parseNameExpression(bool mustParse) {
-        if(auto name = getToken().GetName()) {
-            eatToken();
-            return *name;
-        }
+        if(auto token = getToken())
+            if(auto name = token->GetName()) {
+                eatToken();
+                return *name;
+            }
 
         if(mustParse)
             errorExpected("name");
@@ -568,7 +578,8 @@ namespace ry {
     std::optional<ASTNode::ExpressionUnaryOperation> Parser::parseUnaryOperationExpression(bool mustParse) {
         using UnaryOp = ASTNode::ExpressionUnaryOperation;
         RY_PARSER__WRAP_PARSE_FUNC("unary operation", std::optional<UnaryOp>, {
-            auto optUnaryKind = UnaryOp::GetTokenKindToUnaryKind(getToken().GetKind());
+            RY_PARSER__ASSERT(getToken());
+            auto optUnaryKind = UnaryOp::GetTokenKindToUnaryKind(getToken()->GetKind());
             if(optUnaryKind.has_value()) {
                 eatToken();
 
@@ -584,12 +595,14 @@ namespace ry {
     std::optional<ASTNode::ExpressionBinaryOperation> Parser::parseBinaryOperationExpression(bool mustParse, const ASTNode::Expression& expr1) {
         using BinOp = ASTNode::ExpressionBinaryOperation;
         RY_PARSER__WRAP_PARSE_FUNC("binary operation", std::optional<BinOp>, {
-            auto optBinaryKind = BinOp::GetTokenKindToBinaryKind(getToken().GetKind());
+            RY_PARSER__ASSERT(getToken());
+            auto optBinaryKind = BinOp::GetTokenKindToBinaryKind(getToken()->GetKind());
             RY_PARSER__ASSERT(optBinaryKind);
             eatToken();
 
             auto optExpr2 = parseExpression(mustParse);
             RY_PARSER__ASSERT(optExpr2);
+
 
             auto kind = optBinaryKind.value();
             auto operand1 = std::make_shared<ASTNode::Expression>(expr1);
