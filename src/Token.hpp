@@ -21,7 +21,7 @@ namespace ry {
 
     class TokenLiteral {
     public:
-        using Int = int;
+        using Int = uint64_t;
         using Float = double;
         using String = std::string;
         using Char = char;
