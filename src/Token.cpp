@@ -148,7 +148,7 @@ namespace ry {
             for(int i = 0; i < CODE_STRINGS_LEN; i++) {
                 const char * str = CODE_STRINGS[i];
                 Code code = Code( int(Code::_First) + 1 + i );
-                if(strlen(str) == len && strncmp(str, chars, len) == 0)
+                if(strlen(str) == len && strcmp(str, chars) == 0)
                     return {{code, len}};
             }
         }
@@ -165,7 +165,8 @@ namespace ry {
             const char * codeStr = CODE_STRINGS[i];
             if(!std::isalpha(codeStr[0]))
                 continue;
-            if(strncmp(codeStr, str.data(), str.length()) == 0)
+            std::size_t len = std::max(strlen(codeStr), str.length());
+            if(strncmp(codeStr, str.data(), len) == 0)
                 return Code(int(Code::_First) + 1 + i);
         }
         return {};

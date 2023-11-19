@@ -18,6 +18,8 @@ namespace ry {
         using Name = std::string_view;
         using TK = Token::Code;
 
+        static std::string GetIndentString(std::size_t indent);
+
     public:
         class Expression;
 
@@ -102,9 +104,13 @@ namespace ry {
 
             const Fields& GetFields() const;
 
-            std::string Stringify() const;
+            std::string Stringify(std::size_t indent = 0) const;
+            std::string StringifyPretty() const;
 
         private:
+            std::string StringifyField(const Field& field, std::size_t indent) const;
+            std::string StringifyFieldPretty(const Field& field) const;
+
             Fields m_fields;
         };
 
@@ -120,7 +126,8 @@ namespace ry {
             const ArgumentsType & GetArgumentsType () const;
             const ReturnType    & GetReturnType    () const;
 
-            std::string Stringify() const;
+            std::string Stringify(std::size_t indent = 0) const;
+            std::string StringifyPretty() const;
 
         private:
             ArgumentsType m_argumentsType;
@@ -147,7 +154,8 @@ namespace ry {
             const Data& Get() const;
 
             static const char * StringifyPrimitiveType(TypePrimitive primitiveType);
-            std::string Stringify() const;
+            std::string Stringify(std::size_t indent = 0) const;
+            std::string StringifyPretty() const;
 
             static std::optional<TypePrimitive> GetTokenKindToPrimitiveType(const Token::Kind& tokenKind);
 
@@ -184,7 +192,8 @@ namespace ry {
                     const FieldName & GetName  () const;
                     const Value     & GetValue () const;
 
-                    std::string Stringify() const;
+                    std::string Stringify(std::size_t indent = 0) const;
+                    std::string StringifyPretty() const;
 
                 private:
                     FieldName m_name;
@@ -196,7 +205,8 @@ namespace ry {
 
                 const Fields& GetFields() const;
 
-                std::string Stringify() const;
+                std::string Stringify(std::size_t indent = 0) const;
+                std::string StringifyPretty() const;
 
             private:
                 Fields m_fields;
@@ -209,7 +219,10 @@ namespace ry {
 
             const Data& Get() const;
 
-            std::string Stringify() const;
+            std::string Stringify(std::size_t indent = 0) const;
+            std::string StringifyPretty() const;
+
+            std::optional<Float> TryGetNumberValue() const;
 
         private:
             Data m_data;
@@ -227,7 +240,8 @@ namespace ry {
             const Function   & GetFunction   () const;
             const Parameters & GetParameters () const;
 
-            std::string Stringify() const;
+            std::string Stringify(std::size_t indent = 0) const;
+            std::string StringifyPretty() const;
 
         private:
             Function m_function;
@@ -248,7 +262,8 @@ namespace ry {
             const Label      & GetLabel      () const;
             const Statements & GetStatements () const;
 
-            std::string Stringify() const;
+            std::string Stringify(std::size_t indent = 0) const;
+            std::string StringifyPretty() const;
 
         private:
             Label m_label;
@@ -273,7 +288,8 @@ namespace ry {
             const SuccessExpression & GetSuccessExpression () const;
             const FailExpression    & GetFailExpression    () const;
 
-            std::string Stringify() const;
+            std::string Stringify(std::size_t indent = 0) const;
+            std::string StringifyPretty() const;
 
         private:
             Condition m_condition;
@@ -302,7 +318,8 @@ namespace ry {
             const PostStatement & GetPostStatement () const;
             const BodyStatement & GetBodyStatement () const;
 
-            std::string Stringify() const;
+            std::string Stringify(std::size_t indent = 0) const;
+            std::string StringifyPretty() const;
 
         private:
             InitStatement m_initStatement;
@@ -319,6 +336,7 @@ namespace ry {
 
         #define RY_ASTNODE__UNARYOP_KINDS_E_ENUM(NAME, VALUE) NAME = int(VALUE),
         #define RY_ASTNODE__UNARYOP_KINDS_E_VALUES(NAME, VALUE) Token::NumericKind(VALUE),
+        #define RY_ASTNODE__UNARYOP_KINDS_E_NAME_MAP(NAME, VALUE) { Kind::NAME, #NAME } ,
         #define RY_ASTNODE__UNARYOP_KINDS(E) /* E - expand macro */ \
             E(ArithmeticNegation, '-') \
             E(BitwiseNegation,    '~') \
@@ -339,7 +357,11 @@ namespace ry {
             const Operand& GetOperand() const;
 
             static std::string StringifyKind(Kind kind);
-            std::string Stringify() const;
+            static std::string StringifyKindPretty(Kind kind);
+            std::string Stringify(std::size_t indent = 0) const;
+            std::string StringifyPretty() const;
+
+            std::optional<ExpressionLiteral::Float> TryGetNumberValue() const;
 
         private:
             static const std::set<Token::NumericKind> TOKEN_KINDS;
@@ -355,38 +377,41 @@ namespace ry {
             using Operand = ExpressionUnaryOperation::Operand;
             using Operands = std::pair<Operand, Operand>;
 
-        #define RY_ASTNODE__BINOP_KINDS_E_ENUM(NAME, VALUE) NAME = int(VALUE),
-        #define RY_ASTNODE__BINOP_KINDS_E_VALUES(NAME, VALUE) Token::NumericKind(VALUE),
+        #define RY_ASTNODE__BINOP_KINDS_E_ENUM(NAME, VALUE, _) NAME = int(VALUE),
+        #define RY_ASTNODE__BINOP_KINDS_E_VALUES(NAME, VALUE, _) Token::NumericKind(VALUE),
+        #define RY_ASTNODE__BINOP_KINDS_E_PRIORITY(NAME, _, PRIORITY) { Kind::NAME, PRIORITY } ,
+        #define RY_ASTNODE__BINOP_KINDS_E_NAME_MAP(NAME, VALUE, _) { Kind::NAME, #NAME } ,
         #define RY_ASTNODE__BINOP_KINDS(E) /* E - expand macro */ \
-            E(Add, '+') \
-            E(Sub, '-') \
-            E(Mul, '*') \
-            E(Div, '/') \
-            E(Mod, '%') \
+            E(Add, '+', 8) \
+            E(Sub, '-', 8) \
+            E(Mul, '*', 9) \
+            E(Div, '/', 9) \
+            E(Mod, '%', 9) \
             \
-            E(BitOr,     '|')  \
-            E(BitXor,    '^') \
-            E(BitAnd,    '&') \
-            E(BitLShift, TK::BitLShift) \
-            E(BitRShift, TK::BitRShift) \
+            E(BitOr,     '|', 5)  \
+            E(BitXor,    '^', 4) \
+            E(BitAnd,    '&', 6) \
+            E(BitLShift, TK::BitLShift, 7) \
+            E(BitRShift, TK::BitRShift, 7) \
             \
-            E(Eq,         TK::Equal)   \
-            E(Uneq,       TK::Unequal) \
-            E(Less,       '<') \
-            E(LessEqual,  TK::LessEqual)  \
-            E(Great,      '>')    \
-            E(GreatEqual, TK::GreatEqual) \
+            E(Eq,         TK::Equal, 3)   \
+            E(Uneq,       TK::Unequal, 3) \
+            E(Less,       '<', 3) \
+            E(LessEqual,  TK::LessEqual, 3)  \
+            E(Great,      '>', 3)    \
+            E(GreatEqual, TK::GreatEqual, 3) \
             \
-            E(Or,  TK::KeywordOr)  \
-            E(And, TK::KeywordAnd) \
+            E(Or,  TK::KeywordOr, 1)  \
+            E(And, TK::KeywordAnd, 2) \
             \
-            E(TypeCast,           TK::KeywordAs) \
-            E(StructMemberAccess, '.')
+            E(TypeCast,           TK::KeywordAs, 10) \
+            E(StructMemberAccess, '.', 12)
 
             enum class Kind {
                 RY_ASTNODE__BINOP_KINDS(RY_ASTNODE__BINOP_KINDS_E_ENUM)
             };
 
+            static int GetKindPriority(Kind kind);
             static std::optional<Kind> GetTokenKindToBinaryKind(const Token::Kind& tokenKind);
 
             ExpressionBinaryOperation(Kind kind, const Operand& firstOperand, const Operand& secondOperand);
@@ -395,11 +420,13 @@ namespace ry {
             const Operands& GetOperands() const;
 
             static std::string StringifyKind(Kind kind);
-            std::string Stringify() const;
+            static std::string StringifyKindPretty(Kind kind);
+            std::string Stringify(std::size_t indent = 0) const;
+            std::string StringifyPretty() const;
+
+            std::optional<ExpressionLiteral::Float> TryGetNumberValue() const;
 
         private:
-            static const std::set<Token::NumericKind> TOKEN_KINDS;
-
             Kind m_kind;
             Operands m_operands;
         };
@@ -439,16 +466,21 @@ namespace ry {
                 ExpressionName
             >;
 
-            Expression(const Data& data);
+            Expression(const Data& data, bool isGrouped = false);
 
             const Data& Get() const;
+            bool IsGrouped() const;
             
             bool IsLValue() const;
             LValue ToLValue() const;
 
-            std::string Stringify() const;
+            std::string Stringify(std::size_t indent = 0) const;
+            std::string StringifyPretty() const;
+
+            std::optional<ExpressionLiteral::Float> TryGetNumberValue() const;
 
         private:
+            bool m_isGrouped; // ( ... )
             Data m_data;
         };
 
@@ -558,7 +590,8 @@ namespace ry {
 
             const Data& Get() const;
 
-            std::string Stringify() const;
+            std::string Stringify(std::size_t indent = 0) const;
+            std::string StringifyPretty() const;
     
         private:
             Data m_data;

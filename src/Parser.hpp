@@ -3,6 +3,7 @@
 #include "Infos.hpp"
 #include "Token.hpp"
 #include "ASTNode.hpp"
+#include "src/ASTNode.hpp"
 
 #include <variant>
 #include <vector>
@@ -35,7 +36,7 @@ namespace ry {
         std::optional<ASTNode::Type> parseType(bool mustParse = true);
         std::optional<ASTNode::TypeStruct::Field> parseStructTypeField();
 
-        std::optional<ASTNode::Expression>                parseExpression                (bool mustParse = true);
+        std::optional<ASTNode::Expression>                parseExpression                (bool mustParse = true, std::optional<ASTNode::ExpressionBinaryOperation::Kind> currentBinOpKind = {});
         std::optional<ASTNode::ExpressionLiteral::Struct> parseStructLiteralExpression   (bool mustParse = true);
         std::optional<ASTNode::ExpressionLiteral>         parseLiteralExpression         (bool mustParse = true);
         std::optional<ASTNode::ExpressionFunctionCall>    parseFunctionCallExpression    (bool mustParse, const ASTNode::Expression& expr);
@@ -44,7 +45,7 @@ namespace ry {
         std::optional<ASTNode::ExpressionLoop>            parseLoopExpression            (bool mustParse = true);
         std::optional<ASTNode::ExpressionName>            parseNameExpression            (bool mustParse = true);
         std::optional<ASTNode::ExpressionUnaryOperation>  parseUnaryOperationExpression  (bool mustParse = true);
-        std::optional<ASTNode::ExpressionBinaryOperation> parseBinaryOperationExpression (bool mustParse, const ASTNode::Expression& expr);
+        std::optional<ASTNode::ExpressionBinaryOperation> parseBinaryOperationExpression (bool mustParse, const ASTNode::Expression& expr, std::optional<ASTNode::ExpressionBinaryOperation::Kind> currentBinOpKind = {});
 
         std::optional<ASTNode::Statement> parseStatement(bool mustParse = true);
 

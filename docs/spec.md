@@ -6,42 +6,42 @@ Note to self: press `CTRL K` + `Z` to leave zen mode
 
 **Other Languages**
 
-- [ ] [Go](https://go.dev/ref/spec)
-- [x] [Zig](https://ziglang.org/documentation/master/)
-- [x] [Odin](https://odin-lang.org/docs/overview/) - no spec
-- [x] [Rust](https://doc.rust-lang.org/reference/index.html)
-- [x] [Haxe](https://haxe.org/manual/introduction.html)
-- [ ] [D](https://dlang.org/spec/spec.html)
+-   [ ] [Go](https://go.dev/ref/spec)
+-   [x] [Zig](https://ziglang.org/documentation/master/)
+-   [x] [Odin](https://odin-lang.org/docs/overview/) - no spec
+-   [x] [Rust](https://doc.rust-lang.org/reference/index.html)
+-   [x] [Haxe](https://haxe.org/manual/introduction.html)
+-   [ ] [D](https://dlang.org/spec/spec.html)
 
 ---
 
 **Useful**
 
-- rustc dev guide - https://rustc-dev-guide.rust-lang.org/part-2-intro.html
-- Advanced R - https://adv-r.hadley.nz/
+-   rustc dev guide - https://rustc-dev-guide.rust-lang.org/part-2-intro.html
+-   Advanced R - https://adv-r.hadley.nz/
 
 ---
 
 **Consider**
 
-- static
-- extern
-- type constraints - see [notes/playground/main.rs](../notes/playground/main.rs)
-- closures
-- variadic funtion arguments (struct fields) - might not need it with macros
-- we dont need a slice type - see [notes/slice.rs](../notes/slice.rs)
-- bit sets (odinlang)
-- `any` type
-- tests
+-   static
+-   extern
+-   type constraints - see [notes/playground/main.rs](../notes/playground/main.rs)
+-   closures
+-   variadic funtion arguments (struct fields) - might not need it with macros
+-   we dont need a slice type - see [notes/slice.rs](../notes/slice.rs)
+-   bit sets (odinlang)
+-   `any` type
+-   tests
 
 ---
 
 **TODO**
 
-- Types
-  - type constraints
-  - enums
-  - unions
+-   Types
+    -   type constraints
+    -   enums
+    -   unions
 
 ---
 
@@ -164,11 +164,11 @@ Lexical analysis is the process of grouping source code characters into tokens.
 
 **Interpretation**
 
-- A name cannot start with a digit.
-- Names (identifiers) can only consist of:
-  - underscores `_`,
-  - lowercase and uppercase letters from `aA` to `zZ`,
-  - digits from `0` to `9`
+-   A name cannot start with a digit.
+-   Names (identifiers) can only consist of:
+    -   underscores `_`,
+    -   lowercase and uppercase letters from `aA` to `zZ`,
+    -   digits from `0` to `9`
 
 **Examples**
 
@@ -407,11 +407,11 @@ Refer to [Operators](#operators)
 
 Tokens represent:
 
-- [Names](#names)
-- [Keywords](#keywords)
-- [Operators](#operators)
-- [Literals](#literals)
-- Characters: `( ) ; [ ] & * ? ~ , { }`
+-   [Names](#names)
+-   [Keywords](#keywords)
+-   [Operators](#operators)
+-   [Literals](#literals)
+-   Characters: `( ) ; [ ] & * ? ~ , { }`
 
 # 2. Parsing and Semantic Analysis {#parsing-and-semantic-analysis}
 
@@ -577,18 +577,18 @@ Assignment
 | Level | Operators                       |
 | :---: | :------------------------------ |
 |   -   | `=>`                            |
-|   1   | `.`                             |
-|   2   | `-a` `~` `not` `&a` `*a` `comp` |
-|   3   | `as`                            |
-|   4   | `a*b` `/` `%`                   |
-|   5   | `a+b` `a-b`                     |
-|   6   | `<<` `>>`                       |
-|   7   | `a&b`                           |
-|   8   | `\|`                            |
-|   9   | `^`                             |
-|  10   | `==` `!=` `<` `<=` `>` `>=`     |
-|  11   | `and`                           |
-|  12   | `or`                            |
+|  12   | `.`                             |
+|  11   | `-a` `~` `not` `&a` `*a` `comp` |
+|  10   | `as`                            |
+|   9   | `a*b` `/` `%`                   |
+|   8   | `a+b` `a-b`                     |
+|   7   | `<<` `>>`                       |
+|   6   | `a&b`                           |
+|   5   | `\|`                            |
+|   4   | `^`                             |
+|   3   | `==` `!=` `<` `<=` `>` `>=`     |
+|   2   | `and`                           |
+|   1   | `or`                            |
 
 ### 2.2.7. Operator Associativity {#operator-associativity}
 
@@ -650,7 +650,7 @@ Assignment
 
 A block is a collection of statements.
 
-- See `<stmt>` in [Statements](#statements) for the definition of a _statement_.
+-   See `<stmt>` in [Statements](#statements) for the definition of a _statement_.
 
 A block can be "broken from" using the `break` statement.
 
@@ -669,21 +669,21 @@ TODO
 
 **Interpretation**
 
-- All blocks can be labeled with a preceding string literal.
-- Break statements can be optionally provided the block label to break from (as a string literal) and an expression to return from a block
-  ```rust
-    max usize = 10;
-    x isize = "x" {
-        for( a usize = max;; a > 0; a -= 1 ) {
-            for( b usize = max;; b > 0; b -= 1 ) {
-                if( a + b == a * b ) {
-                    break "x" (a + b);
-                }
-            }
-        }
-        break -1;
-    }
-  ```
+-   All blocks can be labeled with a preceding string literal.
+-   Break statements can be optionally provided the block label to break from (as a string literal) and an expression to return from a block
+    ```rust
+      max usize = 10;
+      x isize = "x" {
+          for( a usize = max;; a > 0; a -= 1 ) {
+              for( b usize = max;; b > 0; b -= 1 ) {
+                  if( a + b == a * b ) {
+                      break "x" (a + b);
+                  }
+              }
+          }
+          break -1;
+      }
+    ```
 
 **Examples**
 
@@ -947,51 +947,51 @@ An Enum (Enumeration) is a collection of scoped, named & unique integer values (
 
 TODO
 
-- The first enum field, if not explicitely set, is equal to 0.
-- Each next enum field, if not explicitely set, is 1 higher than the previous value.
+-   The first enum field, if not explicitely set, is equal to 0.
+-   Each next enum field, if not explicitely set, is 1 higher than the previous value.
 
 **Interpretation**
 
-- Enum fields are of type `i32`
-  - See `<primitive>` in [Types](#types) for the type of `i32`.
-- Enums can only be defined inside of namespaces.
-  - See [Namespace](#namespace)
-    Enums are also namespaces.
-  - See [Namespace](#namespace).
-- Enum fields can be accessed using the colon `:` operator
-  - See [Operators](#operators) for the _enum field access_ operator.
-  ```rust
-  var #Enum = #Enum:FIELD;
-  ```
-- _Enum_ fields can be explicitely set.
-  - The set value must be a _compile-time_ expression resulting in a value of type `i32`.
-    - See [Expressions](#expressions) for the definition of a _compile-time_ expression `compexpr`.
+-   Enum fields are of type `i32`
+    -   See `<primitive>` in [Types](#types) for the type of `i32`.
+-   Enums can only be defined inside of namespaces.
+    -   See [Namespace](#namespace)
+        Enums are also namespaces.
+    -   See [Namespace](#namespace).
+-   Enum fields can be accessed using the colon `:` operator
+    -   See [Operators](#operators) for the _enum field access_ operator.
     ```rust
-    x i32 = 10;
-    #Color = {
-        RED = x, // ERROR
-        GREEN = 0.5, // ERROR
-    };
+    var #Enum = #Enum:FIELD;
     ```
-  - The set value must be higher than the previous values.
-    ```rust
-    #Color = {
-        RED, // 0
-        GREEN, // 1
-        BLUE = 1 // ERROR
-    }
-    ```
-  - The fields can be set even multiple times
-    ```rust
-    #Animal = {
-        DOG, // 0
-        CAT = 10,
-        WOLF, // 11
-        LION, // 12
-        SQUID = 100,
-        HORSE // 101
-    }
-    ```
+-   _Enum_ fields can be explicitely set.
+    -   The set value must be a _compile-time_ expression resulting in a value of type `i32`.
+        -   See [Expressions](#expressions) for the definition of a _compile-time_ expression `compexpr`.
+        ```rust
+        x i32 = 10;
+        #Color = {
+            RED = x, // ERROR
+            GREEN = 0.5, // ERROR
+        };
+        ```
+    -   The set value must be higher than the previous values.
+        ```rust
+        #Color = {
+            RED, // 0
+            GREEN, // 1
+            BLUE = 1 // ERROR
+        }
+        ```
+    -   The fields can be set even multiple times
+        ```rust
+        #Animal = {
+            DOG, // 0
+            CAT = 10,
+            WOLF, // 11
+            LION, // 12
+            SQUID = 100,
+            HORSE // 101
+        }
+        ```
 
 **Examples**
 

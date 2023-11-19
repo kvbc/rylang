@@ -1,6 +1,7 @@
 #include "Parser.hpp"
 #include "Token.hpp"
 #include "ry.hpp"
+#include "src/ASTNode.hpp"
 
 #include <format>
 #include <memory>
@@ -333,13 +334,19 @@ namespace ry {
      *
      */
 
-    std::optional<ASTNode::Expression> Parser::parseExpression(bool mustParse) {
+    std::optional<ASTNode::Expression> Parser::parseExpression(bool mustParse, std::optional<ASTNode::ExpressionBinaryOperation::Kind> currentBinOpKind) {
     #define TRY_RETURN(OPT) { \
         if(auto opt = OPT) \
-            return ASTNode::Expression(opt.value()); \
+            return ASTNode::Expression(opt.value(), isGrouped); \
     }
-
         RY_PARSER__WRAP_PARSE_FUNC("expression", std::optional<ASTNode::Expression>, {
+            bool isGrouped = false;
+            if(isToken('(')) {
+                eatToken();
+                isGrouped = true;
+                currentBinOpKind = {};
+            }
+
             auto tryParse = [&]() -> std::optional<ASTNode::Expression> {
                 TRY_RETURN(parseNameExpression          (false));
                 TRY_RETURN(parseLiteralExpression       (false));
@@ -351,12 +358,20 @@ namespace ry {
             };
             auto optExpr = tryParse();
             if(optExpr.has_value()) {
-                TRY_RETURN(parseFunctionCallExpression   (false, optExpr.value()));
-                TRY_RETURN(parseBinaryOperationExpression(false, optExpr.value()));
-                return optExpr.value();
+                if(auto optFuncCall = parseFunctionCallExpression(false, optExpr.value()))
+                    optExpr = ASTNode::Expression(optFuncCall.value(), isGrouped);
+                else if(auto optBinOp = parseBinaryOperationExpression(false, optExpr.value(), currentBinOpKind))
+                    optExpr = ASTNode::Expression(optBinOp.value(), isGrouped);
             }
-        });
 
+            if(isGrouped) {
+                RY_PARSER__ASSERT(expectToken(')'));
+                eatToken();
+            }
+
+            RY_PARSER__ASSERT(optExpr);
+            return optExpr.value();
+        });
     #undef TRY_RETURN
     }
 
@@ -592,21 +607,39 @@ namespace ry {
         });
     }
 
-    std::optional<ASTNode::ExpressionBinaryOperation> Parser::parseBinaryOperationExpression(bool mustParse, const ASTNode::Expression& expr1) {
+    std::optional<ASTNode::ExpressionBinaryOperation> Parser::parseBinaryOperationExpression(
+        bool mustParse,
+        const ASTNode::Expression& expr1,
+        std::optional<ASTNode::ExpressionBinaryOperation::Kind> currentBinOpKind
+    ) {
         using BinOp = ASTNode::ExpressionBinaryOperation;
         RY_PARSER__WRAP_PARSE_FUNC("binary operation", std::optional<BinOp>, {
             RY_PARSER__ASSERT(getToken());
             auto optBinaryKind = BinOp::GetTokenKindToBinaryKind(getToken()->GetKind());
             RY_PARSER__ASSERT(optBinaryKind);
+            auto binaryKind = optBinaryKind.value();
             eatToken();
 
-            auto optExpr2 = parseExpression(mustParse);
+            if(currentBinOpKind) {
+                auto leftPriority = BinOp::GetKindPriority(currentBinOpKind.value());
+                auto thisPriority = BinOp::GetKindPriority(binaryKind);
+                RY_PARSER__ASSERT(thisPriority > leftPriority);
+            }
+
+            auto optExpr2 = parseExpression(mustParse, binaryKind);
             RY_PARSER__ASSERT(optExpr2);
 
             auto kind = optBinaryKind.value();
             auto operand1 = std::make_shared<ASTNode::Expression>(expr1);
             auto operand2 = std::make_shared<ASTNode::Expression>(optExpr2.value());
-            return BinOp(kind, operand1, operand2);
+            auto binOp = BinOp(kind, operand1, operand2);
+            auto expr = ASTNode::Expression(binOp);
+
+            auto optBinOp2 = parseBinaryOperationExpression(false, expr);
+            if(optBinOp2)
+                return optBinOp2.value();
+
+            return binOp;
         });
     }
 
