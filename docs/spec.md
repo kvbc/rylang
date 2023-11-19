@@ -12,6 +12,7 @@ Note to self: press `CTRL K` + `Z` to leave zen mode
 -   [x] [Rust](https://doc.rust-lang.org/reference/index.html)
 -   [x] [Haxe](https://haxe.org/manual/introduction.html)
 -   [ ] [D](https://dlang.org/spec/spec.html)
+-   [ ] [GML](https://manual.yoyogames.com/GameMaker_Language/GameMaker_Language_Index.htm)
 
 ---
 
