@@ -603,7 +603,6 @@ namespace ry {
             auto optExpr2 = parseExpression(mustParse);
             RY_PARSER__ASSERT(optExpr2);
 
-
             auto kind = optBinaryKind.value();
             auto operand1 = std::make_shared<ASTNode::Expression>(expr1);
             auto operand2 = std::make_shared<ASTNode::Expression>(optExpr2.value());
