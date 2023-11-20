@@ -6,43 +6,43 @@ Note to self: press `CTRL K` + `Z` to leave zen mode
 
 **Other Languages**
 
-- [ ] [Go](https://go.dev/ref/spec)
-- [x] [Zig](https://ziglang.org/documentation/master/)
-- [x] [Odin](https://odin-lang.org/docs/overview/) - no spec
-- [x] [Rust](https://doc.rust-lang.org/reference/index.html)
-- [x] [Haxe](https://haxe.org/manual/introduction.html)
-- [ ] [D](https://dlang.org/spec/spec.html)
-- [ ] [GML](https://manual.yoyogames.com/GameMaker_Language/GameMaker_Language_Index.htm)
+-   [ ] [Go](https://go.dev/ref/spec)
+-   [x] [Zig](https://ziglang.org/documentation/master/)
+-   [x] [Odin](https://odin-lang.org/docs/overview/) - no spec
+-   [x] [Rust](https://doc.rust-lang.org/reference/index.html)
+-   [x] [Haxe](https://haxe.org/manual/introduction.html)
+-   [ ] [D](https://dlang.org/spec/spec.html)
+-   [ ] [GML](https://manual.yoyogames.com/GameMaker_Language/GameMaker_Language_Index.htm)
 
 ---
 
 **Useful**
 
-- rustc dev guide - https://rustc-dev-guide.rust-lang.org/part-2-intro.html
-- Advanced R - https://adv-r.hadley.nz/
+-   rustc dev guide - https://rustc-dev-guide.rust-lang.org/part-2-intro.html
+-   Advanced R - https://adv-r.hadley.nz/
 
 ---
 
 **Consider**
 
-- static
-- extern
-- type constraints - see [notes/playground/main.rs](../notes/playground/main.rs)
-- closures
-- variadic funtion arguments (struct fields) - might not need it with macros
-- we dont need a slice type - see [notes/slice.rs](../notes/slice.rs)
-- bit sets (odinlang)
-- `any` type
-- tests
+-   static
+-   extern
+-   type constraints - see [notes/playground/main.rs](../notes/playground/main.rs)
+-   closures
+-   variadic funtion arguments (struct fields) - might not need it with macros
+-   we dont need a slice type - see [notes/slice.rs](../notes/slice.rs)
+-   bit sets (odinlang)
+-   `any` type
+-   tests
 
 ---
 
 **TODO**
 
-- Types
-  - type constraints
-  - enums
-  - unions
+-   Types
+    -   type constraints
+    -   enums
+    -   unions
 
 ---
 
@@ -109,11 +109,11 @@ _(lets just ignore test coverage for now)_
 | &emsp; &emsp; &emsp; 2.3.6.2. [Loop](#loop)                                       |   ✔️   |    ❌     |                   ✔️                    |          ❌          |           ❌           |      ❌       |                                                               |
 | &emsp; &emsp; 2.3.7. [Struct Literals](#struct-literals)                          |   ✔️   |    ❌     |                   ✔️                    |          ❌          |           ❌           |      ❌       |                                                               |
 | &emsp; &emsp; 2.3.8. [Compile-time Expressions](#compile-time-expressions)        |   ✔️   |    ❌     |                   ✔️                    |          ❌          |           ❌           |      ❌       |                                                               |
-| &emsp; 2.4. [Statements](#statements)                                             |  ✔️👇  |    ❌     |                   ❌                    |          ❌          |           ❌           |      ❌       |                                                               |
-| &emsp; &emsp; 2.4.1. [Variable Definition](#variable-definition)                  |   ➖   |    ❌     |                   ❌                    |          ❌          |           ❌           |      ❌       | // possibly add struct destructuring                          |
-| &emsp; &emsp; 2.4.2. [Assignment](#assignment)                                    |   ✔️   |    ❌     |                   ❌                    |          ❌          |           ❌           |      ❌       |                                                               |
-| &emsp; &emsp; 2.4.3. [Continue Statement](#continue-statement)                    |   ✔️   |    ❌     |                   ❌                    |          ❌          |           ❌           |      ❌       |                                                               |
-| &emsp; &emsp; 2.4.4. [Break Statement](#break-statement)                          |   ✔️   |    ❌     |                   ❌                    |          ❌          |           ❌           |      ❌       |                                                               |
+| &emsp; 2.4. [Statements](#statements)                                             |  ✔️👇  |    ❌     |                   ↪️👇                    |          ❌          |           ❌           |      ❌       |                                                               |
+| &emsp; &emsp; 2.4.1. [Variable Definition](#variable-definition)                  |   ➖   |    ❌     |                   ✔️                    |          ❌          |           ❌           |      ❌       | // possibly add struct destructuring                          |
+| &emsp; &emsp; 2.4.2. [Assignment](#assignment)                                    |   ✔️   |    ❌     |                   ✔️                    |          ❌          |           ❌           |      ❌       |                                                               |
+| &emsp; &emsp; 2.4.3. [Continue Statement](#continue-statement)                    |   ✔️   |    ❌     |                   ✔️                    |          ❌          |           ❌           |      ❌       |                                                               |
+| &emsp; &emsp; 2.4.4. [Break Statement](#break-statement)                          |   ✔️   |    ❌     |                   ✔️                    |          ❌          |           ❌           |      ❌       |                                                               |
 | &emsp; 2.5. [Metadata](#metadata)                                                 |   ✔️   |    ❌     |                   ❌                    |          ❌          |           ❌           |      ❌       |                                                               |
 | <br> 3. [Typing](#typing) <br> <br>                                               |   👇   |    ❌     |                   👇                    |          ❌          |           👇           |      👇       | **"Typing" the untyped AST nodes**                            |
 | <br> 4. [Transpilation](#transpilation) <br> <br>                                 |   👇   |    ❌     |                   👇                    |          ❌          |           👇           |      👇       | **Transpiling typed AST nodes into C source code**            |
@@ -165,11 +165,11 @@ Lexical analysis is the process of grouping source code characters into tokens.
 
 **Interpretation**
 
-- A name cannot start with a digit.
-- Names (identifiers) can only consist of:
-  - underscores `_`,
-  - lowercase and uppercase letters from `aA` to `zZ`,
-  - digits from `0` to `9`
+-   A name cannot start with a digit.
+-   Names (identifiers) can only consist of:
+    -   underscores `_`,
+    -   lowercase and uppercase letters from `aA` to `zZ`,
+    -   digits from `0` to `9`
 
 **Examples**
 
@@ -408,11 +408,11 @@ Refer to [Operators](#operators)
 
 Tokens represent:
 
-- [Names](#names)
-- [Keywords](#keywords)
-- [Operators](#operators)
-- [Literals](#literals)
-- Characters: `( ) ; [ ] & * ? ~ , { }`
+-   [Names](#names)
+-   [Keywords](#keywords)
+-   [Operators](#operators)
+-   [Literals](#literals)
+-   Characters: `( ) ; [ ] & * ? ~ , { }`
 
 # 2. Parsing and Semantic Analysis {#parsing-and-semantic-analysis}
 
@@ -512,13 +512,13 @@ tuple [i32, bool, f32] = [1, true, 2.3];
 
 Assignment
 
-| Tag       | Type   | Operator | Name               | Syntax             |
-| --------- | ------ | :------: | ------------------ | ------------------ |
-| <stmt_op> | Binary |   `+=`   | addition           | `<name> += <expr>` |
-| <stmt_op> | Binary |   `-=`   | subtraction        | `<name> -= <expr>` |
-| <stmt_op> | Binary |   `*=`   | multiplication     | `<name> *= <expr>` |
-| <stmt_op> | Binary |   `/=`   | division           | `<name> /= <expr>` |
-| <stmt_op> | Binary |   `%=`   | modulo (remainder) | `<name> %= <expr>` |
+| Tag       | Type   | Operator | Name               | Syntax               |
+| --------- | ------ | :------: | ------------------ | -------------------- |
+| <stmt_op> | Binary |   `+=`   | addition           | `<lvalue> += <expr>` |
+| <stmt_op> | Binary |   `-=`   | subtraction        | `<lvalue> -= <expr>` |
+| <stmt_op> | Binary |   `*=`   | multiplication     | `<lvalue> *= <expr>` |
+| <stmt_op> | Binary |   `/=`   | division           | `<lvalue> /= <expr>` |
+| <stmt_op> | Binary |   `%=`   | modulo (remainder) | `<lvalue> %= <expr>` |
 
 ### 2.2.2. Bitwise Operators {#bitwise-operators}
 
@@ -533,13 +533,13 @@ Assignment
 
 Assignment
 
-| Tag       | Type   | Operator | Name                | Syntax              |
-| --------- | ------ | :------: | ------------------- | ------------------- |
-| <stmt_op> | Binary |  `\|=`   | bitwise OR          | `<name> \|= <expr>` |
-| <stmt_op> | Binary |   `^=`   | bitwise XOR         | `<name> ^= <expr>`  |
-| <stmt_op> | Binary |   `&=`   | bitwise AND         | `<name> &= <expr>`  |
-| <stmt_op> | Binary |  `>>=`   | bitwise right shift | `<name> >>= <expr>` |
-| <stmt_op> | Binary |  `<<=`   | bitwise left shift  | `<name> <<= <expr>` |
+| Tag       | Type   | Operator | Name                | Syntax                |
+| --------- | ------ | :------: | ------------------- | --------------------- |
+| <stmt_op> | Binary |  `\|=`   | bitwise OR          | `<lvalue> \|= <expr>` |
+| <stmt_op> | Binary |   `^=`   | bitwise XOR         | `<lvalue> ^= <expr>`  |
+| <stmt_op> | Binary |   `&=`   | bitwise AND         | `<lvalue> &= <expr>`  |
+| <stmt_op> | Binary |  `>>=`   | bitwise right shift | `<lvalue> >>= <expr>` |
+| <stmt_op> | Binary |  `<<=`   | bitwise left shift  | `<lvalue> <<= <expr>` |
 
 ### 2.2.3. Comparison Operators {#comparison-operators}
 
@@ -651,7 +651,7 @@ Assignment
 
 A block is a collection of statements.
 
-- See `<stmt>` in [Statements](#statements) for the definition of a _statement_.
+-   See `<stmt>` in [Statements](#statements) for the definition of a _statement_.
 
 A block can be "broken from" using the `break` statement.
 
@@ -670,21 +670,21 @@ TODO
 
 **Interpretation**
 
-- All blocks can be labeled with a preceding string literal.
-- Break statements can be optionally provided the block label to break from (as a string literal) and an expression to return from a block
-  ```rust
-    max usize = 10;
-    x isize = "x" {
-        for( a usize = max;; a > 0; a -= 1 ) {
-            for( b usize = max;; b > 0; b -= 1 ) {
-                if( a + b == a * b ) {
-                    break "x" (a + b);
-                }
-            }
-        }
-        break -1;
-    }
-  ```
+-   All blocks can be labeled with a preceding string literal.
+-   Break statements can be optionally provided the block label to break from (as a string literal) and an expression to return from a block
+    ```rust
+      max usize = 10;
+      x isize = "x" {
+          for( a usize = max;; a > 0; a -= 1 ) {
+              for( b usize = max;; b > 0; b -= 1 ) {
+                  if( a + b == a * b ) {
+                      break "x" (a + b);
+                  }
+              }
+          }
+          break -1;
+      }
+    ```
 
 **Examples**
 
@@ -817,9 +817,9 @@ pos [x i32; y i32] = [3; 5];
 
 ### 2.4.4. Break Statement {#break-statement}
 
-| Tag           | Syntax                        | Comment |
-| ------------- | ----------------------------- | ------- |
-| \<break_stmt> | `break [<string_lit>] <expr>` |         |
+| Tag           | Syntax                          | Comment |
+| ------------- | ------------------------------- | ------- |
+| \<break_stmt> | `break [<string_lit>] [<expr>]` |         |
 
 ## 2.5. Metadata {#metadata}
 
@@ -948,51 +948,51 @@ An Enum (Enumeration) is a collection of scoped, named & unique integer values (
 
 TODO
 
-- The first enum field, if not explicitely set, is equal to 0.
-- Each next enum field, if not explicitely set, is 1 higher than the previous value.
+-   The first enum field, if not explicitely set, is equal to 0.
+-   Each next enum field, if not explicitely set, is 1 higher than the previous value.
 
 **Interpretation**
 
-- Enum fields are of type `i32`
-  - See `<primitive>` in [Types](#types) for the type of `i32`.
-- Enums can only be defined inside of namespaces.
-  - See [Namespace](#namespace)
-    Enums are also namespaces.
-  - See [Namespace](#namespace).
-- Enum fields can be accessed using the colon `:` operator
-  - See [Operators](#operators) for the _enum field access_ operator.
-  ```rust
-  var #Enum = #Enum:FIELD;
-  ```
-- _Enum_ fields can be explicitely set.
-  - The set value must be a _compile-time_ expression resulting in a value of type `i32`.
-    - See [Expressions](#expressions) for the definition of a _compile-time_ expression `compexpr`.
+-   Enum fields are of type `i32`
+    -   See `<primitive>` in [Types](#types) for the type of `i32`.
+-   Enums can only be defined inside of namespaces.
+    -   See [Namespace](#namespace)
+        Enums are also namespaces.
+    -   See [Namespace](#namespace).
+-   Enum fields can be accessed using the colon `:` operator
+    -   See [Operators](#operators) for the _enum field access_ operator.
     ```rust
-    x i32 = 10;
-    #Color = {
-        RED = x, // ERROR
-        GREEN = 0.5, // ERROR
-    };
+    var #Enum = #Enum:FIELD;
     ```
-  - The set value must be higher than the previous values.
-    ```rust
-    #Color = {
-        RED, // 0
-        GREEN, // 1
-        BLUE = 1 // ERROR
-    }
-    ```
-  - The fields can be set even multiple times
-    ```rust
-    #Animal = {
-        DOG, // 0
-        CAT = 10,
-        WOLF, // 11
-        LION, // 12
-        SQUID = 100,
-        HORSE // 101
-    }
-    ```
+-   _Enum_ fields can be explicitely set.
+    -   The set value must be a _compile-time_ expression resulting in a value of type `i32`.
+        -   See [Expressions](#expressions) for the definition of a _compile-time_ expression `compexpr`.
+        ```rust
+        x i32 = 10;
+        #Color = {
+            RED = x, // ERROR
+            GREEN = 0.5, // ERROR
+        };
+        ```
+    -   The set value must be higher than the previous values.
+        ```rust
+        #Color = {
+            RED, // 0
+            GREEN, // 1
+            BLUE = 1 // ERROR
+        }
+        ```
+    -   The fields can be set even multiple times
+        ```rust
+        #Animal = {
+            DOG, // 0
+            CAT = 10,
+            WOLF, // 11
+            LION, // 12
+            SQUID = 100,
+            HORSE // 101
+        }
+        ```
 
 **Examples**
 

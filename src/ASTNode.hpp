@@ -2,6 +2,7 @@
 
 #include "Token.hpp"
 #include "ry.hpp"
+#include "src/ASTNode.hpp"
 
 #include <memory>
 #include <optional>
@@ -360,6 +361,8 @@ namespace ry {
             static std::string StringifyKindPretty(Kind kind);
             std::string Stringify(std::size_t indent = 0) const;
             std::string StringifyPretty() const;
+            static std::string Stringify(Kind kind, const Operand& operand, std::size_t indent = 0);
+            static std::string StringifyPretty(Kind kind, const Operand& operand);
 
             std::optional<ExpressionLiteral::Float> TryGetNumberValue() const;
 
@@ -423,8 +426,11 @@ namespace ry {
             static std::string StringifyKindPretty(Kind kind);
             std::string Stringify(std::size_t indent = 0) const;
             std::string StringifyPretty() const;
+            static std::string Stringify(Kind kind, const Operands& operands, std::size_t indent = 0);
+            static std::string StringifyPretty(Kind kind, const Operands& operands);
 
             std::optional<ExpressionLiteral::Float> TryGetNumberValue() const;
+            static std::optional<ExpressionLiteral::Float> TryGetNumberValue(Kind kind, const Operands& operands);
 
         private:
             Kind m_kind;
@@ -439,21 +445,13 @@ namespace ry {
 
         class Expression {
         public:
-            class LValue {
-            public:
-                using Name               = ExpressionName;
-                using PointerDereference = ExpressionUnaryOperation;
-                using StructMemberAccess = ExpressionBinaryOperation;
-
-                using Data = std::variant<Name, PointerDereference, StructMemberAccess>;
-
-                LValue(const Data& data);
-
-                const Data& Get() const;
-
-            private:
-                Data m_data;
-            };
+            using PointerDereference = ExpressionUnaryOperation::Operand;
+            using StructMemberAccess = ExpressionBinaryOperation::Operands;
+            using LValue = std::variant<
+                ExpressionName,
+                PointerDereference,
+                StructMemberAccess
+            >;
 
             using Data = std::variant<
                 ExpressionLiteral,
@@ -471,13 +469,15 @@ namespace ry {
             const Data& Get() const;
             bool IsGrouped() const;
             
-            bool IsLValue() const;
-            LValue ToLValue() const;
+            std::optional<LValue> ToLValue() const;
 
             std::string Stringify(std::size_t indent = 0) const;
             std::string StringifyPretty() const;
 
             std::optional<ExpressionLiteral::Float> TryGetNumberValue() const;
+
+            static std::string StringifyLValue(const LValue& lvalue, std::size_t indent = 0);
+            static std::string StringifyLValuePretty(const LValue& lvalue);
 
         private:
             bool m_isGrouped; // ( ... )
@@ -498,15 +498,38 @@ namespace ry {
         public:
             using Operands = std::pair<Expression::LValue, Expression>;
 
+        #define RY_ASTNODE__STMTBINOP_KINDS_E_ENUM(NAME, _) NAME ,
+        #define RY_ASTNODE__STMTBINOP_KINDS_E_VALUES(_, VALUE) VALUE ,
+        #define RY_ASTNODE__STMTBINOP_KINDS_E_NAME_MAP(NAME, _) { Kind::NAME, #NAME } ,
+        #define RY_ASTNODE__STMTBINOP_KINDS(E) \
+            E(AddEq,   TK::AddEqual) \
+            E(SubEq,   TK::SubEqual) \
+            E(MulEq,   TK::MulEqual) \
+            E(DivEq,   TK::DivEqual) \
+            E(ModEq,   TK::ModEqual) \
+            \
+            E(BitOrEq,     TK::BitOrEqual) \
+            E(BitXorEq,    TK::BitXorEqual) \
+            E(BitAndEq,    TK::BitAndEqual) \
+            E(BitLShiftEq, TK::BitLShiftEqual) \
+            E(BitRShiftEq, TK::BitRShiftEqual) \
+
             enum class Kind {
-                AddEq, SubEq, MulEq, PowerEq, DivEq, ModEq,
-                BitOrEq, BitXorEq, BitAndEq, BitLShiftEq, BitRShiftEq
+                RY_ASTNODE__STMTBINOP_KINDS(RY_ASTNODE__STMTBINOP_KINDS_E_ENUM)
             };
+
+            static std::optional<Kind> GetTokenKindToBinaryKind(const Token::Kind& tokenKind);
 
             StatementBinaryOperation(Kind kind, const Operands& operands);
 
+            
             Kind GetKind() const;
             const Operands & GetOperands() const;
+
+            static std::string StringifyKind(Kind kind);
+            static std::string StringifyKindPretty(Kind kind);
+            std::string StringifyPretty() const;
+            std::string Stringify(std::size_t indent = 0) const;
 
         private:
             Kind m_kind;
@@ -515,25 +538,49 @@ namespace ry {
 
         // 
 
-        class StatementVariableDefinition {
+        class StatementTypedVariableDefinition {
         public:
             using VarName  = ExpressionName;
-            using VarType  = std::optional<std::shared_ptr<Type>>;
-            using VarValue = std::optional<std::shared_ptr<Expression>>;
+            using VarType  = Type;
+            using VarValue = std::optional<Expression>;
 
-            StatementVariableDefinition(const VarName& varName, const VarType& varType); // an optional type
-            StatementVariableDefinition(const VarName& varName, const VarValue& varValue); // infer type
-            StatementVariableDefinition(const VarName& varName, const VarType& varType, const VarValue& varValue);
+            StatementTypedVariableDefinition(const VarName& varName, const VarType& varType, const VarValue& varValue = {});
 
             const VarName  & GetName () const;
             const VarType  & GetType () const;
             const VarValue & GetValue() const;
+
+            std::string StringifyPretty() const;
+            std::string Stringify(std::size_t indent = 0) const;
 
         private:
             VarName m_varName;
             VarType m_varType;
             VarValue m_varValue;
         };
+
+        class StatementUntypedVariableDefinition {
+        public:
+            using VarName  = ExpressionName;
+            using VarValue = Expression;
+
+            StatementUntypedVariableDefinition(const VarName& varName, const VarValue& varValue);
+
+            const VarName  & GetName () const;
+            const VarValue & GetValue() const;
+
+            std::string StringifyPretty() const;
+            std::string Stringify(std::size_t indent = 0) const;
+
+        private:
+            VarName m_varName;
+            VarValue m_varValue;
+        };
+
+        using StatementVariableDefinition = std::variant<
+            StatementTypedVariableDefinition,
+            StatementUntypedVariableDefinition
+        >;
 
         // 
 
@@ -561,7 +608,7 @@ namespace ry {
         class StatementBreak {
         public:
             using Label = ExpressionBlock::Label;
-            using Value = Expression;
+            using Value = std::optional<Expression>;
 
             StatementBreak(const Label& label, const Value& value);
 

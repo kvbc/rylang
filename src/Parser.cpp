@@ -2,6 +2,7 @@
 #include "Token.hpp"
 #include "ry.hpp"
 #include "src/ASTNode.hpp"
+#include "src/Token.hpp"
 
 #include <format>
 #include <memory>
@@ -650,9 +651,122 @@ namespace ry {
      */
 
     std::optional<ASTNode::Statement> Parser::parseStatement(bool mustParse) {
-        if(mustParse)
-            errorExpected("statement");
-        return {};
+    #define TRY_RETURN(OPT) { \
+        if(auto opt = OPT) \
+            return ASTNode::Statement(opt.value()); \
+    }
+
+        RY_PARSER__WRAP_PARSE_FUNC("statement", std::optional<ASTNode::Statement>, {
+            TRY_RETURN(parseExpression                 (false));
+            TRY_RETURN(parseBinaryOperationStatement   (false));
+            TRY_RETURN(parseVariableDefinitionStatement(false));
+            TRY_RETURN(parseAssignmentStatement        (false));
+            TRY_RETURN(parseContinueStatement          (false));
+            TRY_RETURN(parseBreakStatement             (false));
+        });
+    
+    #undef TRY_RETURN
+    }
+
+    std::optional<ASTNode::StatementBinaryOperation> Parser::parseBinaryOperationStatement(bool mustParse) {
+        using BinOp = ASTNode::StatementBinaryOperation;
+        RY_PARSER__WRAP_PARSE_FUNC("binary operation statement", std::optional<BinOp>, {
+            auto optExpr1 = parseExpression(mustParse);
+            RY_PARSER__ASSERT(optExpr1);
+            auto optLValue1 = optExpr1->ToLValue();
+            RY_PARSER__ASSERT(optLValue1);
+            auto expr1 = optLValue1.value();
+
+            RY_PARSER__ASSERT(getToken());
+            auto optBinKind = BinOp::GetTokenKindToBinaryKind(getToken()->GetKind());
+            RY_PARSER__ASSERT(optBinKind);
+            auto binKind = optBinKind.value();
+
+            auto optExpr2 = parseExpression(mustParse);
+            RY_PARSER__ASSERT(optExpr2);
+            auto expr2 = optExpr2.value();
+
+            return BinOp(binKind, {expr1, expr2});
+        });
+    }
+
+    std::optional<ASTNode::StatementVariableDefinition> Parser::parseVariableDefinitionStatement(bool mustParse) {
+        RY_PARSER__WRAP_PARSE_FUNC("variable definition", std::optional<ASTNode::StatementVariableDefinition>, {
+            if(auto token = getToken())
+            if(auto name = token->GetName()) {
+                eatToken();
+                if(isToken(Token::Code::Define)) {
+                    eatToken();
+
+                    auto optExpr = parseExpression(mustParse);
+                    RY_PARSER__ASSERT(optExpr);
+                    auto expr = optExpr.value();
+
+                    return ASTNode::StatementUntypedVariableDefinition(*name, expr);
+                }
+                else {
+                    auto optType = parseType(mustParse);
+                    RY_PARSER__ASSERT(optType);
+                    auto type = optType.value();
+
+                    if(isToken('=')) {
+                        eatToken();
+
+                        auto optExpr = parseExpression(mustParse);
+                        RY_PARSER__ASSERT(optExpr)
+                        auto expr = optExpr.value();
+
+                        return ASTNode::StatementTypedVariableDefinition(*name, type, expr);
+                    }
+
+                    return ASTNode::StatementTypedVariableDefinition(*name, type);
+                }
+            }
+        });
+    }
+
+    std::optional<ASTNode::StatementAssignment> Parser::parseAssignmentStatement(bool mustParse) {
+        RY_PARSER__WRAP_PARSE_FUNC("assignment", std::optional<ASTNode::StatementAssignment>, {
+            auto optExpr1 = parseExpression(mustParse);
+            RY_PARSER__ASSERT(optExpr1);
+            auto optLValue1 = optExpr1->ToLValue();
+            RY_PARSER__ASSERT(optLValue1);
+            auto expr1 = optLValue1.value();
+
+            RY_PARSER__ASSERT(isToken('='))
+            eatToken();
+
+            auto optExpr2 = parseExpression(mustParse);
+            RY_PARSER__ASSERT(optExpr2);
+            auto expr2 = optExpr2.value();
+
+            return ASTNode::StatementAssignment(expr1, expr2);
+        });
+    }
+
+    std::optional<ASTNode::StatementContinue> Parser::parseContinueStatement(bool mustParse) {
+        RY_PARSER__WRAP_PARSE_FUNC("continue", std::optional<ASTNode::StatementContinue>, {
+            if(isToken(Token::Code::KeywordContinue))
+                return ASTNode::StatementContinue();
+        });
+    }
+
+    std::optional<ASTNode::StatementBreak> Parser::parseBreakStatement(bool mustParse) {
+        RY_PARSER__WRAP_PARSE_FUNC("break", std::optional<ASTNode::StatementBreak>, {
+            RY_PARSER__ASSERT(isToken(Token::Code::KeywordBreak));
+            eatToken();
+
+            RY_PARSER__ASSERT(getToken());
+            ASTNode::StatementBreak::Label label;
+            if(auto optStringLiteral = getToken()->GetLiteralValue<TokenLiteral::String>()) {
+                label = *optStringLiteral;
+                eatToken();
+            }
+
+            auto optExpr = parseExpression(false);
+
+            return ASTNode::StatementBreak(label, optExpr);
+        });
     }
 
 }

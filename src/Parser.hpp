@@ -47,7 +47,12 @@ namespace ry {
         std::optional<ASTNode::ExpressionUnaryOperation>  parseUnaryOperationExpression  (bool mustParse = true);
         std::optional<ASTNode::ExpressionBinaryOperation> parseBinaryOperationExpression (bool mustParse, const ASTNode::Expression& expr, std::optional<ASTNode::ExpressionBinaryOperation::Kind> currentBinOpKind = {});
 
-        std::optional<ASTNode::Statement> parseStatement(bool mustParse = true);
+        std::optional<ASTNode::Statement>                   parseStatement                   (bool mustParse = true);
+        std::optional<ASTNode::StatementBinaryOperation>    parseBinaryOperationStatement    (bool mustParse = true);
+        std::optional<ASTNode::StatementVariableDefinition> parseVariableDefinitionStatement (bool mustParse = true);
+        std::optional<ASTNode::StatementAssignment>         parseAssignmentStatement         (bool mustParse = true);
+        std::optional<ASTNode::StatementContinue>           parseContinueStatement           (bool mustParse = true);
+        std::optional<ASTNode::StatementBreak>              parseBreakStatement              (bool mustParse = true);
 
         int m_tokenIdx;
         const std::vector<Token>& m_tokens;

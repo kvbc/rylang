@@ -836,34 +836,11 @@ namespace ry {
     }
 
     std::string ExpressionUnaryOperation::Stringify(std::size_t indent) const {
-        std::string str = "ExprUnaryOp";
-        str += '\n';
-
-        str +=
-            GetIndentString(indent + 1)
-            + "[Pretty]: "
-            + StringifyPretty()
-            + '\n';
-
-        str +=
-            GetIndentString(indent + 1)
-            + "Kind: "
-            + StringifyKind(m_kind)
-            + " ("
-            + StringifyKindPretty(m_kind)
-            + ')'
-            + '\n';
-
-        str +=
-            GetIndentString(indent + 1)
-            + "Operand: "
-            + m_operand->Stringify(indent + 1);
-
-        return str;
+        return Stringify(m_kind, m_operand, indent);
     }
 
     std::string ExpressionUnaryOperation::StringifyPretty() const {
-        return StringifyKindPretty(m_kind) + m_operand->StringifyPretty();
+        return StringifyPretty(m_kind, m_operand);
     }
 
     std::optional<ExpressionLiteral::Float> ExpressionUnaryOperation::TryGetNumberValue() const {
@@ -871,6 +848,37 @@ namespace ry {
             if(auto optNumValue = m_operand->TryGetNumberValue())
                 return - optNumValue.value();
         return {};
+    }
+
+    std::string ExpressionUnaryOperation::Stringify(Kind kind, const Operand& operand, std::size_t indent) {
+        std::string str = "ExprUnaryOp";
+        str += '\n';
+
+        str +=
+            GetIndentString(indent + 1)
+            + "[Pretty]: "
+            + StringifyPretty(kind, operand)
+            + '\n';
+
+        str +=
+            GetIndentString(indent + 1)
+            + "Kind: "
+            + StringifyKind(kind)
+            + " ("
+            + StringifyKindPretty(kind)
+            + ')'
+            + '\n';
+
+        str +=
+            GetIndentString(indent + 1)
+            + "Operand: "
+            + operand->Stringify(indent + 1);
+
+        return str;
+    }
+
+    std::string ExpressionUnaryOperation::StringifyPretty(Kind kind, const Operand& operand) {
+        return StringifyKindPretty(kind) + operand->StringifyPretty();
     }
 
     // 
@@ -928,16 +936,24 @@ namespace ry {
     }
 
     std::string ExpressionBinaryOperation::Stringify(std::size_t indent) const {
+        return Stringify(m_kind, m_operands, indent);
+    }
+
+    std::string ExpressionBinaryOperation::StringifyPretty() const {
+        return StringifyPretty(m_kind, m_operands);
+    }
+
+    std::string ExpressionBinaryOperation::Stringify(Kind kind, const Operands& operands, std::size_t indent) {
         std::string str = "ExprBinOp";
         str += '\n';
 
         str +=
             GetIndentString(indent + 1)
             + "[Pretty]: "
-            + StringifyPretty()
+            + StringifyPretty(kind, operands)
             + '\n';
 
-        auto optNumValue = TryGetNumberValue();
+        auto optNumValue = TryGetNumberValue(kind, operands);
         str +=
             GetIndentString(indent + 1)
             + "[InterpretedValue]: "
@@ -947,35 +963,39 @@ namespace ry {
         str +=
             GetIndentString(indent + 1)
             + "Kind: "
-            + StringifyKind(m_kind)
+            + StringifyKind(kind)
             + '\n';
 
         str +=
             GetIndentString(indent + 1)
             + "FirstOperand: "
-            + m_operands.first->Stringify(indent + 1)
+            + operands.first->Stringify(indent + 1)
             + '\n';
 
         str +=
             GetIndentString(indent + 1)
             + "SecondOperand: "
-            + m_operands.second->Stringify(indent + 1);
+            + operands.second->Stringify(indent + 1);
 
         return str;
     }
 
-    std::string ExpressionBinaryOperation::StringifyPretty() const {
-        return m_operands.first->StringifyPretty() + ' ' + StringifyKindPretty(m_kind) + ' ' + m_operands.second->StringifyPretty();
+    std::string ExpressionBinaryOperation::StringifyPretty(Kind kind, const Operands& operands) {
+        return operands.first->StringifyPretty() + ' ' + StringifyKindPretty(kind) + ' ' + operands.second->StringifyPretty();
     }
 
     std::optional<ExpressionLiteral::Float> ExpressionBinaryOperation::TryGetNumberValue() const {
-        auto optNum1 = m_operands.first->TryGetNumberValue();
-        auto optNum2 = m_operands.second->TryGetNumberValue();
+        return TryGetNumberValue(m_kind, m_operands);
+    }
+
+    std::optional<ExpressionLiteral::Float> ExpressionBinaryOperation::TryGetNumberValue(Kind kind, const Operands& operands) {
+        auto optNum1 = operands.first->TryGetNumberValue();
+        auto optNum2 = operands.second->TryGetNumberValue();
         if(optNum1 && optNum2) {
             auto a = optNum1.value();
             auto b = optNum2.value();
             using Int = ExpressionLiteral::Int;
-            switch(m_kind) { 
+            switch(kind) { 
                 case Kind::Add : return a + b;
                 case Kind::Sub : return a - b;
                 case Kind::Div : return a / b;
@@ -1012,20 +1032,6 @@ namespace ry {
     // 
 
     using Expression = ASTNode::Expression;
-    using LValue = Expression::LValue;
-
-    LValue::LValue(const Data& data):
-        m_data(data)
-    {}
-
-    const LValue::Data& LValue::Get() const {
-        return m_data;
-    }
-
-    Expression::Expression(const Data& data, bool isGrouped):
-        m_data(data),
-        m_isGrouped(isGrouped)
-    {}
 
     const Expression::Data& Expression::Get() const {
         return m_data;
@@ -1035,20 +1041,19 @@ namespace ry {
         return m_isGrouped;
     }
 
-    bool Expression::IsLValue() const {
-        return std::holds_alternative<LValue::Name>(m_data)
-            || std::holds_alternative<LValue::PointerDereference>(m_data)
-            || std::holds_alternative<LValue::StructMemberAccess>(m_data);
-    }
+    std::optional<Expression::LValue> Expression::ToLValue() const {
+        if(auto name = std::get_if<ExpressionName>(&m_data))
+            return *name;
+        
+        if(auto unaryOp = std::get_if<ExpressionUnaryOperation>(&m_data))
+            if(unaryOp->GetKind() == ExpressionUnaryOperation::Kind::PointerDereference)
+                return unaryOp->GetOperand();
 
-    LValue Expression::ToLValue() const {
-        if(const LValue::Name * ptr = std::get_if<LValue::Name>(&m_data))
-            return LValue(*ptr);
-        if(const LValue::PointerDereference * ptr = std::get_if<LValue::PointerDereference>(&m_data))
-            return LValue(*ptr);
-        if(const LValue::StructMemberAccess * ptr = std::get_if<LValue::StructMemberAccess>(&m_data))
-            return LValue(*ptr);
-        throw std::invalid_argument("expression is not an lvalue");
+        if(auto binOp = std::get_if<ExpressionBinaryOperation>(&m_data))
+            if(binOp->GetKind() == ExpressionBinaryOperation::Kind::StructMemberAccess)
+                return binOp->GetOperands();
+
+        return {};
     }
 
     std::string Expression::Stringify(std::size_t indent) const {
@@ -1120,6 +1125,46 @@ namespace ry {
         return {};
     }
 
+    std::string Expression::StringifyLValue(const LValue& lvalue, std::size_t indent) {
+        return std::visit(overloaded{
+            [&](const ExpressionName& name) {
+                return std::string(name);
+            },
+            [&](const PointerDereference& operand) {
+                return ExpressionUnaryOperation::Stringify(
+                    ExpressionUnaryOperation::Kind::PointerDereference,
+                    operand, indent
+                );
+            },
+            [&](const StructMemberAccess& operands) {
+                return ExpressionBinaryOperation::Stringify(
+                    ExpressionBinaryOperation::Kind::StructMemberAccess,
+                    operands, indent
+                );
+            }
+        }, lvalue);
+    }
+
+    std::string Expression::StringifyLValuePretty(const LValue& lvalue) {
+        return std::visit(overloaded{
+            [&](const ExpressionName& name) {
+                return std::string(name);
+            },
+            [&](const PointerDereference& operand) {
+                return ExpressionUnaryOperation::StringifyPretty(
+                    ExpressionUnaryOperation::Kind::PointerDereference,
+                    operand
+                );
+            },
+            [&](const StructMemberAccess& operands) {
+                return ExpressionBinaryOperation::StringifyPretty(
+                    ExpressionBinaryOperation::Kind::StructMemberAccess,
+                    operands
+                );
+            }
+        }, lvalue);
+    }
+
     /*
      *
      * Statement
@@ -1145,27 +1190,77 @@ namespace ry {
         return m_operands;
     }
 
+    std::string StatementBinaryOperation::StringifyKind(Kind kind) {
+        static const std::unordered_map<Kind, const char *> nameMap = {
+            RY_ASTNODE__STMTBINOP_KINDS(RY_ASTNODE__STMTBINOP_KINDS_E_NAME_MAP)
+        };
+        return nameMap.at(kind);
+    }
+
+    std::string StatementBinaryOperation::StringifyKindPretty(Kind kind) {
+        auto optTokenNumericKind = Token::GetIntToNumericKind(int(kind));
+        assert(optTokenNumericKind);
+        return Token::StringifyNumericKind(optTokenNumericKind.value());
+    }
+
+    std::optional<StatementBinaryOperation::Kind> StatementBinaryOperation::GetTokenKindToBinaryKind(const Token::Kind& tokenKind) {
+        static const std::set<Token::NumericKind> tokenKinds {
+            RY_ASTNODE__STMTBINOP_KINDS(RY_ASTNODE__STMTBINOP_KINDS_E_VALUES)
+        };
+        auto optNumericKind = Token::GetKindToNumericKind(tokenKind);
+        if(!optNumericKind.has_value())
+            return {};
+        auto numericKind = optNumericKind.value();
+        if(tokenKinds.contains(numericKind))
+            return Kind(Token::GetNumericKindToInt(numericKind));
+        return {};
+    }
+
+    std::string StatementBinaryOperation::StringifyPretty() const {
+        std::string str;
+
+        str += Expression::StringifyLValue(m_operands.first);
+        str += ' ' + StringifyKindPretty(m_kind) + ' ';
+        str += m_operands.second.StringifyPretty();
+
+        return str;
+    }
+
+    std::string StatementBinaryOperation::Stringify(std::size_t indent) const {
+        std::string str = "StmtBinOp";
+        str += '\n';
+
+        str +=
+            GetIndentString(indent + 1)
+            + "[Pretty]: "
+            + StringifyPretty()
+            + '\n';
+
+        str +=
+            GetIndentString(indent + 1)
+            + "Kind: "
+            + StringifyKind(m_kind)
+            + '\n';
+
+        str +=
+            GetIndentString(indent + 1)
+            + "FirstOperand: "
+            + Expression::StringifyLValue(m_operands.first, indent + 1)
+            + '\n';
+
+        str +=
+            GetIndentString(indent + 1)
+            + "SecondOperand: "
+            + m_operands.second.Stringify(indent + 1);
+
+        return str;
+    }
+
     // 
 
-    using StatementVariableDefinition = ASTNode::StatementVariableDefinition;
+    using StatementTypedVariableDefinition = ASTNode::StatementTypedVariableDefinition;
 
-    StatementVariableDefinition::StatementVariableDefinition(
-        const VarName& varName,
-        const VarType& varType
-    ):
-        m_varName(varName),
-        m_varType(varType)
-    {}
-
-    StatementVariableDefinition::StatementVariableDefinition(
-        const VarName& varName,
-        const VarValue& varValue
-    ):
-        m_varName(varName),
-        m_varValue(varValue)
-    {}
-
-    StatementVariableDefinition::StatementVariableDefinition(
+    StatementTypedVariableDefinition::StatementTypedVariableDefinition(
         const VarName& varName,
         const VarType& varType,
         const VarValue& varValue
@@ -1175,16 +1270,68 @@ namespace ry {
         m_varValue(varValue)
     {}
 
-    const StatementVariableDefinition::VarName& StatementVariableDefinition::GetName() const {
-        return m_varName;
+    const StatementTypedVariableDefinition::VarName  & StatementTypedVariableDefinition::GetName () const { return m_varName; }
+    const StatementTypedVariableDefinition::VarType  & StatementTypedVariableDefinition::GetType () const { return m_varType; }
+    const StatementTypedVariableDefinition::VarValue & StatementTypedVariableDefinition::GetValue() const { return m_varValue; }
+
+    std::string StatementTypedVariableDefinition::StringifyPretty() const {
+        std::string str;
+
+        str += m_varName;
+        str += ' ';
+        str += m_varType.StringifyPretty();
+        if(m_varValue) {
+            str += " = ";
+            str += m_varValue->StringifyPretty();
+        }
+
+        return str;
     }
 
-    const StatementVariableDefinition::VarType& StatementVariableDefinition::GetType() const {
-        return m_varType;
+    std::string StatementTypedVariableDefinition::Stringify(std::size_t indent) const {
+        std::string str = "StmtTypedVarDef";
+        str += '\n';
+
+        str +=
+            GetIndentString(indent + 1)
+            + "Name: "
+            + std::string(m_varName)
+            + '\n';
+
+        str +=
+            GetIndentString(indent + 1)
+            + "Type: "
+            + m_varType.Stringify(indent + 1)
+            + '\n';
+
+        str +=
+            GetIndentString(indent + 1)
+            + "Value: "
+            + (m_varValue ? m_varValue->Stringify(indent + 1) : "none")
+            + '\n';
+
+        return str;
+    }
+    
+    using StatementUntypedVariableDefinition = ASTNode::StatementUntypedVariableDefinition;
+
+    StatementUntypedVariableDefinition::StatementUntypedVariableDefinition(
+        const VarName& varName,
+        const VarValue& varValue
+    ):
+        m_varName(varName),
+        m_varValue(varValue)
+    {}
+
+    const StatementUntypedVariableDefinition::VarName  & StatementUntypedVariableDefinition::GetName () const { return m_varName; }
+    const StatementUntypedVariableDefinition::VarValue & StatementUntypedVariableDefinition::GetValue() const { return m_varValue; }
+
+    std::string StatementUntypedVariableDefinition::StringifyPretty() const {
+        // TODO
     }
 
-    const StatementVariableDefinition::VarValue& StatementVariableDefinition::GetValue() const {
-        return m_varValue;
+    std::string StatementUntypedVariableDefinition::Stringify(std::size_t indent) const {
+        // TODO
     }
 
     // 
