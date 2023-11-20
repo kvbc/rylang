@@ -148,7 +148,7 @@ namespace ry {
             for(int i = 0; i < CODE_STRINGS_LEN; i++) {
                 const char * str = CODE_STRINGS[i];
                 Code code = Code( int(Code::_First) + 1 + i );
-                if(strlen(str) == len && strcmp(str, chars) == 0)
+                if(strlen(str) == len && strncmp(str, chars, len) == 0)
                     return {{code, len}};
             }
         }

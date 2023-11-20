@@ -498,21 +498,21 @@ namespace ry {
         public:
             using Operands = std::pair<Expression::LValue, Expression>;
 
-        #define RY_ASTNODE__STMTBINOP_KINDS_E_ENUM(NAME, _) NAME ,
-        #define RY_ASTNODE__STMTBINOP_KINDS_E_VALUES(_, VALUE) VALUE ,
+        #define RY_ASTNODE__STMTBINOP_KINDS_E_ENUM(NAME, VALUE) NAME = int(VALUE),
+        #define RY_ASTNODE__STMTBINOP_KINDS_E_VALUES(_, VALUE) Token::NumericKind(VALUE) ,
         #define RY_ASTNODE__STMTBINOP_KINDS_E_NAME_MAP(NAME, _) { Kind::NAME, #NAME } ,
         #define RY_ASTNODE__STMTBINOP_KINDS(E) \
-            E(AddEq,   TK::AddEqual) \
-            E(SubEq,   TK::SubEqual) \
-            E(MulEq,   TK::MulEqual) \
-            E(DivEq,   TK::DivEqual) \
-            E(ModEq,   TK::ModEqual) \
+            E(AddEq, TK::AddEqual) \
+            E(SubEq, TK::SubEqual) \
+            E(MulEq, TK::MulEqual) \
+            E(DivEq, TK::DivEqual) \
+            E(ModEq, TK::ModEqual) \
             \
-            E(BitOrEq,     TK::BitOrEqual) \
-            E(BitXorEq,    TK::BitXorEqual) \
-            E(BitAndEq,    TK::BitAndEqual) \
+            E(BitOrEq, TK::BitOrEqual) \
+            E(BitXorEq, TK::BitXorEqual) \
+            E(BitAndEq, TK::BitAndEqual) \
             E(BitLShiftEq, TK::BitLShiftEqual) \
-            E(BitRShiftEq, TK::BitRShiftEqual) \
+            E(BitRShiftEq, TK::BitRShiftEqual)
 
             enum class Kind {
                 RY_ASTNODE__STMTBINOP_KINDS(RY_ASTNODE__STMTBINOP_KINDS_E_ENUM)
@@ -594,6 +594,9 @@ namespace ry {
             const LValue & GetLValue() const;
             const RValue & GetRValue() const;
 
+            std::string StringifyPretty() const;
+            std::string Stringify(std::size_t indent = 0) const;
+
         private:
             LValue m_lvalue;
             RValue m_rvalue;
@@ -601,7 +604,11 @@ namespace ry {
 
         // 
 
-        using StatementContinue = struct {};
+        class StatementContinue {
+        public:
+            static std::string StringifyPretty();
+            static std::string Stringify(std::size_t indent = 0);
+        };
 
         // 
 
@@ -614,6 +621,9 @@ namespace ry {
 
             const Label& GetLabel() const;
             const Value& GetValue() const;
+
+            std::string StringifyPretty() const;
+            std::string Stringify(std::size_t indent = 0) const;
 
         private:
             Label m_label;
@@ -656,6 +666,9 @@ namespace ry {
         ASTNode(const Data& data);
 
         const Data& Get() const;
+
+        std::string Stringify(std::size_t indent = 0) const;
+        std::string StringifyPretty() const;
 
     private:
         Data m_data;

@@ -69,7 +69,7 @@ namespace ry {
 
     std::string TypeStruct::StringifyField(const Field& field, std::size_t indent) const {
         auto stringifyDefaultValue = [&](const FieldDefaultValue& defaultValue, std::size_t indent) -> std::string {
-            std::string str = "none \n";
+            std::string str = "none";
             if(defaultValue)
                 str = defaultValue.value()->Stringify(indent);
             return
@@ -108,7 +108,9 @@ namespace ry {
                         + '\n';
 
                 str += stringifyFieldType(namedField.GetType(), indent + 1);
+                str += '\n';
                 str += stringifyDefaultValue(namedField.GetDefaultValue(), indent + 1);
+                str += '\n';
                 str += stringifyPretty(namedField, indent + 1);
 
                 return str;
@@ -126,7 +128,9 @@ namespace ry {
                     + '\n';
 
                 str += stringifyFieldType(unnamedField.GetType(), indent + 1);
+                str += '\n';
                 str += stringifyDefaultValue(unnamedField.GetDefaultValue(), indent + 1);
+                str += '\n';
                 str += stringifyPretty(unnamedField, indent + 1);
 
                 return str;
@@ -317,8 +321,7 @@ namespace ry {
                 [&](const TypeStruct& structType) -> std::string {
                     return structType.Stringify(indent + 1);
                 }
-            }, m_data)
-            + '\n';
+            }, m_data);
 
         return str;
     }
@@ -610,11 +613,11 @@ namespace ry {
         str +=
             GetIndentString(indent + 1)
             + "Statements: ";
-        for(auto it = m_statements.cbegin(); it != m_statements.cend(); it++) {
-            auto statement = *it;
-            str += statement.Stringify(indent + 1);
-            if(it < m_statements.cend() - 1)
-                str += '\n';
+        for(auto stmt : m_statements) {
+            str += '\n';
+            str +=
+                GetIndentString(indent + 2)
+                + stmt.Stringify(indent + 2);
         }
 
         return str;
@@ -1041,6 +1044,11 @@ namespace ry {
         return m_isGrouped;
     }
 
+    Expression::Expression(const Data& data, bool isGrouped):
+        m_data(data),
+        m_isGrouped(isGrouped)
+    {}
+
     std::optional<Expression::LValue> Expression::ToLValue() const {
         if(auto name = std::get_if<ExpressionName>(&m_data))
             return *name;
@@ -1294,6 +1302,12 @@ namespace ry {
 
         str +=
             GetIndentString(indent + 1)
+            + "[Pretty]: "
+            + StringifyPretty()
+            + '\n';
+
+        str +=
+            GetIndentString(indent + 1)
             + "Name: "
             + std::string(m_varName)
             + '\n';
@@ -1307,8 +1321,7 @@ namespace ry {
         str +=
             GetIndentString(indent + 1)
             + "Value: "
-            + (m_varValue ? m_varValue->Stringify(indent + 1) : "none")
-            + '\n';
+            + (m_varValue ? m_varValue->Stringify(indent + 1) : "none");
 
         return str;
     }
@@ -1327,11 +1340,31 @@ namespace ry {
     const StatementUntypedVariableDefinition::VarValue & StatementUntypedVariableDefinition::GetValue() const { return m_varValue; }
 
     std::string StatementUntypedVariableDefinition::StringifyPretty() const {
-        // TODO
+        return std::string(m_varName) + " := " + m_varValue.StringifyPretty();
     }
 
     std::string StatementUntypedVariableDefinition::Stringify(std::size_t indent) const {
-        // TODO
+        std::string str = "StmtUntypedVarDef";
+        str += '\n';
+
+        str +=
+            GetIndentString(indent + 1)
+            + "[Pretty]: "
+            + StringifyPretty()
+            + '\n';
+
+        str +=
+            GetIndentString(indent + 1)
+            + "Name: "
+            + std::string(m_varName)
+            + '\n';
+
+        str += 
+            GetIndentString(indent + 1)
+            + "Value: "
+            + m_varValue.Stringify(indent + 1);
+
+        return str;
     }
 
     // 
@@ -1351,9 +1384,45 @@ namespace ry {
         return m_rvalue;
     }
 
+    std::string StatementAssignment::StringifyPretty() const {
+        return Expression::StringifyLValuePretty(m_lvalue) + " = " + m_rvalue.StringifyPretty();
+    }
+
+    std::string StatementAssignment::Stringify(std::size_t indent) const {
+        std::string str = "StmtAssign";
+        str += '\n';
+
+        str +=
+            GetIndentString(indent + 1)
+            + "[Pretty]: "
+            + StringifyPretty()
+            + '\n';
+
+        str +=
+            GetIndentString(indent + 1)
+            + "LValue: "
+            + Expression::StringifyLValue(m_lvalue, indent + 1)
+            + '\n';
+
+        str +=
+            GetIndentString(indent + 1)
+            + "RValue: "
+            + m_rvalue.Stringify(indent + 1);
+
+        return str;
+    }
+
     // 
 
     using StatementContinue = ASTNode::StatementContinue;
+
+    std::string StatementContinue::StringifyPretty() {
+        return "continue";
+    }
+
+    std::string StatementContinue::Stringify(std::size_t indent) {
+        return "StmtContinue";
+    }
 
     // 
 
@@ -1372,6 +1441,44 @@ namespace ry {
         return m_value;
     }
 
+    std::string StatementBreak::StringifyPretty() const {
+        std::string str = "break";
+        if(m_label) {
+            str += " \"";
+            str += m_label.value();
+            str += '"';
+        }
+        if(m_value) {
+            str += ' ';
+            str += m_value->StringifyPretty();
+        }
+        return str;
+    }
+
+    std::string StatementBreak::Stringify(std::size_t indent) const {
+        std::string str = "StmtBreak";
+        str += '\n';
+
+        str +=
+            GetIndentString(indent + 1)
+            + "[Pretty]: "
+            + StringifyPretty()
+            + '\n';
+
+        str +=
+            GetIndentString(indent + 1)
+            + "Label: "
+            + m_label.value_or("none")
+            + '\n';
+
+        str += 
+            GetIndentString(indent + 1)
+            + "Value: "
+            + (m_value ? m_value->Stringify(indent + 1) : "none");
+
+        return str;
+    }
+
     // 
 
     using Statement = ASTNode::Statement;
@@ -1385,11 +1492,63 @@ namespace ry {
     }
 
     std::string Statement::Stringify(std::size_t indent) const {
-        return "???";
+        std::string str = "Statement";
+        str += '\n';
+
+        str +=
+            GetIndentString(indent + 1)
+            + "Kind: "
+            + std::visit(overloaded{
+                [&](const StatementExpression& expr) {
+                    return expr.Stringify(indent + 1);
+                },
+                [&](const StatementBinaryOperation& binOp) {
+                    return binOp.Stringify(indent + 1);
+                },
+                [&](const StatementVariableDefinition& varDef) {
+                    return std::visit(overloaded{
+                        [&](const StatementTypedVariableDefinition& typedVarDef){ return typedVarDef.Stringify(indent + 1); },
+                        [&](const StatementUntypedVariableDefinition& untypedVarDef){ return untypedVarDef.Stringify(indent + 1); }
+                    }, varDef);
+                },
+                [&](const StatementAssignment& assign) {
+                    return assign.Stringify(indent + 1);
+                },
+                [&](const StatementContinue& stmt) {
+                    return stmt.Stringify(indent + 1);
+                },
+                [&](const StatementBreak& stmtBreak) {
+                    return stmtBreak.Stringify(indent + 1);
+                }
+            }, m_data);
+
+        return str;
     }
 
     std::string Statement::StringifyPretty() const {
-        return "???";
+        return std::visit(overloaded{
+            [](const StatementExpression& expr) {
+                return expr.StringifyPretty();
+            },
+            [](const StatementBinaryOperation& binOp) {
+                return binOp.StringifyPretty();
+            },
+            [](const StatementVariableDefinition& varDef) {
+                return std::visit(overloaded{
+                    [](const StatementTypedVariableDefinition& typedVarDef){ return typedVarDef.StringifyPretty(); },
+                    [](const StatementUntypedVariableDefinition& untypedVarDef){ return untypedVarDef.StringifyPretty(); }
+                }, varDef);
+            },
+            [](const StatementAssignment& assign) {
+                return assign.StringifyPretty();
+            },
+            [](const StatementContinue& stmt) {
+                return stmt.StringifyPretty();
+            },
+            [](const StatementBreak& stmtBreak) {
+                return stmtBreak.StringifyPretty();
+            }
+        }, m_data);
     }
 
     /*
@@ -1404,6 +1563,22 @@ namespace ry {
 
     const ASTNode::Data& ASTNode::Get() const {
         return m_data;
+    }
+
+    std::string ASTNode::Stringify(std::size_t indent) const {
+        return std::visit(overloaded{
+            [&](const Type& type)       { return type.Stringify(indent); },
+            [&](const Statement& stmt)  { return stmt.Stringify(indent); },
+            [&](const Expression& expr) { return expr.Stringify(indent); }
+        }, m_data);
+    }
+
+    std::string ASTNode::StringifyPretty() const {
+        return std::visit(overloaded{
+            [&](const Type& type)       { return type.StringifyPretty(); },
+            [&](const Statement& stmt)  { return stmt.StringifyPretty(); },
+            [&](const Expression& expr) { return expr.StringifyPretty(); }
+        }, m_data);
     }
 
 }

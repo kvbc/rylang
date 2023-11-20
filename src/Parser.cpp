@@ -46,14 +46,8 @@ namespace ry {
     }
 
     std::optional<ASTNode> Parser::Parse() {
-        auto optType = parseType(false);
-        if(optType)
-            return ASTNode(optType.value());
-
-        auto optExpr = parseExpression(false);
-        if(optExpr)
-            return ASTNode(optExpr.value());
-
+        if(auto stmt = parseStatement(false))
+            return ASTNode(stmt.value());
         return {};
     }
 
@@ -657,12 +651,12 @@ namespace ry {
     }
 
         RY_PARSER__WRAP_PARSE_FUNC("statement", std::optional<ASTNode::Statement>, {
-            TRY_RETURN(parseExpression                 (false));
-            TRY_RETURN(parseBinaryOperationStatement   (false));
-            TRY_RETURN(parseVariableDefinitionStatement(false));
-            TRY_RETURN(parseAssignmentStatement        (false));
             TRY_RETURN(parseContinueStatement          (false));
             TRY_RETURN(parseBreakStatement             (false));
+            TRY_RETURN(parseVariableDefinitionStatement(false));
+            TRY_RETURN(parseAssignmentStatement        (false));
+            TRY_RETURN(parseBinaryOperationStatement   (false));
+            TRY_RETURN(parseExpression                 (false)); // last
         });
     
     #undef TRY_RETURN
@@ -680,6 +674,7 @@ namespace ry {
             RY_PARSER__ASSERT(getToken());
             auto optBinKind = BinOp::GetTokenKindToBinaryKind(getToken()->GetKind());
             RY_PARSER__ASSERT(optBinKind);
+            eatToken();
             auto binKind = optBinKind.value();
 
             auto optExpr2 = parseExpression(mustParse);

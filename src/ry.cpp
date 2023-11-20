@@ -35,12 +35,8 @@ int main() {
     std::optional<ry::ASTNode> ast = parser.Parse();
 
     std::cout << header << " AST" << std::endl;
-    if(ast.has_value()) {
-        if(auto * expr = std::get_if<ry::ASTNode::Expression>(&ast.value().Get()))
-            std::cout << expr->Stringify() << std::endl;
-        else if(auto * type = std::get_if<ry::ASTNode::Type>(&ast.value().Get()))
-            std::cout << type->Stringify() << std::endl;
-    }
+    if(ast.has_value())
+        std::cout << ast.value().Stringify() << std::endl;
     std::cout << std::endl;
 
     std::cout << header << " Parser Info" << std::endl;
