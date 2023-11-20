@@ -13,6 +13,7 @@ Note to self: press `CTRL K` + `Z` to leave zen mode
 -   [x] [Haxe](https://haxe.org/manual/introduction.html)
 -   [ ] [D](https://dlang.org/spec/spec.html)
 -   [ ] [GML](https://manual.yoyogames.com/GameMaker_Language/GameMaker_Language_Index.htm)
+-   [ ] [Lua](https://www.lua.org/manual/5.4/)
 
 ---
 
@@ -109,7 +110,7 @@ _(lets just ignore test coverage for now)_
 | &emsp; &emsp; &emsp; 2.3.6.2. [Loop](#loop)                                       |   ✔️   |    ❌     |                   ✔️                    |          ❌          |           ❌           |      ❌       |                                                               |
 | &emsp; &emsp; 2.3.7. [Struct Literals](#struct-literals)                          |   ✔️   |    ❌     |                   ✔️                    |          ❌          |           ❌           |      ❌       |                                                               |
 | &emsp; &emsp; 2.3.8. [Compile-time Expressions](#compile-time-expressions)        |   ✔️   |    ❌     |                   ✔️                    |          ❌          |           ❌           |      ❌       |                                                               |
-| &emsp; 2.4. [Statements](#statements)                                             |  ✔️👇  |    ❌     |                   ↪️👇                    |          ❌          |           ❌           |      ❌       |                                                               |
+| &emsp; 2.4. [Statements](#statements)                                             |  ✔️👇  |    ❌     |                  ↪️👇                   |          ❌          |           ❌           |      ❌       |                                                               |
 | &emsp; &emsp; 2.4.1. [Variable Definition](#variable-definition)                  |   ➖   |    ❌     |                   ✔️                    |          ❌          |           ❌           |      ❌       | // possibly add struct destructuring                          |
 | &emsp; &emsp; 2.4.2. [Assignment](#assignment)                                    |   ✔️   |    ❌     |                   ✔️                    |          ❌          |           ❌           |      ❌       |                                                               |
 | &emsp; &emsp; 2.4.3. [Continue Statement](#continue-statement)                    |   ✔️   |    ❌     |                   ✔️                    |          ❌          |           ❌           |      ❌       |                                                               |
