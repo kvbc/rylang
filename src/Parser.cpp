@@ -97,6 +97,16 @@ namespace ry {
 
     // 
 
+    void Parser::error(std::string_view msg) {
+        if(auto token = getToken()) {
+            m_infos.Push(Infos::Info(
+                Infos::Info::Level::ERROR,
+                msg,
+                token->GetSourcePosition()
+            ));
+        }
+    }
+
     void Parser::errorExpected(std::string_view what) {
         std::cout << std::stacktrace::current() << std::endl;
         if(auto token = getToken()) {
@@ -129,84 +139,151 @@ namespace ry {
      *
      */
 
+
+    // 
+    // Syntax:
+    //        <type>              :: ['('] [~] [?] (<type_primitive> | <type_func> | <type_struct> | <type_ptr>) [')']
+    //        <type_primitive>    :: (* see ASTNode::TypePrimitive *)
+    //        <type_func>         :: <type_struct> => <type>
+    //        <type_struct>       :: '[' [{<type_struct_field> ,|;} <type_struct_field>] ']'
+    //        <type_struct_field> :: (* see Parser::parseStructTypeField() *)
+    //        <type_ptr>          :: * <type>
+    // Errors:
+    //        "Duplicate optional type attribute "??""
+    //        "Duplicate mutable type attribute "~~""
+    //        "Cannot have an optional mutable type "?~", did you mean "~?" ?" 
+    //        "Function type arguments expected to be of type struct, got ..."
+    //        "Expected struct type field separator"
+    //        "Unterminated grouped type"
+    //        ... see Parser::parseStructTypeField()
+    // 
     std::optional<ASTNode::Type> Parser::parseType(bool mustParse) {
-        // type attribs
-
-        ASTNode::Type::Attribs attribs;
-        if(isToken('~')) {
-            eatToken();
-            attribs.isMutable = true;
-        }
-        if(isToken('?')) {
-            eatToken();
-            attribs.isOptional = true;
-        }
-
-        // type
-
-        auto token = getToken();
-        RY_PARSER__ASSERT(token);
-
-        if(isToken('*')) {
-            // pointer
-            eatToken();
-            auto optBaseType = parseType();
-            RY_PARSER__ASSERT(optBaseType);
-            ASTNode::Type baseType = optBaseType.value();
-            ASTNode::TypePointer ptrType = std::make_shared<ASTNode::Type>(baseType);
-            return ASTNode::Type(ptrType, attribs);
-        }
-        else if(auto optPrimitiveType = ASTNode::Type::GetTokenKindToPrimitiveType(token->GetKind())) {
-            // primitive
-            eatToken();
-            return ASTNode::Type(optPrimitiveType.value(), attribs);
-        }
-        else if(isToken('[')) {
-            // struct or function
-            eatToken();
-            
-            ASTNode::TypeStruct::Fields structFields;
-            for(;;) {
-                if(isToken(']')) {
-                    eatToken();
-                    break;
-                }
-
-                auto optField = parseStructTypeField();
-                RY_PARSER__ASSERT(optField);
-                structFields.push_back(optField.value());
-
-                bool isSep = isToken(',') || isToken(';');
-                bool isEnd = isToken(']');
-                if(isSep)
-                    eatToken();
-                else if(!isEnd)
-                    errorExpected("separator");
-            }
-            auto structType = ASTNode::TypeStruct(structFields);
-
-            if(isToken(Token::Code::FunctionArrow)) {
-                // function
+        RY_PARSER__WRAP_PARSE_FUNC("type", std::optional<ASTNode::Type>, {
+            bool isGrouped = false;
+            if(isToken('(')) {
                 eatToken();
-                std::optional<ASTNode::Type> optRetType = parseType();
-                RY_PARSER__ASSERT(optRetType.has_value());
-                auto retType = optRetType.value();
-                auto retTypePtr = std::make_shared<ASTNode::Type>(retType);
-                auto funcType = ASTNode::TypeFunction(structType, retTypePtr);
-                return ASTNode::Type(funcType, attribs);
+                isGrouped = true;
             }
 
-            // struct
-            return ASTNode::Type(structType, attribs);
-        }
+            // type attribs
 
-        // not a type
+            ASTNode::Type::Attribs attribs;
+            if(isToken('~')) {
+                eatToken();
+                attribs.isMutable = true;
 
-        if(mustParse)
-            errorExpected("type");
-        return {};
+                if(isToken('~')) {
+                    error("Duplicate optional type attribute \"~~\"");
+                    eatToken();
+                }
+            }
+            if(isToken('?')) {
+                eatToken();
+                attribs.isOptional = true;
+
+                if(isToken('?')) {
+                    error("Duplicate optional type attribute \"??\"");
+                    eatToken();
+                }
+                else if(isToken('~')) {
+                    error("Cannot have an optional mutable type \"?~\", did you mean \"~?\"");
+                    eatToken();
+                }
+            }
+
+            // type
+
+            auto token = getToken();
+            RY_PARSER__ASSERT(token);
+
+            auto parseNonFunctionType = [&]() -> std::optional<ASTNode::Type> {
+                if(isToken('*')) {
+                    // pointer
+                    eatToken();
+                    auto optBaseType = parseType();
+                    RY_PARSER__ASSERT(optBaseType);
+                    ASTNode::Type baseType = optBaseType.value();
+                    ASTNode::TypePointer ptrType = std::make_shared<ASTNode::Type>(baseType);
+                    return ASTNode::Type(ptrType, attribs);
+                }
+                else if(auto optPrimitiveType = ASTNode::Type::GetTokenKindToPrimitiveType(token->GetKind())) {
+                    // primitive
+                    eatToken();
+                    return ASTNode::Type(optPrimitiveType.value(), attribs);
+                }
+                else if(isToken('[')) {
+                    // struct or function
+                    eatToken();
+                    
+                    ASTNode::TypeStruct::Fields structFields;
+                    for(;;) {
+                        if(isToken(']')) {
+                            eatToken();
+                            break;
+                        }
+
+                        auto optField = parseStructTypeField();
+                        RY_PARSER__ASSERT(optField);
+                        structFields.push_back(optField.value());
+
+                        bool isSep = isToken(',') || isToken(';');
+                        bool isEnd = isToken(']');
+                        if(isSep)
+                            eatToken();
+                        else if(!isEnd)
+                            errorExpected("separator");
+                    }
+                    auto structType = ASTNode::TypeStruct(structFields);
+                    return ASTNode::Type(structType, attribs);
+                }
+                return {};
+            };
+
+            auto parseFunctionType = [&](const ASTNode::Type& argsType) -> std::optional<ASTNode::Type> {
+                if(isToken(Token::Code::FunctionArrow)) {
+                    eatToken();
+                    if(auto structType = std::get_if<ASTNode::TypeStruct>(&argsType.Get())) {
+                        // function
+                        std::optional<ASTNode::Type> optRetType = parseType();
+                        RY_PARSER__ASSERT(optRetType.has_value());
+                        auto retType = optRetType.value();
+                        auto retTypePtr = std::make_shared<ASTNode::Type>(retType);
+                        auto funcType = ASTNode::TypeFunction(*structType, retTypePtr);
+                        return ASTNode::Type(funcType, attribs);
+                    } else {
+                        error(std::format("Function type arguments expected to be of type struct, got {}", argsType.StringifyKind()));
+                        RY_PARSER__ASSERT(parseType()); // parse return type
+                    }
+                }
+                return {};
+            };
+
+            auto optType = parseNonFunctionType();
+            RY_PARSER__ASSERT(optType);
+            auto type = optType.value();
+            auto retType = parseFunctionType(type).value_or(type);
+
+            if(isGrouped) {
+                if(isToken(')'))
+                    eatToken();
+                else {
+                    error("Unterminated grouped type");
+                    return {};
+                }
+            }
+
+            return parseFunctionType(retType).value_or(retType);
+        });
     }
 
+    //
+    // Syntax:
+    //        <type_struct_field> :: <name>{,<name>} <type> [= <comp_expr>]
+    //                             | <type> [* <comp_expr>] [= <comp_expr>]
+    //                             | [<comp_expr> *] <type> [= <comp_expr>]
+    // Errors:
+    //        TODO
+    // 
     std::optional<ASTNode::TypeStruct::Field> Parser::parseStructTypeField() {
         using TypeStruct = ASTNode::TypeStruct;
         using Field = TypeStruct::Field;

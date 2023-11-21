@@ -249,8 +249,7 @@ namespace ry {
         str +=
             GetIndentString(indent + 1)
             + "ReturnType: "
-            + GetReturnType()->Stringify(indent + 1)
-            + '\n';
+            + GetReturnType()->Stringify(indent + 1);
 
         return str;
     }
@@ -358,6 +357,15 @@ namespace ry {
         if(PRIMITIVE_TYPES_TOKEN_KINDS.contains(numericKind))
             return ASTNode::TypePrimitive(Token::GetNumericKindToInt(numericKind));
         return {};
+    }
+
+    const char * Type::StringifyKind() const {
+        return std::visit(overloaded{
+            [](const TypePrimitive&){ return "primitive"; },
+            [](const TypePointer&)  { return "pointer"; },
+            [](const TypeFunction&) { return "function"; },
+            [](const TypeStruct&)   { return "struct"; },
+        }, m_data);
     }
 
     /*

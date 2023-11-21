@@ -28,6 +28,7 @@ namespace ry {
         const Token * getToken(int offset = 0);
         void eatToken();
 
+        void error(std::string_view msg);
         void errorExpected(std::string_view what);
         template<typename T>
         void errorExpectedToken();

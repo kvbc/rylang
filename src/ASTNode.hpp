@@ -157,6 +157,7 @@ namespace ry {
             static const char * StringifyPrimitiveType(TypePrimitive primitiveType);
             std::string Stringify(std::size_t indent = 0) const;
             std::string StringifyPretty() const;
+            const char * StringifyKind() const;
 
             static std::optional<TypePrimitive> GetTokenKindToPrimitiveType(const Token::Kind& tokenKind);
 
