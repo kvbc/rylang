@@ -501,7 +501,7 @@ namespace ry {
             return ASTNode::ExpressionLiteral(optStructLiteral.value());
         }
 
-        if(auto token = getToken())
+        if(auto token = getToken()) {
             if(auto literal = std::get_if<TokenLiteral>(&token->GetKind())) {
                 eatToken();
                 Literal::Data litData = std::visit(overloaded{
@@ -513,6 +513,11 @@ namespace ry {
                 }, literal->GetValue());
                 return ASTNode::ExpressionLiteral(litData);
             }
+            else if(isToken(Token::Code::KeywordNull)) {
+                eatToken();
+                return ASTNode::ExpressionLiteral();
+            }
+        }
 
         if(mustParse)
             errorExpected("literal");
@@ -575,20 +580,20 @@ namespace ry {
             if(optCondExpr.has_value()) {
                 if (expectToken(Token::Code::KeywordDo)) {
                     eatToken();
-                    auto optThenExpr = parseExpression();
-                    if(optThenExpr.has_value()) {
+                    auto optThenStmt = parseStatement();
+                    if(optThenStmt.has_value()) {
                         // else
-                        ASTNode::ExpressionIf::FailExpression failExpr;
+                        ASTNode::ExpressionIf::FailStatement failStmt;
                         if(isToken(Token::Code::KeywordElse)) {
                             eatToken();
-                            auto optFailExpr = parseExpression(false);
-                            if(optFailExpr.has_value())
-                                failExpr = std::make_shared<ASTNode::Expression>(optFailExpr.value());
+                            auto optFailStmt = parseStatement(false);
+                            if(optFailStmt.has_value())
+                                failStmt = std::make_shared<ASTNode::Statement>(optFailStmt.value());
                         }
 
                         auto condExpr = std::make_shared<ASTNode::Expression>(optCondExpr.value());
-                        auto thenExpr = std::make_shared<ASTNode::Expression>(optThenExpr.value());
-                        return ASTNode::ExpressionIf(condExpr, thenExpr, failExpr);
+                        auto thenStmt = std::make_shared<ASTNode::Statement>(optThenStmt.value());
+                        return ASTNode::ExpressionIf(condExpr, thenStmt, failStmt);
                     }
                 }
             }

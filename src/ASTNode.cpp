@@ -655,24 +655,24 @@ namespace ry {
 
     ExpressionIf::ExpressionIf(
         const Condition& condition,
-        const SuccessExpression& successExpression,
-        const FailExpression& failExpression
+        const SuccessStatement& successStatement,
+        const FailStatement& failStatement
     ):
         m_condition(condition),
-        m_successExpression(successExpression),
-        m_failExpression(failExpression)
+        m_successStatement(successStatement),
+        m_failStatement(failStatement)
     {}
 
     const ExpressionIf::Condition& ExpressionIf::GetCondition() const {
         return m_condition;
     }
 
-    const ExpressionIf::SuccessExpression& ExpressionIf::GetSuccessExpression() const {
-        return m_successExpression;
+    const ExpressionIf::SuccessStatement& ExpressionIf::GetSuccessStatement() const {
+        return m_successStatement;
     }
 
-    const ExpressionIf::FailExpression& ExpressionIf::GetFailExpression() const {
-        return m_failExpression;
+    const ExpressionIf::FailStatement& ExpressionIf::GetFailStatement() const {
+        return m_failStatement;
     }
     
     std::string ExpressionIf::Stringify(std::size_t indent) const {
@@ -693,14 +693,14 @@ namespace ry {
 
         str +=
             GetIndentString(indent + 1)
-            + "SuccessExpr: "
-            + m_successExpression->Stringify(indent + 1)
+            + "SuccessStmt: "
+            + m_successStatement->Stringify(indent + 1)
             + '\n';
 
         str +=
             GetIndentString(indent + 1)
-            + "FailExpr: "
-            + (m_failExpression ? m_failExpression.value()->Stringify(indent + 1) : "none");
+            + "FailStmt: "
+            + (m_failStatement ? m_failStatement.value()->Stringify(indent + 1) : "none");
 
         return str;
     }
@@ -709,10 +709,10 @@ namespace ry {
         std::string str = "if ";
         str += m_condition->StringifyPretty();
         str += " do ";
-        str += m_successExpression->StringifyPretty();
-        if(m_failExpression.has_value()) {
+        str += m_successStatement->StringifyPretty();
+        if(m_failStatement.has_value()) {
             str += " else ";
-            str += m_failExpression.value()->StringifyPretty();
+            str += m_failStatement.value()->StringifyPretty();
         }
         return str;
     }

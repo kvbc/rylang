@@ -717,7 +717,7 @@ for( x usize = 0;; x < 10; x += 1 ) "x" {
 
 | Tag            | Syntax                              |
 | -------------- | ----------------------------------- |
-| \<if>          | `if <expr> do <expr> [else <expr>]` |
+| \<if>          | `if <expr> do <stmt> [else <stmt>]` |
 | &emsp; \<expr> | See [Expressions](#expressions)     |
 
 **Examples**

@@ -277,26 +277,26 @@ namespace ry {
         class ExpressionIf {
         public:
             using Condition = std::shared_ptr<Expression>;
-            using SuccessExpression = std::shared_ptr<Expression>;
-            using FailExpression = std::optional<std::shared_ptr<Expression>>;
+            using SuccessStatement = std::shared_ptr<Statement>;
+            using FailStatement = std::optional<std::shared_ptr<Statement>>;
 
             ExpressionIf(
                 const Condition& condition,
-                const SuccessExpression& successExpression,
-                const FailExpression& failExpression
+                const SuccessStatement& successStatement,
+                const FailStatement& failStatement
             );
 
-            const Condition         & GetCondition         () const;
-            const SuccessExpression & GetSuccessExpression () const;
-            const FailExpression    & GetFailExpression    () const;
+            const Condition        & GetCondition        () const;
+            const SuccessStatement & GetSuccessStatement () const;
+            const FailStatement    & GetFailStatement    () const;
 
             std::string Stringify(std::size_t indent = 0) const;
             std::string StringifyPretty() const;
 
         private:
             Condition m_condition;
-            SuccessExpression m_successExpression;
-            FailExpression m_failExpression;
+            SuccessStatement m_successStatement;
+            FailStatement m_failStatement;
         };
 
         // 
