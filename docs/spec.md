@@ -1,51 +1,147 @@
 # Language Specification
 
-Note to self: press `CTRL K` + `Z` to leave zen mode
+<!--
 
----
+Note to self: press CTRL K + Z to leave zen mode
 
-**Other Languages**
+Other languages:
+- Go    https://go.dev/ref/spec
+- Zig   https://ziglang.org/documentation/master
+- Odin  https://odin-lang.org/docs/overview
+- Rust  https://doc.rust-lang.org/reference/index.html
+- Haxe  https://haxe.org/manual/introduction.html
+- D     https://dlang.org/spec/spec.html
+- GML   https://manual.yoyogames.com/GameMaker_Language/GameMaker_Language_Index.htm
+- Lua   https://www.lua.org/manual/5.4/
 
--   [ ] [Go](https://go.dev/ref/spec)
--   [x] [Zig](https://ziglang.org/documentation/master/)
--   [x] [Odin](https://odin-lang.org/docs/overview/) - no spec
--   [x] [Rust](https://doc.rust-lang.org/reference/index.html)
--   [x] [Haxe](https://haxe.org/manual/introduction.html)
--   [ ] [D](https://dlang.org/spec/spec.html)
--   [ ] [GML](https://manual.yoyogames.com/GameMaker_Language/GameMaker_Language_Index.htm)
--   [ ] [Lua](https://www.lua.org/manual/5.4/)
+Useful resources:
+- rustc dev guide - https://rustc-dev-guide.rust-lang.org/part-2-intro.html
 
----
+Consider:
+- static
+- extern
+- type constraints - see [notes/playground/main.rs](../notes/playground/main.rs)
+- closures
+- variadic funtion arguments (struct fields) - might not need it with macros
+- we dont need a slice type - see [notes/slice.rs](../notes/slice.rs)
+- bit sets (odinlang)
+- `any` type
+- tests
 
-**Useful**
+TODO:
+- Types
+- type constraints
+- enums
+- unions
 
--   rustc dev guide - https://rustc-dev-guide.rust-lang.org/part-2-intro.html
--   Advanced R - https://adv-r.hadley.nz/
+-->
 
----
+<style>
+    ol { counter-reset: item }
+	ol li { display: block }
+	ol li:before { content: counters(item, ".") " "; counter-increment: item }
+</style>
 
-**Consider**
+<body>
+<div style="width:300px; position: fixed; font-size: 12px;">
+	<ol>
+		<li>
+			<a href="#introduction">Introduction</a>
+			<ol>
+				<li><a href="#notation">Notation</a></li>
+			</ol>
+		</li>
+		<li>
+			<a href="#lexical-analysis">Lexical Analysis</a>
+			<ol>
+				<li><a href="#source-code">Source Code</a></li>
+				<li><a href="#names">Names</a></li>
+				<li><a href="#comments">Comments</a></li>
+				<li>
+					<a href="#literals">Literals</a>
+					<ol>
+						<li><a href="#integer-literals">Integer Literals</a></li>
+						<li><a href="#float-literals">Float Literals</a></li>
+						<li><a href="#string-literals">String Literals</a></li>
+						<li><a href="#char-literals">Character Literals</a></li>
+						<li><a href="#bool-literals">Boolean Literals</a></li>
+						<li><a href="#null-literals">Null Literal</a></li>
+					</ol>
+				</li>
+				<li><a href="#keywords">Keywords</a></li>
+				<li><a href="#operators">Operators</a></li>
+				<li><a href="#tokens">Tokens</a></li>
+			</ol>
+		</li>
+		<li>
+			<a href="#syntax-analysis">Syntax Analysis, Semantic Analysis, Typing</a>
+			<ol>
+				<li>
+					<a href="#types">Types</a>
+					<ol>
+						<li>
+							<a href="#type-attribs">Type Attributes</a>
+							<ol>
+								<li><a href="#mutable">Mutable</a></li>
+								<li><a href="#optional">Optional</a></li>
+							</ol>
+						</li>
+						<li><a href="#primitive-types">Primitive Types</a></li>
+						<li><a href="#function-type">Function Type</a></li>
+						<li><a href="#struct-type">Struct Type</a></li>
+						<li><a href="#pointer-type">Pointer Type</a></li>
+					</ol>
+				</li>
+				<li>
+					<a href="#parsing-operators">Operators</a>
+					<ol>
+						<li><a href="#arithmetic-operators">Arithmetic Operators</a></li>
+						<li><a href="#bitwise-operators">Bitwise Operators</a></li>
+						<li><a href="#comparison-operators">Comparison Operators</a></li>
+						<li><a href="#logical-operators">Logical Operators</a></li>
+						<li><a href="#other-operators">Other Operators</a></li>
+						<li><a href="#operator-precedence">Operator Precedence</a></li>
+						<li><a href="#operator-associativity">Operator Associativity</a></li>
+					</ol>
+				</li>
+				<li>
+					<a href="#expressions">Expressions</a>
+					<ol>
+						<li>
+							<a href="#l-values">L-Values</a>
+							<ol>
+								<li><a href="#pointer-dereferencing">Pointer Dereferencing</a></li>
+								<li><a href="#struct-member-access">Struct Member Access</a></li>
+							</ol>
+							<li><a href="#function-call">Function Call</a></li>
+							<li><a href="#address-of">Address Of</a></li>
+							<li><a href="#type-cast">Type Cast</a></li>
+							<li><a href="#block">Block</a></li>
+							<li><a href="#if-else">If / Else</a></li>
+							<li><a href="#loop">Loop</a></li>
+							<li><a href="#struct-literals">Struct Literals</a></li>
+							<li><a href="#compile-time-expressions">Compile-time Expressions</a></li>
+						</li>
+					</ol>
+				</li>
+				<li>
+					<a href="#statements">Statements</a>
+					<ol>
+						<li><a href="#variable-definition">Variable Definition</a></li>
+						<li><a href="#assignment">Assignment</a></li>
+						<li><a href="#continue-statement">Continue Statement</a></li>
+						<li><a href="#break-statement">Break Statement</a></li>
+					</ol>
+				</li>
+				<li><a href="#metadata">Metadata</a></li>
+			</ol>
+		</li>
+	<ol>
+</div>
 
--   static
--   extern
--   type constraints - see [notes/playground/main.rs](../notes/playground/main.rs)
--   closures
--   variadic funtion arguments (struct fields) - might not need it with macros
--   we dont need a slice type - see [notes/slice.rs](../notes/slice.rs)
--   bit sets (odinlang)
--   `any` type
--   tests
+<div style="margin-left:300px">
 
----
-
-**TODO**
-
--   Types
-    -   type constraints
-    -   enums
-    -   unions
-
----
+<!--
 
 **Table of Contents**
 
@@ -121,9 +217,11 @@ _(lets just ignore test coverage for now)_
 | <br> 5. [Compile-time Evaluation](#compile-time-evaluation) <br> <br>             |   👇   |    ❌     |                   👇                    |          ❌          |           👇           |      👇       | **JIT compile-time expression evaluation**                    |
 | &emsp; 5.1. [Macros](#macros)                                                     |   ❌   |    ❌     |                   ❌                    |          ❌          |           ❌           |      ❌       |                                                               |
 
----
+-->
 
-# 0. Notation {#notation}
+# 1. Introduction {#introduction}
+
+## 1.1. Notation {#notation}
 
 The syntax is specified using a variant of Extended Backus-Naur Form (EBNF)
 
@@ -139,167 +237,129 @@ Example:
 <alpha>        = <alphanumeric> ~ <alpha> (* this, excluding number *)
 ```
 
-# 1. Lexical Analysis {#lexical-analysis}
+# 2. Lexical Analysis {#lexical-analysis}
 
 Lexical analysis is the process of grouping source code characters into tokens.
 
-## 1.1. Source Code {#source-code}
+## 2.1. Source Code {#source-code}
 
-| Tag           | Syntax                                                                                             | Comment                                                                     |
-| ------------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| \<new_line>   | `\n \| \r \| \r\n` or `LF \| CR \| CRLF`                                                           |                                                                             |
-| \<src_char>   | Any valid [ASCII](https://www.asciitable.com/) character in range of <1, 127> and not `<new_line>` | The NUL `\0` character is not considered <br> a valid source code character |
-| \<whitespace> | `' ' \| \t \| \v \| \f \| <new_line>`                                                              |                                                                             |
-| \<src_code>   | `<src_char> {<src_char>}`                                                                          | One or more source code characters                                          |
-| \<eof>        | NUL `\0`, end of the `<src_code>` stream.                                                          | End Of File                                                                 |
+**Grammar**
 
-## 1.2. Names {#names}
-
-**Syntax**
-
-| Tag                       | Syntax                                                              |
-| ------------------------- | ------------------------------------------------------------------- |
-| \<name>                   | `<name_start_char> {<name_char>}` where `<name>` is not `<keyword>` |
-| &emsp; \<name_start_char> | <code>\_ \| a-z \| A-Z</code>                                       |
-| &emsp; \<name_char>       | <code>\<name_start_char> \| 0-9</code>                              |
-| &emsp; \<keyword>         | See [Keywords](#keywords)                                           |
-
-**Interpretation**
-
--   A name cannot start with a digit.
--   Names (identifiers) can only consist of:
-    -   underscores `_`,
-    -   lowercase and uppercase letters from `aA` to `zZ`,
-    -   digits from `0` to `9`
-
-**Examples**
-
-```rust
-_var
-a_b_c
-x__
-word
-_0
-__Big_Word__
-
-1_3      // invalid
-2_plus_2 // invalid
+```ebnf
+<new_line>   = \n | \r | \r\n (* LF | CR | CRLF *)
+<src_char>   = (* Any ASCII character in range of <1, 127> and not <new_line> *)
+<whitespace> = ' ' | \t | \v | \f | <new_line>
+<eos>        = (* end of source code *)
 ```
 
-## 1.3. Comments {#comments}
+**Warnings**
 
-**Syntax**
-
-| Tag(s)                                      | Syntax                                                                | Comment                                                                                       |
-| ------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| \<comment>                                  | `// {<src_char>} [<new_line>]` where `<src_char>` is not `<new_line>` | Single-line comment                                                                           |
-| \<comment>, <br> \<multi_line_comment>      | `/* {<src_char>} */` where `<src_char>` is not `*/`                   | Multi-line comment. <br> Multiple multi-line comments can NOT be nested inside of each other. |
-| &emsp; \<src_char>, <br> &emsp; \<new_line> | See [Source Code](#source-code)                                       |
+-   Mixed new-line encodings
 
 **Errors**
 
-| Tag                   | Error                              | Syntax                  | Comment                    |
-| --------------------- | ---------------------------------- | ----------------------- | -------------------------- |
-| \<multi_line_comment> | ❗ Unterminated multi-line comment | `/* {<src_char>} <eof>` | Terminating `*/` not found |
+-   NUL character (0) in source code
 
-**Examples**
+## 2.2. Names {#names}
 
-```rust
-// single-line comment
+**Grammar**
+
+```ebnf
+<name>                = (<name_start_char> {<name_char>}) ~ <keyword>
+    <name_start_char> = _ | a-z | A-Z
+    <name_char>       = <name_start_char> | 0-9
 ```
 
-```rust
-/*
-multi
-line
-comment
-*/
+**References**
 
-/* or single line */
+-   [\<keyword\>](#keywords)
+
+## 2.3. Comments {#comments}
+
+**Grammar**
+
+```ebnf
+<comment> = // {<src_char>} (<new_line> | <eos>)
+          | /* ({<src_char>} ~ */) */
 ```
 
-## 1.4. Literals {#literals}
+**References**
 
-| Tag                  | Syntax                                                                                               | Comment                                                                                                           |
-| -------------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| \<literal>           | `<int_lit> \| <float_lit> \| <string_lit> \| <char_lit> \| <bool_lit> \| <null_lit> \| <struct_lit>` |                                                                                                                   |
-| &emsp; \<int_lit>    | See [Integer Literals](#integer-literals)                                                            |                                                                                                                   |
-| &emsp; \<float_lit>  | See [Float Literals](#float-literals)                                                                |                                                                                                                   |
-| &emsp; \<string_lit> | See [String Literals](#string-literals)                                                              |                                                                                                                   |
-| &emsp; \<char_lit>   | See [Character Literals](#char-literals)                                                             |                                                                                                                   |
-| &emsp; \<struct_lit> | See [Struct Literals](#struct-literals)                                                              | Struct literals are not part of the lexical analysis process, <br> therefore are not mentioned under this chapter |
+-   [\<src_char\>, \<new_line\>, \<eos\>](#source-code)
+
+**Errors**
+
+-   Unterminated multi-line comment
+
+## 2.4. Literals {#literals}
+
+**Grammar**
+
+```ebnf
+<literal> = <int_lit>
+          | <float_lit>
+          | <string_lit>
+          | <char_lit>
+          | <bool_lit>
+          | <null_lit>
+          | <struct_lit> (* struct literals are not recognized during the lexing phase *)
+```
+
+**References**
+
+-   [\<int_lit\>](#integer-literals)
+-   [\<float_lit\>](#float-literals)
+-   [\<string_lit\>](#string-literals)
+-   [\<char_lit\>](#char-literals)
+-   [\<struct_lit\>](#struct-literals)
 
 ### 1.4.1. Integer Literals {#integer-literals}
 
-**Syntax**
+**Grammar**
 
-| Tag(s)                          | Syntax                                 | Comment                     |
-| ------------------------------- | -------------------------------------- | --------------------------- |
-| \<bin_int_lit>, <br> \<int_lit> | `0b 0\|1 {{_} 0\|1 {_}}`               | Binary integer literal      |
-| \<oct_int_lit>, <br> \<int_lit> | `0o 0-7 {{_} 0-7 {_}}`                 | Octal integer literal       |
-| \<dec_int_lit>, <br> \<int_lit> | `0-9 {{_} 0-9 {_}}`                    | Decimal integer literal     |
-| \<hex_int_lit>, <br> \<int_lit> | `0x <hex_digit> {{_} <hex_digit> {_}}` | Hexadecimal integer literal |
-| &emsp; \<hex_digit>             | `(0 - 9) \| (a - f) \| (A - F)`        | Hexadecimal digit           |
+```ebnf
+<int_lit> = 0b 0|1 {{_} 0|1 {_}}
+          | 0o 0-7 {{_} 0-7 {_}}
+          |    0-9 {{_} 0-9 {_}}
+          | 0x <hex_digit> {{_} <hex_digit> {_}}
+<hex_digit> = (0-9) | (a-f) | (A-F)
+```
 
 **Errors**
 
+TODO
+
+<!--
 | Tag        | Error                        | Syntax                                                                                                                                                                                                           | Comment |
 | ---------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
 | \<int_lit> | ❗ Malformed integer literal | `0(b\|o)(<src_char> ~ 0-9)` <br> `0x(<src_char> ~ <hex_digit>)` <br> <br> `(<bin_int_lit> \| <oct_int_lit>) <alpha>` <br> `(<hex_int_lit> (<alpha> ~ <hex_digit>))` <br> <li> where `<alpha> = a-z \| A-Z` </li> |         |
 | \<int_lit> | ❗ Invalid digit             | `(0b \| <bin_int_lit>) 0-9` or <br> `(0o \| <oct_int_lit>) 0-9` or <br> `(0x \| <hex_int_lit>) 0-9`                                                                                                              |
-
-**Examples**
-
-```rust
-// decimal
-00100 // == 100
-2_0_1 // == 201
-69
-
-// bin
-0b1111_1111_1111_0000 // == 255.255.255.0
-0b0_0_0_1 // == 1
-0b110 // == 6
-
-// hex
-0x7A
-0x6_9
-0x0_01_35 // == 0x135
-
-// oct
-0o23
-0o7_7
-0o1_2_3
-
-_420   // INVALID
-2137_  // INVALID
-_1_    // INVALID
-0x_1   // INVALID
-0x23_  // INVALID
-0x_0_  // INVALID
-```
+-->
 
 ### 1.4.2. Float Literals {#float-literals}
 
-**Syntax**
+**Grammar**
 
-| Tag                 | Syntax                                    | Comment  |
-| ------------------- | ----------------------------------------- | -------- |
-| \<float_lit>        | `<int_lit> . <int_lit> [<float_exp>]`     |
-| \<float_lit>        | `<int_lit> <float_exp>`                   |
-| &emsp; \<float_exp> | `e\|E [+\|-] <int_lit>`                   | Exponent |
-| &emsp; \<int_lit>   | See [Integer Literals](#integer-literals) |
+```ebnf
+<float_lit> = <int_lit> . <int_lit> [<float_exp>]
+            | <int_lit> <float_exp>
+<float_exp> = e|E [+|-] <int_lit>
+```
+
+**References**
+
+-   [\<int_lit\>](#integer-literals)
 
 **Errors**
 
+TODO
+
+<!--
 | Tag          | Error                       | Syntax                                     |
 | ------------ | --------------------------- | ------------------------------------------ |
 | \<float_lit> | ❗ Unfinished float literal | `<dec_int_lit> . ~<dec_int_lit>`           |
 | \<float_lit> | ❗ Unfinished exponent      | `<dec_int_lit> e\|E [+\|-] ~<dec_int_lit>` |
-
-**Examples**
-
-TODO
+-->
 
 ### 1.4.3. String Literals {#string-literals}
 
@@ -1074,3 +1134,6 @@ main ${} -> void = {
   };
 };
 ```
+
+</div>
+</body>
