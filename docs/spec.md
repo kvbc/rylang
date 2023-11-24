@@ -1,4 +1,6 @@
-# Language Specification
+<center><h1>Language Specification</h1></center>
+
+---
 
 <!--
 
@@ -43,7 +45,7 @@ TODO:
 </style>
 
 <body>
-<div style="width:300px; position: fixed; font-size: 12px;">
+<div style="width:300px; position:fixed; top:0; font-size:12px;">
 	<ul>
         <li>
             <a href="#implementation">Implementation</a>
@@ -253,10 +255,11 @@ _(lets just ignore test coverage for now)_
 Error messages consist of one or more "source markers".
 
 A source marker describes the following properties:
-- Start line number,
-- Start column number,
-- End line number,
-- End column number
+
+-   Start line number,
+-   Start column number,
+-   End line number,
+-   End column number
 
 Source markers can NOT overlap.
 
@@ -271,7 +274,7 @@ One source marker spanning over multiple lines
          | Error message
          |
       11 |     "a", "very",
-         |     ~~~~~~~~~~~~     
+         |     ~~~~~~~~~~~~
       12 |     "long", "function call"
          |     ~~~~~~~~~~~~~~~~~~~~~~~
       13 | )
@@ -287,7 +290,7 @@ Multple source markers
          | Error message
          |
       11 |     "a", "very",
-         |     ^~~  ^~~~~~  
+         |     ^~~  ^~~~~~
       12 |     "long", "function call"
          |     ^~~~~~  ^~~~~~~~~~~~~~~
       13 | )
@@ -305,11 +308,11 @@ Lexical analysis is the process of grouping source code characters into tokens b
 
 Tokens represent:
 
-- [Names](#names)
-- [Keywords](#keywords)
-- [Operators](#operators)
-- [Literals](#literals)
-- Individual [source code](#source-code) characters
+-   [Names](#names)
+-   [Keywords](#keywords)
+-   [Operators](#operators)
+-   [Literals](#literals)
+-   Individual [source code](#source-code) characters
 
 ### 1.2.2. Syntax Analysis {#syntax-analysis}
 
@@ -442,7 +445,7 @@ Examples
 Invalid escape sequence:
     "\x"
       ^
-      
+
 Escape sequence out of bounds:
     "\200"
       ^~~
@@ -450,8 +453,8 @@ Escape sequence out of bounds:
 
 **References**
 
-- [Integer Literals](#integer-literals)
-- [Source Code](#source-code)
+-   [Integer Literals](#integer-literals)
+-   [Source Code](#source-code)
 
 ### 2.2.5. Literals {#literals}
 
@@ -513,7 +516,7 @@ Examples
 Invalid digit(s) in integer literal:
     0b2
       ^
-      
+
     0b151617891
        ^ ^ ^~~
 
@@ -524,14 +527,14 @@ Unfinished integer literal:
 Malformed integer literal:
     0o123a
          ^
-         
+
     0xDEADlist
           ^~~~
 ```
 
 **References**
 
-- [Source Code](#source-code)
+-   [Source Code](#source-code)
 
 #### 2.2.5.2. Float Literals {#float-literals}
 
@@ -556,7 +559,7 @@ Examples
 Unfinished float literal:
     35.abc
        ^
-       
+
 Unfinished float literal exponent:
     123e;
        ^
@@ -570,7 +573,7 @@ Unfinished float literal exponent:
 
 **Grammar**
 
-```ebnf
+````ebnf
 <string_lit> = ` {<raw_sl_string_lit_char>} `
              | ``` {<raw_ml_string_lit_char>} ```
              | " {<esc_sl_string_lit_char>} "
@@ -582,11 +585,11 @@ Unfinished float literal exponent:
                          | <new_line>
 <esc_ml_string_lit_char> = <esc_sl_string_lit_char>
                          | <new_lne>
-```
+````
 
 **Errors**
 
-```ebnf
+````ebnf
 Unterminated string literal = ` {<raw_sl_string_lit_char>} <eol>
                             | " {<esc_sl_string_lit_char>} <eol>
                             | ``` {<raw_ml_string_lit_char>} <eos>
@@ -601,7 +604,7 @@ multi-line string literal = ``` {<raw_ml_string_lit_char>} (` | ``)
                           | """ {<esc_ml_string_lit_char>} (" | "")
 
 ... = (* see Escape Sequences *)
-```
+````
 
 Examples
 
@@ -623,8 +626,8 @@ multi-line string literal:
 
 **References**
 
-- [Source Code](#source-code)
-- [Escape Sequences](#escape-sequences)
+-   [Source Code](#source-code)
+-   [Escape Sequences](#escape-sequences)
 
 #### 2.2.5.4. Character Literals {#char-literals}
 
@@ -651,22 +654,22 @@ Examples
 Empty character literal:
     ''
     ^~
-    
+
 Unterminated character literal:
     'c
     ^ ^
-    
+
     'cx
     ^ ^
-    
+
     '
     ^
 ```
 
 **References**
 
-- [Source Code](#source-code)
-- [Escape Sequences](#escape-sequences)
+-   [Source Code](#source-code)
+-   [Escape Sequences](#escape-sequences)
 
 #### 2.2.5.5. Boolean Literals {#bool-literals}
 
@@ -678,7 +681,7 @@ Unterminated character literal:
 
 **References**
 
-- [Keywords](#keywords)
+-   [Keywords](#keywords)
 
 #### 2.2.5.6. Null Literal {#null-literal}
 
@@ -690,7 +693,7 @@ Unterminated character literal:
 
 **References**
 
-- [Keywords](#keywords)
+-   [Keywords](#keywords)
 
 ### 2.2.6. Keywords {#keywords}
 
@@ -708,7 +711,7 @@ Unterminated character literal:
 
 **References**
 
-- [Primitive Types](#primitive-types)
+-   [Primitive Types](#primitive-types)
 
 ### 2.2.7. Operators {#lexical-operators}
 
