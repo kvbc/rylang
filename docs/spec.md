@@ -700,13 +700,13 @@ Unterminated character literal:
 **Grammar**
 
 ```ebnf
-<keyword> = <primitive>
+<keyword> = <primitive_type>
           | do
           | if    | else
           | loop  | continue | break
           | false | true     | null
           | not   | or       | and
-          | as    | comp
+          | as    | comp     | ast
 ```
 
 **References**
@@ -719,81 +719,204 @@ Refer to [Operators](#parsing-operators)
 
 ## 2.3. Syntax & Semantics {#syntax-n-semantic-analysis}
 
-## 2.1. Types {#types}
+### 2.3.1. Types {#types}
 
-| Tag                       | Syntax                                                                                                     |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| \<type>                   | `[<mut_type_attrib>] [<opt_type_attrib>] (<primitive_type> \| <func_type> \| <struct_type> \| <ptr_type>)` |
-| &emsp; \<mut_type_attrib> | See [Type Mutability](#type-mutability)                                                                    |
-| &emsp; \<opt_type_attrib> | See [Optional Types](#optional-types)                                                                      |
-| &emsp; \<primitive_type>  | See [Primitive Types](#primitive-types)                                                                    |
-| &emsp; \<func_type>       | See [Function Type](#function-type)                                                                        |
-| &emsp; \<struct_type>     | See [Struct Type](#struct-type)                                                                            |
-| &emsp; \<ptr_type>        | See [Pointer Types](#pointer-types)                                                                        |
+**Syntax**
 
-### 2.1.1. Primitive Types {#primitive-types}
+```ebnf
+<base_type> = <primitive_type> | <func_type> | <struct_type> | <ptr_type>
+            | '(' <base_type> ')'
 
-| Tag               | Type             | Syntax                            |
-| ----------------- | ---------------- | --------------------------------- |
-| \<primitive_type> | Character        | `char`                            |
-| \<primitive_type> | Signed integer   | `i8 \| i16 \| i32 \| i64 \| i128` |
-| \<primitive_type> | Unsigned integer | `u8 \| u16 \| u32 \| u64 \| u128` |
-| \<primitive_type> | Floating-point   | `f32 \| f64`                      |
-| \<primitive_type> | Boolean          | `bool`                            |
-
-### 2.1.2. Function Type {#function-type}
-
-| Tag                   | Syntax                          |
-| --------------------- | ------------------------------- |
-| \<func_type>          | `<struct_type> => <type>`       |
-| &emsp; \<struct_type> | See [Struct Type](#struct-type) |
-| &emsp; \<type>        | See [Types](#types)             |
-
-**Examples**
-
-```rust
-add[a i32; b i32] => i32 = a + b;
+<type> = <type_attribs> <base_type>
+       | '(' <type> ')'
 ```
 
-### 2.1.3. Struct Type {#struct-type}
+**Syntax Errors**
 
-| Tag                    | Syntax                                                                                                                                                                                                                                                                                                                                                 |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| \<struct_type>         | `'[' [{<struct_field> ,\|;} <struct_field>] ']'`                                                                                                                                                                                                                                                                                                       |
-| &emsp; \<struct_field> | `<name>{,<name>} <type> [= <comp_expr>]` where `<comp_expr>` coerces into `<type>` <br> `<type> [* <comp_expr>] [= <comp_expr>]` where the first `<comp_expr>` is of type `u32` and the second coerces into `<type>` <br> `[<comp_expr> *] <type> [= <comp_expr>]` where the first `<comp_expr>` is of type `u32` and the second coerces into `<type>` |
-| &emsp; \<name>         | See [Names](#names)                                                                                                                                                                                                                                                                                                                                    |
-| &emsp; \<type>         | See [Types](#types)                                                                                                                                                                                                                                                                                                                                    |
-| &emsp; \<comp_expr>    | See [Compile-time expressions](#compile-time-expressions)                                                                                                                                                                                                                                                                                              |
+```ebnf
+Unclosed type
 
-**Examples**
-
-```rust
-pos [x i32, y i32 = 9] = [3, 5];
-
-list [i32 * 3] = [1, 2, 3];
-
-tuple [i32, bool, f32] = [1, true, 2.3];
+... (* see Type Attributes *)
 ```
 
-### 2.1.4. Pointer Types {#pointer-types}
+Examples
 
-| Tag         | Syntax     |
-| ----------- | ---------- |
-| \<ptr_type> | `* <type>` |
+```
+Unclosed type:
+    (i32
+    ^   ^
+    
+    ?((bool)
+      ^    ^
+```
 
-### 2.1.5. Type Attributes {#type-attribs}
+**References**
 
-#### 2.1.5.1. Type Mutability {#type-mutability}
+- [Type Attributes](#type-attribs)
+- [Primitive Types](#primitive-types)
+- [Function Type](#function-type)
+- [Struct Type](#struct-type)
+- [Pointer Type](#pointer-type)
 
-| Tag                | Syntax |
-| ------------------ | ------ |
-| \<mut_type_attrib> | `~`    |
+#### 2.3.1.1. Type Attributes {#type-attribs}
 
-#### 2.1.5.2. Optional Types {#optional-types}
+**Syntax**
 
-| Tag                | Syntax |
-| ------------------ | ------ |
-| \<opt_type_attrib> | `?`    |
+```ebnf
+<_mut> = <mut_type_attrib>
+<_opt> = <opt_type_attrib>
+<type_attribs> = [<_mut>] [<_opt>]
+```
+
+**Syntax Errors**
+
+```ebnf
+Duplicate type attribute(s) = <mut> <mut> {<mut>}
+                            | <opt> <opt> {<opt>}
+
+Invalid type attribute order = <opt> <mut>
+```
+
+Examples
+
+```
+Duplicate type attribute(s):
+    ~~x := 3;
+    ^~
+    
+    ~~~~x := 5;
+    ^~~~~
+    
+Invalid type attribute order:
+    ?~a := b;
+     ^
+```
+
+##### 2.3.1.1.1. Mutable {#mutable}
+
+**Syntax**
+
+```ebnf
+<mut_type_attrib> = ~
+```
+
+##### 2.3.1.1.2. Optional {#optional-types}
+
+**Syntax**
+
+```ebnf
+<opt_type_attrib> = ?
+```
+
+#### 2.3.1.2. Primitive Types {#primitive-types}
+
+**Syntax**
+
+```ebnf
+<primitive_type> = char
+                 | i8  | i16 | i32 | i64 | i128
+                 | u8  | u16 | u32 | u64 | u128
+                 | f32 | f64
+                 | bool
+```
+
+#### 2.3.1.3. Function Type {#function-type}
+
+**Syntax**
+
+```ebnf
+<func_type> = <struct_type> => <type>
+```
+
+**Syntax Errors**
+
+```ebnf
+Function arguments expected
+to be of type struct, got ... = (<type> ~ <struct_type>) =>
+```
+
+Examples
+
+```
+Function arguments expected
+to be of type struct, got ...:
+
+    add i32 => i32 = 3;
+        ^~~
+```
+
+**References**
+
+- [Struct Type](#struct-type)
+- [Type](#type)
+
+#### 2.3.1.4. Struct Type {#struct-type}
+
+**Syntax**
+
+```ebnf
+<struct_type> = '[' [{<_field> ,|;} <_field> [,|;]] ']'
+
+<_field> = <name> <type> [= <comp_expr>]
+         | <type> [* <comp_expr>] [= <comp_expr>]
+         | [<comp_expr> *] <type> [= <comp_expr>]
+```
+
+**Syntax Errors**
+
+```ebnf
+Unclosed struct literal
+
+Missing field separator
+```
+
+Examples
+
+```
+Unclosed struct literal:
+
+    [ i32
+         ^
+        
+Missing field separator:
+
+    [ i8, i16 i32 ]
+             ^
+```
+
+**Semantic Errors**
+
+```
+Field type repetitions must evaluate to a value higher than 0. Got ...
+
+    [i32 * -1]
+           ^~
+           
+    #comp rep := 2 - 3;
+    [i32 * rep]
+           ^~~
+
+Duplicate field
+
+    [i32 x, f32 x]
+                ^
+```
+
+**References**
+
+- [Names](#names)
+- [Types](#types)
+- [Compile-time expressions](#compile-time-expressions)
+
+#### 2.3.1.5. Pointer Type {#pointer-type}
+
+**Syntax**
+
+```ebnf
+<ptr_type> = * <type>
+```
+
+---
 
 ## 2.2. Operators {#operators}
 
