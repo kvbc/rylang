@@ -44,99 +44,126 @@ TODO:
 
 <body>
 <div style="width:300px; position: fixed; font-size: 12px;">
-	<ol>
-		<li>
-			<a href="#introduction">Introduction</a>
-			<ol>
-				<li><a href="#notation">Notation</a></li>
-			</ol>
-		</li>
-		<li>
-			<a href="#lexical-analysis">Lexical Analysis</a>
-			<ol>
-				<li><a href="#source-code">Source Code</a></li>
-				<li><a href="#names">Names</a></li>
-				<li><a href="#comments">Comments</a></li>
-				<li>
-					<a href="#literals">Literals</a>
-					<ol>
-						<li><a href="#integer-literals">Integer Literals</a></li>
-						<li><a href="#float-literals">Float Literals</a></li>
-						<li><a href="#string-literals">String Literals</a></li>
-						<li><a href="#char-literals">Character Literals</a></li>
-						<li><a href="#bool-literals">Boolean Literals</a></li>
-						<li><a href="#null-literals">Null Literal</a></li>
-					</ol>
-				</li>
-				<li><a href="#keywords">Keywords</a></li>
-				<li><a href="#operators">Operators</a></li>
-				<li><a href="#tokens">Tokens</a></li>
-			</ol>
-		</li>
-		<li>
-			<a href="#syntax-analysis">Syntax Analysis, Semantic Analysis, Typing</a>
-			<ol>
-				<li>
-					<a href="#types">Types</a>
-					<ol>
-						<li>
-							<a href="#type-attribs">Type Attributes</a>
-							<ol>
-								<li><a href="#mutable">Mutable</a></li>
-								<li><a href="#optional">Optional</a></li>
-							</ol>
-						</li>
-						<li><a href="#primitive-types">Primitive Types</a></li>
-						<li><a href="#function-type">Function Type</a></li>
-						<li><a href="#struct-type">Struct Type</a></li>
-						<li><a href="#pointer-type">Pointer Type</a></li>
-					</ol>
-				</li>
-				<li>
-					<a href="#parsing-operators">Operators</a>
-					<ol>
-						<li><a href="#arithmetic-operators">Arithmetic Operators</a></li>
-						<li><a href="#bitwise-operators">Bitwise Operators</a></li>
-						<li><a href="#comparison-operators">Comparison Operators</a></li>
-						<li><a href="#logical-operators">Logical Operators</a></li>
-						<li><a href="#other-operators">Other Operators</a></li>
-						<li><a href="#operator-precedence">Operator Precedence</a></li>
-						<li><a href="#operator-associativity">Operator Associativity</a></li>
-					</ol>
-				</li>
-				<li>
-					<a href="#expressions">Expressions</a>
-					<ol>
-						<li>
-							<a href="#l-values">L-Values</a>
-							<ol>
-								<li><a href="#pointer-dereferencing">Pointer Dereferencing</a></li>
-								<li><a href="#struct-member-access">Struct Member Access</a></li>
-							</ol>
-							<li><a href="#function-call">Function Call</a></li>
-							<li><a href="#address-of">Address Of</a></li>
-							<li><a href="#type-cast">Type Cast</a></li>
-							<li><a href="#block">Block</a></li>
-							<li><a href="#if-else">If / Else</a></li>
-							<li><a href="#loop">Loop</a></li>
-							<li><a href="#struct-literals">Struct Literals</a></li>
-							<li><a href="#compile-time-expressions">Compile-time Expressions</a></li>
-						</li>
-					</ol>
-				</li>
-				<li>
-					<a href="#statements">Statements</a>
-					<ol>
-						<li><a href="#variable-definition">Variable Definition</a></li>
-						<li><a href="#assignment">Assignment</a></li>
-						<li><a href="#continue-statement">Continue Statement</a></li>
-						<li><a href="#break-statement">Break Statement</a></li>
-					</ol>
-				</li>
-				<li><a href="#metadata">Metadata</a></li>
-			</ol>
-		</li>
-	<ol>
+	<ul>
+        <li>
+            <a href="#implementation">Implementation</a>
+            <ol>
+                <li><a href="#error-handling">Error Handling</a></li>
+                <li>
+                    <a href="#compilation">Compilation</a>
+                    <ol>
+                        <li>
+                            <a href="#lexical-analysis">Lexical Analysis</a>
+                            <ol>
+                                <li><a href="#tokens">Tokens</a></li>
+                            </ol>
+                        </li>
+                        <li><a href="#syntax-analysis">Syntax Analysis</a></li>
+                        <li><a href="#semantic-analysis">Semantic Analysis</a></li>
+                        <li><a href="#type-checking">Type Checking</a></li>
+                        <li><a href="#compile-time-expression-evaluation">Compile-time Expression Evaluation (CTEE)</a></li>
+                        <li><a href="#transpilation">Transpilation</a></li>
+                    </ol>
+                </li>
+            </ol>
+        </li>
+        <li>
+            <a href="#design">Design</a>
+            <ol>
+                <li>
+                    <a href="#introduction">Introduction</a>
+                    <ol>
+                        <li><a href="#notation">Notation</a></li>
+                    </ol>
+                </li>
+                <li>
+                    <a href="#grammar">Grammar</a>
+                    <ol>
+                        <li><a href="#source-code">Source Code</a></li>
+                        <li><a href="#names">Names</a></li>
+                        <li><a href="#comments">Comments</a></li>
+                        <li><a href="#escape-sequences">Escape Sequences</a></li>
+                        <li>
+                            <a href="#literals">Literals</a>
+                            <ol>
+                                <li><a href="#integer-literals">Integer Literals</a></li>
+                                <li><a href="#float-literals">Float Literals</a></li>
+                                <li><a href="#string-literals">String Literals</a></li>
+                                <li><a href="#char-literals">Character Literals</a></li>
+                                <li><a href="#bool-literals">Boolean Literals</a></li>
+                                <li><a href="#null-literals">Null Literal</a></li>
+                            </ol>
+                        </li>
+                        <li><a href="#keywords">Keywords</a></li>
+                        <li><a href="#operators">Operators</a></li>
+                    </ol>
+                </li>
+                <li>
+                    <a href="#syntax-n-semantics">Syntax & Semantics</a>
+                    <ol>
+                        <li>
+                            <a href="#types">Types</a>
+                            <ol>
+                                <li>
+                                    <a href="#type-attribs">Type Attributes</a>
+                                    <ol>
+                                        <li><a href="#mutable">Mutable</a></li>
+                                        <li><a href="#optional">Optional</a></li>
+                                    </ol>
+                                </li>
+                                <li><a href="#primitive-types">Primitive Types</a></li>
+                                <li><a href="#function-type">Function Type</a></li>
+                                <li><a href="#struct-type">Struct Type</a></li>
+                                <li><a href="#pointer-type">Pointer Type</a></li>
+                            </ol>
+                        </li>
+                        <li>
+                            <a href="#parsing-operators">Operators</a>
+                            <ol>
+                                <li><a href="#arithmetic-operators">Arithmetic Operators</a></li>
+                                <li><a href="#bitwise-operators">Bitwise Operators</a></li>
+                                <li><a href="#comparison-operators">Comparison Operators</a></li>
+                                <li><a href="#logical-operators">Logical Operators</a></li>
+                                <li><a href="#other-operators">Other Operators</a></li>
+                                <li><a href="#operator-precedence">Operator Precedence</a></li>
+                                <li><a href="#operator-associativity">Operator Associativity</a></li>
+                            </ol>
+                        </li>
+                        <li>
+                            <a href="#expressions">Expressions</a>
+                            <ol>
+                                <li>
+                                    <a href="#l-values">L-Values</a>
+                                    <ol>
+                                        <li><a href="#pointer-dereferencing">Pointer Dereferencing</a></li>
+                                        <li><a href="#struct-member-access">Struct Member Access</a></li>
+                                    </ol>
+                                    <li><a href="#function-call">Function Call</a></li>
+                                    <li><a href="#address-of">Address Of</a></li>
+                                    <li><a href="#type-cast">Type Cast</a></li>
+                                    <li><a href="#block">Block</a></li>
+                                    <li><a href="#if-else">If / Else</a></li>
+                                    <li><a href="#loop">Loop</a></li>
+                                    <li><a href="#struct-literals">Struct Literals</a></li>
+                                    <li><a href="#compile-time-expressions">Compile-time Expressions</a></li>
+                                </li>
+                            </ol>
+                        </li>
+                        <li>
+                            <a href="#statements">Statements</a>
+                            <ol>
+                                <li><a href="#variable-definition">Variable Definition</a></li>
+                                <li><a href="#assignment">Assignment</a></li>
+                                <li><a href="#continue-statement">Continue Statement</a></li>
+                                <li><a href="#break-statement">Break Statement</a></li>
+                            </ol>
+                        </li>
+                        <li><a href="#metadata">Metadata</a></li>
+                    </ol>
+                </li>
+            </ol>
+        </li>
+	<ul>
 </div>
 
 <div style="margin-left:300px">
@@ -219,9 +246,100 @@ _(lets just ignore test coverage for now)_
 
 -->
 
-# 1. Introduction {#introduction}
+# 1. Implementation {#implementation}
 
-## 1.1. Notation {#notation}
+## 1.1. Error Handling {#error-handling}
+
+Error messages consist of one or more "source markers".
+
+A source marker describes the following properties:
+- Start line number,
+- Start column number,
+- End line number,
+- End column number
+
+Source markers can NOT overlap.
+
+**Examples**
+
+One source marker spanning over multiple lines
+
+```
+ main.ry |
+      10 | this := is(
+         | ^~~~~~~~~~~
+         | Error message
+         |
+      11 |     "a", "very",
+         |     ~~~~~~~~~~~~     
+      12 |     "long", "function call"
+         |     ~~~~~~~~~~~~~~~~~~~~~~~
+      13 | )
+         | ~
+```
+
+Multple source markers
+
+```
+ main.ry |
+      10 | this := is(
+         | ^~~~    ^~
+         | Error message
+         |
+      11 |     "a", "very",
+         |     ^~~  ^~~~~~  
+      12 |     "long", "function call"
+         |     ^~~~~~  ^~~~~~~~~~~~~~~
+      13 | )
+```
+
+## 1.2. Compilation {#compilation}
+
+Compilation is the process of creating an executable from the input source code
+
+### 1.2.1. Lexical Analysis {#lexical-analysis}
+
+Lexical analysis is the process of grouping source code characters into tokens based on specified [grammar](#grammar) rules
+
+#### 1.2.1.1. Tokens {#tokens}
+
+Tokens represent:
+
+- [Names](#names)
+- [Keywords](#keywords)
+- [Operators](#operators)
+- [Literals](#literals)
+- Individual [source code](#source-code) characters
+
+### 1.2.2. Syntax Analysis {#syntax-analysis}
+
+Syntax analysis is the process of creating an Abstract Syntax Tree (AST) from the input tokens
+
+### 1.2.3. Semantic Analysis {#semantic-analysis}
+
+Semantic analysis is the process of analyzing the previously created Abstract Syntax Tree (AST) by specified semantics rules.
+
+### 1.2.4. Type Checking {#type-checking}
+
+Type checking is the process of analyzing a semantically correct Abstract Syntax Tree (AST), assigning types to AST nodes and validating type relations between them.
+
+### 1.2.5. Compile-time Expression Evaluation (CTEE) #{compile-time-expression-evaluation}
+
+TODO <!-- ... and figure out -->
+
+### 1.2.6. Transpilation {#transpilation}
+
+Transpilation is the process of transforming the Abstract Syntax Tree (AST) into the source code of a lower-level programming language (in this case, C).
+
+That transpiled source code then gets compiled by a third-party compiler, producing the final executable and eliminating the need of writing our own backend.
+
+---
+
+# 2. Design {#design}
+
+## 2.1. Introduction {#introduction}
+
+### 2.1.1. Notation {#notation}
 
 The syntax is specified using a variant of Extended Backus-Naur Form (EBNF)
 
@@ -237,19 +355,19 @@ Example:
 <alpha>        = <alphanumeric> ~ <alpha> (* this, excluding number *)
 ```
 
-# 2. Lexical Analysis {#lexical-analysis}
+## 2.2. Grammar {#grammar}
 
-Lexical analysis is the process of grouping source code characters into tokens.
-
-## 2.1. Source Code {#source-code}
+### 2.2.1. Source Code {#source-code}
 
 **Grammar**
 
 ```ebnf
-<new_line>   = \n | \r | \r\n (* LF | CR | CRLF *)
-<src_char>   = (* Any ASCII character in range of <1, 127> and not <new_line> *)
-<whitespace> = ' ' | \t | \v | \f | <new_line>
-<eos>        = (* end of source code *)
+<new_line>     = \n | \r | \r\n (* LF | CR | CRLF *)
+<src_char>     = (* Any ASCII character in range of <1, 127> and not <new_line> *)
+<whitespace>   = ' ' | \t | \v | \f | <new_line>
+<eos>          = (* end of source code *)
+<any_src_char> = <src_char> | <new_line> | <eos>
+<eol>          = <new_line> | <eos> (* end of line *)
 ```
 
 **Warnings**
@@ -260,7 +378,7 @@ Lexical analysis is the process of grouping source code characters into tokens.
 
 -   NUL character (0) in source code
 
-## 2.2. Names {#names}
+### 2.2.2. Names {#names}
 
 **Grammar**
 
@@ -272,9 +390,9 @@ Lexical analysis is the process of grouping source code characters into tokens.
 
 **References**
 
--   [\<keyword\>](#keywords)
+-   [Keywords](#keywords)
 
-## 2.3. Comments {#comments}
+### 2.2.3. Comments {#comments}
 
 **Grammar**
 
@@ -283,15 +401,59 @@ Lexical analysis is the process of grouping source code characters into tokens.
           | /* ({<src_char>} ~ */) */
 ```
 
-**References**
-
--   [\<src_char\>, \<new_line\>, \<eos\>](#source-code)
-
 **Errors**
 
 -   Unterminated multi-line comment
 
-## 2.4. Literals {#literals}
+**References**
+
+-   [Source Code](#source-code)
+
+### 2.2.4. Escape Sequences {#escape-sequences}
+
+**Grammar**
+
+```ebnf
+<esc_seq_char> = a | b | e | f | n | r | t | v | \
+<esc_seq> = \ <esc_seq_char>
+          | \ <int_lit> (* which maps to <any_src_char> *)
+
+<string_esc_seq_char> = <esc_seq_char> | " | <new_line>
+<string_esc_seq> = \ <string_esc_seq_char>
+                 | <esc_seq>
+
+<char_esc_seq_char> = <esc_seq_char> | '
+<char_esc_seq> = \ <char_esc_seq_char>
+               | <esc_seq>
+```
+
+**Errors**
+
+```ebnf
+Invalid escape sequence = \ ~<string_esc_seq_char>
+                        | \ ~<char_esc_seq_char>
+
+Escape sequence out of bounds = \ <int_lit> (* where <int_lit> != <any_src_char> *)
+```
+
+Examples
+
+```ebnf
+Invalid escape sequence:
+    "\x"
+      ^
+      
+Escape sequence out of bounds:
+    "\200"
+      ^~~
+```
+
+**References**
+
+- [Integer Literals](#integer-literals)
+- [Source Code](#source-code)
+
+### 2.2.5. Literals {#literals}
 
 **Grammar**
 
@@ -307,175 +469,252 @@ Lexical analysis is the process of grouping source code characters into tokens.
 
 **References**
 
--   [\<int_lit\>](#integer-literals)
--   [\<float_lit\>](#float-literals)
--   [\<string_lit\>](#string-literals)
--   [\<char_lit\>](#char-literals)
--   [\<struct_lit\>](#struct-literals)
+-   [Integer Literals](#integer-literals)
+-   [Float Literals](#float-literals)
+-   [String Literals](#string-literals)
+-   [Character Literals](#char-literals)
+-   [Struct Literals](#struct-literals)
 
-### 1.4.1. Integer Literals {#integer-literals}
+#### 2.2.5.1. Integer Literals {#integer-literals}
 
 **Grammar**
 
 ```ebnf
-<int_lit> = 0b 0|1 {{_} 0|1 {_}}
-          | 0o 0-7 {{_} 0-7 {_}}
-          |    0-9 {{_} 0-9 {_}}
-          | 0x <hex_digit> {{_} <hex_digit> {_}}
+<int_lit> = <bin_int_lit>
+          | <oct_int_lit>
+          | <dec_int_lit>
+          | <hex_int_lit>
+<bin_int_lit> = 0b 0|1 {{_} 0|1 {_}}
+<oct_int_lit> = 0o 0-7 {{_} 0-7 {_}}
+<dec_int_lit> =    0-9 {{_} 0-9 {_}}
+<hex_int_lit> = 0x <hex_digit> {{_} <hex_digit> {_}}
 <hex_digit> = (0-9) | (a-f) | (A-F)
 ```
 
 **Errors**
 
-TODO
+```ebnf
+(* eats all invalid digits *)
+Invalid digit(s) in integer literal = (0b | <bin_int_lit>) 2-9
+                                    | (0o | <oct_int_lit>) 8-9
+                                    | (0x | <hex_int_lit>) (g-z | G-Z)
 
-<!--
-| Tag        | Error                        | Syntax                                                                                                                                                                                                           | Comment |
-| ---------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| \<int_lit> | ❗ Malformed integer literal | `0(b\|o)(<src_char> ~ 0-9)` <br> `0x(<src_char> ~ <hex_digit>)` <br> <br> `(<bin_int_lit> \| <oct_int_lit>) <alpha>` <br> `(<hex_int_lit> (<alpha> ~ <hex_digit>))` <br> <li> where `<alpha> = a-z \| A-Z` </li> |         |
-| \<int_lit> | ❗ Invalid digit             | `(0b \| <bin_int_lit>) 0-9` or <br> `(0o \| <oct_int_lit>) 0-9` or <br> `(0x \| <hex_int_lit>) 0-9`                                                                                                              |
--->
+Unfinished integer literal = 0b (<any_src_char> ~ 0|1)
+                           = 0o (<any_src_char> ~ 0-7)
+                           = 0x (<any_src_char> ~ <hex_digit>)
 
-### 1.4.2. Float Literals {#float-literals}
+(* eats all the trailing characters *)
+Malformed integer literal = (<bin_int_lit> | <oct_int_lit> | <dec_int_lit>) (a-z | A-Z)
+```
 
-**Grammar**
+Examples
 
 ```ebnf
-<float_lit> = <int_lit> . <int_lit> [<float_exp>]
-            | <int_lit> <float_exp>
-<float_exp> = e|E [+|-] <int_lit>
+Invalid digit(s) in integer literal:
+    0b2
+      ^
+      
+    0b151617891
+       ^ ^ ^~~
+
+Unfinished integer literal:
+    0x;
+      ^
+
+Malformed integer literal:
+    0o123a
+         ^
+         
+    0xDEADlist
+          ^~~~
 ```
 
 **References**
 
--   [\<int_lit\>](#integer-literals)
+- [Source Code](#source-code)
+
+#### 2.2.5.2. Float Literals {#float-literals}
+
+**Grammar**
+
+```ebnf
+<float_lit> = <dec_int_lit> . <dec_int_lit> [<float_exp>]
+            | <dec_int_lit> <float_exp>
+<float_exp> = e|E [+|-] <dec_int_lit>
+```
 
 **Errors**
 
-TODO
+```ebnf
+Unfinished float literal          = <dec_int_lit> . ~<dec_int_lit>
+Unfinished float literal exponent = <dec_int_lit> e|E [+|-] ~<dec_int_lit>
+```
 
-<!--
-| Tag          | Error                       | Syntax                                     |
-| ------------ | --------------------------- | ------------------------------------------ |
-| \<float_lit> | ❗ Unfinished float literal | `<dec_int_lit> . ~<dec_int_lit>`           |
-| \<float_lit> | ❗ Unfinished exponent      | `<dec_int_lit> e\|E [+\|-] ~<dec_int_lit>` |
--->
+Examples
 
-### 1.4.3. String Literals {#string-literals}
+```ebnf
+Unfinished float literal:
+    35.abc
+       ^
+       
+Unfinished float literal exponent:
+    123e;
+       ^
+```
 
-**Syntax**
+**References**
 
-| Tag(s)                                                                | Syntax                                                                                | Comment                              |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------ |
-| \<string_lit>, <br> \<single_line_string_lit>                         | `` ` {<src_char>} ` ``                                                                | Single-line raw string literal       |
-| \<string_lit>, <br> \<multi_line_string_lit>                          | <code>\`\`\` {<src_char> \| <new_line>} \`\`\`</code>                                 | Multi-line raw string literal        |
-| \<string_lit>, <br> \<esc_string_lit>, <br> \<single_line_string_lit> | `" {<esc_string_lit_char>} "`                                                         | Single-line escapable string literal |
-| \<string_lit>, <br> \<esc_string_lit>, <br> \<multi_line_string_lit>  | `""" {<esc_string_lit_char> \| <new_line>} """`                                       | Multi-line escapable string literal  |
-| &emsp; \<esc_string_lit_char>                                         | `(<src_char> ~ \) \| \<string_lit_esc_seq>`                                           |
-| \<string_lit_esc_seq>                                                 | <code>a \| b \| e \| f \| n \| r \| t \| v \| ' \| \` \| " \| \ \| <new_line> </code> |
-| \<string_lit_esc_seq>                                                 | `<int_lit>` which maps to `<src_char>`                                                |
-| &emsp; \<src_char>                                                    | See [Lexical Analysis](#lexical-analysis)                                             |
-| &emsp; \<int_lit>                                                     | See [Integer Literals](#integer-literals)                                             |
+-   [Integer Literals](#integer-literals)
+
+#### 2.2.5.3. String Literals {#string-literals}
+
+**Grammar**
+
+```ebnf
+<string_lit> = ` {<raw_sl_string_lit_char>} `
+             | ``` {<raw_ml_string_lit_char>} ```
+             | " {<esc_sl_string_lit_char>} "
+             | """ {<esc_ml_string_lit_char>} """
+
+<raw_sl_string_lit_char> = <src_char> ~ `
+<esc_sl_string_lit_char> = (<src_char> ~ \ ~ ") | <string_esc_seq>
+<raw_ml_string_lit_char> = <raw_sl_string_lit_char>
+                         | <new_line>
+<esc_ml_string_lit_char> = <esc_sl_string_lit_char>
+                         | <new_lne>
+```
 
 **Errors**
 
-| Tag                       | Error                                                | Syntax                                                                                                                                                                      |
-| ------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| \<single_line_string_lit> | ❗ Unexpected new line in single-line string literal | <code>\` {<src_char>} <new_line> \`<code> <br> `" {<esc_string_lit_char>} <new_line> "`                                                                                     |
-| \<multi_line_string_lit>  | ❗ Expected termination of multi-line string literal | <code>\`\`\` {<src_char> \| <new_line>} \`\|\`\`\|\<eof></code> <br> `""" {<esc_string_lit_char> \| <new_line>} "\|""\|<eof>`                                               |
-| \<single_line_string_lit> | ❗ Unterminated single-line string literal           | <code>\` {<src_char>} \<eof></code> <br> `" {<esc_string_lit_char>} <eof>`                                                                                                  |
-| \<esc_string_lit>         | ❗ Invalid escape sequence                           | `<esc_string_lit>` containing `\<string_lit_esc_seq>` <br> where `<string_lit_esc_seq> = ~ <string_lit_esc_seq>`                                                            |
-| \<esc_string_lit>         | ❗ Escape sequence out of bounds                     | `<esc_string_lit>` containing `\<string_lit_esc_seq>` <br> where `<string_lit_esc_seq>` is `<int_lit>` <br> and `<string_lit_esc_seq>` does not map to a valid `<src_char>` |
+```ebnf
+Unterminated string literal = ` {<raw_sl_string_lit_char>} <eol>
+                            | " {<esc_sl_string_lit_char>} <eol>
+                            | ``` {<raw_ml_string_lit_char>} <eos>
+                            | """ {<esc_ml_string_lit_char>} <eos>
 
-**Examples**
+(*
+    Assumes that the string was meant to be terminated.
+    Closes the literal and eats the terminating characters
+*)
+Expected termination of
+multi-line string literal = ``` {<raw_ml_string_lit_char>} (` | ``)
+                          | """ {<esc_ml_string_lit_char>} (" | "")
 
-```rust
-"one line string"
-"multi \n line \n string"
-"
-    multi
-    multi
-    line
-    string
-"
-`
-    multi
-    raw
-    string
-`
-"
-    one \
-    line \
-    multi \
-" == "one line multi"
+... = (* see Escape Sequences *)
 ```
 
-### 1.4.4. Character Literals {#char-literals}
+Examples
 
-**Syntax**
+```ebnf
+Unterminated string literal:
+    "abc
+    ^   ^
 
-| Tag                          | Syntax                                      |
-| ---------------------------- | ------------------------------------------- |
-| \<char_lit>                  | `' {<char_lit_char>} '`                     |
-| &emsp; \<char_lit_char>      | `(<src_char> ~ \) \| \<string_lit_esc_seq>` |
-| &emsp; \<src_char>           | See [Lexical Analysis](#lexical-analysis)   |
-| &emsp; \<string_lit_esc_seq> | See [String Literals](#string-literals)     |
+Expected termination of
+multi-line string literal:
+    """
+    ^~~
+        multi
+        line
+        string
+    ""
+    ^~
+```
+
+**References**
+
+- [Source Code](#source-code)
+- [Escape Sequences](#escape-sequences)
+
+#### 2.2.5.4. Character Literals {#char-literals}
+
+**Grammar**
+
+```ebnf
+<char_lit> = ' <char_lit_char> '
+<char_lit_char> = (<src_char> ~ \ ~ ') | <char_esc_seq>
+```
 
 **Errors**
 
-| Tag         | Error                             | Syntax                                  | Comment                   |
-| ----------- | --------------------------------- | --------------------------------------- | ------------------------- |
-| \<char_lit> | ❗ Unterminated character literal | `' {<char_lit_char>} <eof>`             | Terminating `'` not found |
-| \<char_lit> | ❗ Invalid escape sequence        | See [String Literals](#string-literals) |
-| \<char_lit> | ❗ Escape sequence out of bounds  | See [String Literals](#string-literals) |
+```ebnf
+Empty character literal = ' '
 
-**Examples**
+Unterminated character literal = ' [<char_lit_char>] (<any_src_char> ~ ')
 
-TODO
-
-### 1.4.5. Boolean Literals {#bool-literals}
-
-| Tag         | Syntax           |
-| ----------- | ---------------- |
-| \<bool_lit> | `true  \| false` |
-
-### 1.4.6. Null Literal {#null-literal}
-
-| Tag         | Syntax |
-| ----------- | ------ |
-| \<null_lit> | `null` |
-
-## 1.5. Keywords {#keywords}
-
-| Tag                 | Syntax                        |
-| ------------------- | ----------------------------- |
-| \<keyword>          | `<primitive>` or any of below |
-| &emsp; \<primitive> | See [Primitives](#primitives) |
-
-```
-do
-if else
-loop continue break
-false true null
-not or and
-as comp
+... = (* see Escape Seqeunces *)
 ```
 
-## 1.6. Operators {#lexical-operators}
+Examples
 
-Refer to [Operators](#operators)
+```ebnf
+Empty character literal:
+    ''
+    ^~
+    
+Unterminated character literal:
+    'c
+    ^ ^
+    
+    'cx
+    ^ ^
+    
+    '
+    ^
+```
 
-## 1.7. Tokens {#tokens}
+**References**
 
-Tokens represent:
+- [Source Code](#source-code)
+- [Escape Sequences](#escape-sequences)
 
--   [Names](#names)
--   [Keywords](#keywords)
--   [Operators](#operators)
--   [Literals](#literals)
--   Characters: `( ) ; [ ] & * ? ~ , { }`
+#### 2.2.5.5. Boolean Literals {#bool-literals}
 
-# 2. Parsing and Semantic Analysis {#parsing-and-semantic-analysis}
+**Grammar**
+
+```ebnf
+<bool_lit> = true | false
+```
+
+**References**
+
+- [Keywords](#keywords)
+
+#### 2.2.5.6. Null Literal {#null-literal}
+
+**Grammar**
+
+```ebnf
+<null_lit> = null
+```
+
+**References**
+
+- [Keywords](#keywords)
+
+### 2.2.6. Keywords {#keywords}
+
+**Grammar**
+
+```ebnf
+<keyword> = <primitive>
+          | do
+          | if    | else
+          | loop  | continue | break
+          | false | true     | null
+          | not   | or       | and
+          | as    | comp
+```
+
+**References**
+
+- [Primitive Types](#primitive-types)
+
+### 2.2.7. Operators {#lexical-operators}
+
+Refer to [Operators](#parsing-operators)
+
+## 2.3. Syntax & Semantics {#syntax-n-semantic-analysis}
 
 ## 2.1. Types {#types}
 
