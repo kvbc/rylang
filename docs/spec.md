@@ -762,7 +762,7 @@ Invalid type attribute order:
 
 ```ebnf
 Function arguments expected
-to be of type struct, got ... = (<type> ~ <struct_type>) =>
+to be of type struct, got ... = (<type> ~ <struct_type>) => [<type>]
 ```
 
 Examples
