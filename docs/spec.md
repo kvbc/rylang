@@ -117,16 +117,26 @@ TODO:
                                 <li><a href="#function-type">Function Type</a></li>
                                 <li><a href="#struct-type">Struct Type</a></li>
                                 <li><a href="#pointer-type">Pointer Type</a></li>
+                                <li><a href="#type-constrains">Type Constraints</a></li>
                             </ol>
                         </li>
                         <li>
-                            <a href="#parsing-operators">Operators</a>
+                            <a href="#operations">Operations</a>
                             <ol>
-                                <li><a href="#arithmetic-operators">Arithmetic Operators</a></li>
-                                <li><a href="#bitwise-operators">Bitwise Operators</a></li>
-                                <li><a href="#comparison-operators">Comparison Operators</a></li>
-                                <li><a href="#logical-operators">Logical Operators</a></li>
-                                <li><a href="#other-operators">Other Operators</a></li>
+                                <li><a href="#arithmetic-operations">Arithmetic Operations</a></li>
+                                <li><a href="#bitwise-operations">Bitwise Operations</a></li>
+                                <li><a href="#comparison-operations">Comparison Operations</a></li>
+                                <li><a href="#logical-operations">Logical Operations</a></li>
+                                <li>
+                                    <a href="#other-operations">Other Operations</a>
+                                    <ol>
+                                        <li><a href="#address-of-operation">Address-of Operation</a></li>
+                                        <li><a href="#ptr-deref-operation">Pointer Dereference Operation</a></li>
+                                        <li><a href="#type-cast-operation">Type Cast Operation</a></li>
+                                        <li><a href="#struct-access-operation">Struct Access Operation</a></li>
+                                        <li><a href="#comp-operation">Comp Operation</a></li>
+                                    </ol>
+                                </li>
                                 <li><a href="#operator-precedence">Operator Precedence</a></li>
                                 <li><a href="#operator-associativity">Operator Associativity</a></li>
                             </ol>
@@ -135,18 +145,13 @@ TODO:
                             <a href="#expressions">Expressions</a>
                             <ol>
                                 <li>
-                                    <a href="#l-values">L-Values</a>
-                                    <ol>
-                                        <li><a href="#pointer-dereferencing">Pointer Dereferencing</a></li>
-                                        <li><a href="#struct-member-access">Struct Member Access</a></li>
-                                    </ol>
-                                    <li><a href="#function-call">Function Call</a></li>
-                                    <li><a href="#address-of">Address Of</a></li>
-                                    <li><a href="#type-cast">Type Cast</a></li>
-                                    <li><a href="#block">Block</a></li>
-                                    <li><a href="#if-else">If / Else</a></li>
-                                    <li><a href="#loop">Loop</a></li>
-                                    <li><a href="#struct-literals">Struct Literals</a></li>
+                                    <li><a href="#name-expression">Name Expression</a></li>
+                                    <li><a href="#l-value-expressions">L-Value Expressions</a></li>
+                                    <li><a href="#function-call-expression">Function Call Expression</a></li>
+                                    <li><a href="#block-expression">Block Expression</a></li>
+                                    <li><a href="#if-else-expression">If / Else Expression</a></li>
+                                    <li><a href="#loop-expression">Loop Expression</a></li>
+                                    <li><a href="#struct-literal-expression">Struct Literal Expression</a></li>
                                     <li><a href="#compile-time-expressions">Compile-time Expressions</a></li>
                                 </li>
                             </ol>
@@ -706,7 +711,8 @@ Unterminated character literal:
           | loop  | continue | break
           | false | true     | null
           | not   | or       | and
-          | as    | comp     | ast
+          | as    | comp
+          | auto
 ```
 
 **References**
@@ -724,7 +730,7 @@ Refer to [Operators](#parsing-operators)
 **Syntax**
 
 ```ebnf
-<base_type> = <primitive_type> | <func_type> | <struct_type> | <ptr_type>
+<base_type> = <primitive_type> | <func_type> | <struct_type> | <ptr_type> | auto
             | '(' <base_type> ')'
 
 <type> = <type_attribs> <base_type>
@@ -916,269 +922,276 @@ Duplicate field
 <ptr_type> = * <type>
 ```
 
----
-
-## 2.2. Operators {#operators}
-
-| Tag       | Syntax    | Comment                                |
-| --------- | --------- | -------------------------------------- |
-| <expr_op> | See below | Operation resulting in an expression   |
-| <stmt_op> | See below | Standalone operation yielding no value |
-
-### 2.2.1. Arithmetic Operators {#arithmetic-operators}
-
-| Tag       | Type   | Operator | Name               | Syntax            |
-| --------- | ------ | :------: | ------------------ | ----------------- |
-| <expr_op> | Unary  |   `-`    | negation           | `- <expr>`        |
-| <expr_op> | Binary |   `+`    | addition           | `<expr> + <expr>` |
-| <expr_op> | Binary |   `-`    | subtraction        | `<expr> - <expr>` |
-| <expr_op> | Binary |   `*`    | multiplication     | `<expr> * <expr>` |
-| <expr_op> | Binary |   `/`    | division           | `<expr> / <expr>` |
-| <expr_op> | Binary |   `%`    | modulo (remainder) | `<expr> % <expr>` |
-
-Assignment
-
-| Tag       | Type   | Operator | Name               | Syntax               |
-| --------- | ------ | :------: | ------------------ | -------------------- |
-| <stmt_op> | Binary |   `+=`   | addition           | `<lvalue> += <expr>` |
-| <stmt_op> | Binary |   `-=`   | subtraction        | `<lvalue> -= <expr>` |
-| <stmt_op> | Binary |   `*=`   | multiplication     | `<lvalue> *= <expr>` |
-| <stmt_op> | Binary |   `/=`   | division           | `<lvalue> /= <expr>` |
-| <stmt_op> | Binary |   `%=`   | modulo (remainder) | `<lvalue> %= <expr>` |
-
-### 2.2.2. Bitwise Operators {#bitwise-operators}
-
-| Tag       | Type   | Operator | Name                | Syntax             |
-| --------- | ------ | :------: | ------------------- | ------------------ |
-| <expr_op> | Unary  |   `~`    | bitwise negation    | `~ <expr>`         |
-| <expr_op> | Binary |   `\|`   | bitwise OR          | `<expr> \| <expr>` |
-| <expr_op> | Binary |   `^`    | bitwise XOR         | `<expr> ^ <expr>`  |
-| <expr_op> | Binary |   `&`    | bitwise AND         | `<expr> & <expr>`  |
-| <expr_op> | Binary |   `<<`   | bitwise left shift  | `<expr> << <expr>` |
-| <expr_op> | Binary |   `>>`   | bitwise right shift | `<expr> >> <expr>` |
-
-Assignment
-
-| Tag       | Type   | Operator | Name                | Syntax                |
-| --------- | ------ | :------: | ------------------- | --------------------- |
-| <stmt_op> | Binary |  `\|=`   | bitwise OR          | `<lvalue> \|= <expr>` |
-| <stmt_op> | Binary |   `^=`   | bitwise XOR         | `<lvalue> ^= <expr>`  |
-| <stmt_op> | Binary |   `&=`   | bitwise AND         | `<lvalue> &= <expr>`  |
-| <stmt_op> | Binary |  `>>=`   | bitwise right shift | `<lvalue> >>= <expr>` |
-| <stmt_op> | Binary |  `<<=`   | bitwise left shift  | `<lvalue> <<= <expr>` |
-
-### 2.2.3. Comparison Operators {#comparison-operators}
-
-| Tag       | Type   | Operator | Name             | Syntax             |
-| --------- | ------ | :------: | ---------------- | ------------------ |
-| <expr_op> | Binary |   `==`   | equals           | `<expr> == <expr>` |
-| <expr_op> | Binary |   `!=`   | not equals       | `<expr> != <expr>` |
-| <expr_op> | Binary |   `< `   | less             | `<expr> < <expr>`  |
-| <expr_op> | Binary |   `<=`   | less or equal    | `<expr> <= <expr>` |
-| <expr_op> | Binary |   `> `   | greater          | `<expr> > <expr>`  |
-| <expr_op> | Binary |   `>=`   | greater or equal | `<expr> >= <expr>` |
-
-### 2.2.4. Logical Operators {#logical-operators}
-
-| Tag       | Type   | Operator | Name        | Syntax              |
-| --------- | ------ | :------: | ----------- | ------------------- |
-| <expr_op> | Unary  |  `not`   | logical NOT | `not <expr>`        |
-| <expr_op> | Binary |   `or`   | logical OR  | `<expr> or <expr>`  |
-| <expr_op> | Binary |  `and`   | logical AND | `<expr> and <expr>` |
-
-### 2.2.5. Other Operators {#other-operators}
-
-|  Type  | Operator | Name                 | Syntax                                                    |
-| :----: | :------: | -------------------- | --------------------------------------------------------- |
-| Unary  |  `comp`  | Compile-time         | See [Compile-time expressions](#compile-time-expressions) |
-| Unary  |   `&`    | Address Of           | See [Address Of](#address-of)                             |
-| Unary  |   `*`    | Pointer Dereference  | See [Pointer Dereference](#pointer-dereference)           |
-| Binary |   `as`   | Type Cast            | See [Type Cast](#type-cast)                               |
-| Binary |   `.`    | Struct Member Access | See [Struct Member Access](#struct-member-access)         |
-|   -    |   `=>`   | Function Arrow       | See [Function Type](#function-type)                       |
-| Binary |   `=`    | Assignment           | See ... TODO                                              |
-| Binary |   `:=`   | Variable Definition  | See ... TODO                                              |
-
-### 2.2.6. Operator Precedence {#operator-precedence}
-
-| Level | Operators                       |
-| :---: | :------------------------------ |
-|   -   | `=>`                            |
-|  12   | `.`                             |
-|  11   | `-a` `~` `not` `&a` `*a` `comp` |
-|  10   | `as`                            |
-|   9   | `a*b` `/` `%`                   |
-|   8   | `a+b` `a-b`                     |
-|   7   | `<<` `>>`                       |
-|   6   | `a&b`                           |
-|   5   | `\|`                            |
-|   4   | `^`                             |
-|   3   | `==` `!=` `<` `<=` `>` `>=`     |
-|   2   | `and`                           |
-|   1   | `or`                            |
-
-### 2.2.7. Operator Associativity {#operator-associativity}
-
-| Associativity | Operators                                                                                      |
-| :-----------: | ---------------------------------------------------------------------------------------------- |
-|     `<--`     | `-a ~ not &a *a comp`                                                                          |
-|     `-->`     | `a+b a-b a*b ** / %` <br> `\| ^ a&b << >>` <br> `== != < <= > >=` <br> `or and` <br> `as . =>` |
-
-## 2.3. Expressions {#expressions}
-
-**Syntax**
-
-| Tag               | Syntax                                                                                                                                               |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| \<expr>           | `['(']  <literal> \| <func_call> \| <block> \| <if> \| <loop> \| <expr_op> \| <lvalue> \| <address_of> \| <type_cast> \| <explicit_comp_expr> [')']` |
-| &emsp; \<literal> | See [Literals](#literals)                                                                                                                            |
-| &emsp; \<block>   | See [Block](#block)                                                                                                                                  |
-| &emsp; \<if>      | See [If / Else](#if-else)                                                                                                                            |
-| &emsp; \<loop>    | See [Loop](#loop)                                                                                                                                    |
-| &emsp; \<expr_op> | See [Operators](#operators)                                                                                                                          |
-
-### 2.3.1. L-Values {#l-values}
-
-| Tag       | Syntax                                            |
-| --------- | ------------------------------------------------- |
-| \<lvalue> | `<name> \| <ptr_deref> \| <struct_member_access>` |
-
-#### 2.3.1.1. Pointer Dereference {#pointer-dereference}
-
-| Tag          | Syntax                                       |
-| ------------ | -------------------------------------------- |
-| \<ptr_deref> | `* <expr>` where `<expr>` is of pointer type |
-
-#### 2.3.1.2. Struct Member Access {#struct-member-access}
-
-| Tag                     | Syntax                                                                                                            | Comment |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------- | ------- |
-| \<struct_member_access> | `<expr> . (<name> \| <expr>)` where the first `<expr>` is of struct type and the last `<expr>` coerces into `u32` |
-
-### 2.3.2. Function Call {#function-call}
-
-| Tag          | Syntax                | Comment                            |
-| ------------ | --------------------- | ---------------------------------- |
-| \<func_call> | `<expr> <struct_lit>` | where `<expr>` is of function type |
-
-### 2.3.3. Address Of {#address-of}
-
-| Tag           | Syntax     |
-| ------------- | ---------- |
-| \<address_of> | `& <expr>` |
-
-### 2.3.4. Type Cast {#type-cast}
-
-| Tag          | Syntax             |
-| ------------ | ------------------ |
-| \<type_cast> | `<expr> as <type>` |
-
-### 2.3.5. Block {#block}
-
-A block is a collection of statements.
-
--   See `<stmt>` in [Statements](#statements) for the definition of a _statement_.
-
-A block can be "broken from" using the `break` statement.
-
-**Syntax**
-
-| Tag              | Syntax                                       |
-| ---------------- | -------------------------------------------- |
-| \<block>         | `[<string_lit>] '{' [{<stmt> ;} <stmt>] '}'` |
-| &emsp; \<string> | See [Literals](#literals)                    |
-| &emsp; \<stmt>   | See [Statements](#statements)                |
-| &emsp; \<expr>   | See [Expressions](#expressions)              |
-
-**Context**
+#### 2.3.1.6. Type Constrains {#type-constrains}
 
 TODO
 
-**Interpretation**
+### 2.3.2. Operators {#operators}
 
--   All blocks can be labeled with a preceding string literal.
--   Break statements can be optionally provided the block label to break from (as a string literal) and an expression to return from a block
-    ```rust
-      max usize = 10;
-      x isize = "x" {
-          for( a usize = max;; a > 0; a -= 1 ) {
-              for( b usize = max;; b > 0; b -= 1 ) {
-                  if( a + b == a * b ) {
-                      break "x" (a + b);
-                  }
-              }
-          }
-          break -1;
-      }
-    ```
+**Syntax**
 
-**Examples**
-
-```rust
-for( x usize = 0;; x < 10; x += 1 ) "x" {
-	for( y usize = 0;; y < 10; y += 1 ) {
-		for( z usize = 0;; z < 10; z += 1) {
-			if z < 5 { break "x"; }
-		}
-	}
-}
+```ebnf
+<op_expr> = <op_expr_arith>
+          | <op_expr_bit>
+          | <op_expr_comp>
+          | <op_expr_log>
+          | <op_expr_other>
+      
+<op_stmt> = <op_stmt_arith>
+          | <op_stmt_bit>
 ```
 
-<!--
-#### 2.3.4.1. Break
-
-| Tag                  | Syntax                          |
-| -------------------- | ------------------------------- |
-| \<break>             | `break [<string_lit>] [<expr>]` |
-| &emsp; \<string_lit> | See [Literals](#literals)       |
-| &emsp; \<expr>       | See [Expressions](#expressions) |
---->
-
-### 2.3.6. Control Flow {#control-flow}
-
-#### 2.3.6.1. If / Else {#if-else}
+#### 2.3.2.1. Arithmetic Operators {#arithmetic-operators}
 
 **Syntax**
 
-| Tag            | Syntax                              |
-| -------------- | ----------------------------------- |
-| \<if>          | `if <expr> do <stmt> [else <stmt>]` |
-| &emsp; \<expr> | See [Expressions](#expressions)     |
+```ebnf
+<_op_expr_unary> = -
+<_op_expr_bin> = + | - | * | / | %
+<_op_stmt> = += | -= | *= | /= | %=
 
-**Examples**
+<op_expr_arith> = <_op_expr_unary> <expr>
+                | <expr> <_op_expr_bin> <expr>
 
-```rust
-a i32 = 1;
-b i32 = if( a == 1 ) {
-    break 10;
-} elif( a == 2 ) {
-    break 20;
-} elif( a == 3 ) {
-    break 30;
-} else {
-    break 0;
-}
+<op_stmt_arith> = <lvalue> <_op_stmt> <expr>
 ```
 
-#### 2.3.6.2. Loop {#loop}
+#### 2.3.2.2. Bitwise Operators {#bitwise-operators}
 
 **Syntax**
 
-| Tag            | Syntax                                                                                        | Comment                                                         |
-| -------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| \<loop>        | `loop [<stmt> [;\|, <expr> [;\|, <stmt>]] do] <stmt>` where `<expr>` result in a boolean type | init statement `;` break condition `;` post iteration statement |
-| &emsp; \<stmt> | See [Statements](#statements)                                                                 |
-| &emsp; \<expr> | See [Expressions](#expressions)                                                               |
+```ebnf
+<_op_expr_unary> = ~
+<_op_expr_bin> = '|' | ^ | & | << | >>
+<_op_stmt> = |= | ^= | &= | <<= | >>=
 
-<!--
-##### 2.3.5.2.1. Continue {#continue}
+<op_expr_bit> = <_op_expr_unary> <expr>
+                | <expr> <_op_expr_bin> <expr>
+
+<op_stmt_bit> = <lvalue> <_op_stmt> <expr>
+```
+
+#### 2.3.2.3. Comparison Operators {#comparison-operators}
 
 **Syntax**
 
-| Tag         | Syntax     |
-| ----------- | ---------- |
-| \<continue> | `continue` |
--->
+```ebnf
+<_op_expr> = == | != | < | <= | > | >=
+
+<op_expr_comp> = <expr> <_op_expr> <expr>
+```
+
+#### 2.3.2.4. Logical Operators {#logical-operators}
+
+**Syntax**
+
+```ebnf
+<_op_expr_unary> = not
+<_op_expr_bin> = or | and
+
+<op_expr_log> = <_op_expr_unary> <expr>
+              | <expr> <_op_expr_bin> <expr>
+```
+
+#### 2.3.2.5. Other Operators {#other-operators}
+
+**Syntax**
+
+```ebnf
+<op_expr_other> = <op_addr_of>
+                | <op_ptr_deref>
+                | <op_op_type_cast>
+                | <op_struct_access>
+                | <op_comp>
+```
+
+##### 2.3.2.5.1. Address-of Operator {#address-of-operator}
+
+**Syntax**
+
+```ebnf
+<op_addr_of> = & <expr>
+```
+
+##### 2.3.2.5.2. Pointer Dereference Operator {#ptr-deref-operator}
+
+**Syntax**
+
+```ebnf
+<op_ptr_deref> = * <expr>
+```
+
+##### 2.3.2.5.3. Type Cast Operator {#type-cast-operator}
+
+**Syntax**
+
+```ebnf
+<op_type_cast> = <expr> as <type>
+```
+
+##### 2.3.2.5.4. Struct Access Operator {#struct-access-operator}
+
+**Syntax**
+
+```ebnf
+<op_struct_access> = <expr> . (<expr> | <name>)
+```
+
+##### 2.3.2.5.5. Comp Operator {#comp-operator}
+
+**Syntax**
+
+```ebnf
+<op_comp> = comp <expr>
+```
+
+#### 2.3.2.6. Operator Precedence {#operator-precedence}
+
+```ebnf
+Priority |
+  Level  | Operators
+---------|----------
+   12    | .                            
+   11    | -a ~ not &a *a comp
+   10    | as                           
+    9    | a*b / %                  
+    8    | a+b a-b                    
+    7    | << >>                      
+    6    | a&b                          
+    5    | \|                           
+    4    | ^                            
+    3    | == != < <= > >=    
+    2    | and                          
+    1    | or                           
+```
+
+#### 2.3.2.7. Operator Associativity {#operator-associativity}
+
+All unary operators are left-associative (right to left `<--`).
+
+All binary operators are right-associative (left to right `-->`)
+
+### 2.3.3. Expressions {#expressions}
+
+**Syntax**
+
+```ebnf
+<expr> = <expr_name>
+       | <expr_literal>
+       | <expr_func_call>
+       | <expr_block>
+       | <expr_if>
+       | <expr_loop>
+       | <op_expr>
+       | '(' <expr> ')'
+```
+
+**Syntax Errors**
+
+```ebnf
+Unclosed expression:
+
+    (3 + 5
+          ^
+```
+
+#### 2.3.3.1. Name Expression {#name-expression}
+
+**Syntax**
+
+```ebnf
+<expr_name> = <name>
+```
+
+**Semantics**
+
+```ebnf
+Name resolution:
+
+    The compiler first searches the function parameters.
+    Then it searches the block that the expression is being evaluated in.
+    Then it expands its search on the outer blocks.
+    If not resolved, an error is thrown.
+```
+
+**Semantic Errors**
+
+```ebnf
+Unresolved name:
+
+    x := 3;
+    y := xx;
+         ^~
+```
+
+#### 2.3.3.2. L-Value Expressions {#l-value-expressions}
+
+**Syntax**
+
+```ebnf
+<expr_lvalue> = <expr_name> | <op_ptr_deref> <op_struct_access>
+```
+
+#### 2.3.3.3. Function Call Expression {#function-call-expression}
+
+**Syntax**
+
+```ebnf
+<expr_func_call> = <expr> <expr_struct_lit>
+```
+
+#### 2.3.3.4. Block Expression {#block-expression}
+
+**Syntax**
+
+```ebnf
+<expr_block> = [<name> :] '{' [{<stmt> ;} <stmt> [;]] '}'
+```
+
+**Syntax Errors**
+
+```ebnf
+Expected block after block label, got ... = <name> : (<any_src_char> ~ '{')
+    
+    x := lbl:3;
+             ^
+
+Unclosed block expression:
+
+    { x := 3; 
+             ^
+```
+
+**Semantic Errors**
+
+```ebnf
+Duplicate block label:
+    
+    x: {
+        x: {
+        ^
+        
+        }
+    }
+```
+
+#### 2.3.3.5. If / Else Expression {#if-else-expression}
+
+**Syntax**
+
+```ebnf
+<expr_if> = if <expr> do <stmt> [else <stmt>]
+```
+
+#### 2.3.3.6. Loop Expression {#loop-expression}
+
+**Syntax**
+
+```ebnf
+<expr_loop> = loop [<stmt> [;|, <expr> [;|, <stmt>]] do] <stmt>`
+```
+
+---
 
 ### 2.3.7. Struct Literals {#struct-literals}
 

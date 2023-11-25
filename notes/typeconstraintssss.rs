@@ -17,4 +17,9 @@ c := add[a, b]
 
 //
 
-// idk figure it out
+#comp Pair := ast [
+    #comp T ast.Type;
+    a macro T;
+    b macro T;
+]
+pair macro Pair = [ast i32, 1, 2]
