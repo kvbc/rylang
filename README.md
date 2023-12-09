@@ -46,8 +46,24 @@ graph TD
 
 # Overview
 
-TODO
+```rust
+Vector2 := $[
+    x, y #i32;
+    
+    add[self *#Vector2, other *Vector2] => [] = {
+        self.x += other.x;
+        self.y += other.y;
+    }
+]
 
+main[] => [] = {
+    pos Vector2 = [1, 2];
+    ofs Vector2 = [3, 4];
+    pos.add[&ofs];
+}
+```
+
+<!--
 ```rust
 ast = import "ast";
 Pair[T ast:Node & type] => ast:Node & struct = [
@@ -60,6 +76,7 @@ main[] => [] = {
     dif i32 = pair..0 - pair..1; // -1
 }
 ```
+-->
 
 # Installing
 
