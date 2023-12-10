@@ -49,7 +49,7 @@ a.b.c.d;
 // or types are always compile-time expressions of type (#comp ast.Type)
 //
 
-:= import "ast";
+use import "ast";
 
 Pair[T1 Type, T2 Type] => Type = [a T1, b T2];
 ab Pair[i32, f32] = [1, 2];
@@ -68,3 +68,10 @@ main[] => [] = {
     x := 2;
     {x *= x};
 }
+
+//
+//
+//
+
+use [X = 3];
+std.print[X]; // 3
