@@ -176,6 +176,8 @@ TODO:
 
 <div style="margin-left:300px">
 
+see [notes/impl_vec2.rs](../notes/impl_vec2.rs)
+
 # 1. Implementation {#implementation}
 
 ## 1.1. Error Handling {#error-handling}
@@ -248,7 +250,7 @@ Syntax analysis is the process of creating an Abstract Syntax Tree (AST) from th
 
 ### 1.2.3. Semantic Analysis {#semantic-analysis}
 
-Semantic analysis is the process of analyzing the previously created Abstract Syntax Tree (AST) by specified semantics rules.
+Semantic analysis is the process of analyzing the previously created Abstract Syntax Tree (AST) according to specified semantics rules.
 
 ### 1.2.4. Type Checking {#type-checking}
 
@@ -280,7 +282,7 @@ Symbols have been wrapped in arrow brackets `<>` and are now called tags.
 Example:
 
 ```ebnf
-<number>       = 0-9;
+<number>       = 0-9
 <alphanumeric> = a-z | A-Z | <number>
 <not_number>   = ~ <number>               (* anything but a number    *)
 <alpha>        = <alphanumeric> ~ <alpha> (* this, excluding number *)
@@ -636,7 +638,7 @@ Unterminated character literal:
           | false | true     | null
           | not   | or       | and
           | as    | comp
-          | auto
+          | auto  | ast
 ```
 
 **References**
@@ -654,7 +656,11 @@ Refer to [Operations](#operations)
 **Syntax**
 
 ```ebnf
-<base_type> = <primitive_type> | <func_type> | <struct_type> | <ptr_type> | auto
+<base_type> = <primitive_type>
+            | <func_type>
+            | <struct_type>
+            | <ptr_type>
+            | auto
             | '(' <base_type> ')'
 
 <type> = <type_attribs> <base_type>
